@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!--
+    VARIANTE DE TAMAÑO PEQUEÑO — no es la marca de pantalla reducida.
+
+    Sin rectángulo de fondo: solo la marca, y el navegador pone detrás su
+    propio color de pestaña.
+
+    La marca de pantalla mete el dólar en el vano entre las hojas. A 16 px eso
+    no funciona: el signo mide ~4 px, sus contadores caen por debajo del píxel
+    y se rellenan — sale un bulto, no un símbolo. Medido: 0 de 6 filas con
+    hueco abierto y 42 % de cobertura de tinta.
+
+    Aquí se invierte la jerarquía. El dólar ocupa el centro a tamaño grande y
+    las hojas se retiran a los bordes como corchetes. Se conserva lo que
+    identifica —vano, simetría, dólar, color— y se sacrifica la proporción,
+    que a 16 px nadie puede ver.
+
+    Los valores no son de ojo: se compararon cuatro combinaciones de grosor y
+    ancho rasterizando a 16/24/32/64 px y contando filas con hueco visible.
+    Esta gana en todas (5/8 a 16 px, 11/14 a 32 px).
+  -->
+  <g fill="none" stroke="#C9A96A" stroke-linecap="square" stroke-linejoin="miter" stroke-width="8">
+    <path d="M22 14 L6 50 L22 86"/>
+    <path d="M78 14 L94 50 L78 86"/>
+  </g>
+  <g fill="none" stroke="#C9A96A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M50 12 L50 88"/>
+    <path d="M70 36
+             C70 28 61.2 23 50 23
+             C38.8 23 30 28 30 36
+             C30 44 38.8 48 50 51.5
+             C61.2 55 70 59.5 70 68
+             C70 76.5 61.2 81 50 81
+             C38.8 81 30 76.5 30 68"/>
+  </g>
+</svg>

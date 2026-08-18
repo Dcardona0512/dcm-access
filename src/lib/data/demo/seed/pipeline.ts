@@ -1,0 +1,357 @@
+import type { CommissionPlan, RateTable } from "@/lib/commerce/commissions";
+import type { Deal, Lead } from "@/lib/domain/types";
+
+/* ============================================================================
+   PIPELINE DE DEMOSTRACIÓN
+   ----------------------------------------------------------------------------
+   Leads, operaciones y planes de comisión suficientes para que el CRM tenga
+   algo que mostrar y para que el motor de comisiones se pueda ejercitar con
+   varios tipos de regla a la vez.
+   ========================================================================== */
+
+/**
+ * Tabla de cambio relativa a USD. Valores de orden de magnitud, NO cotizaciones
+ * reales: existen para que el desglose multi-moneda se pueda ver funcionando.
+ * Sustituir por un proveedor de FX antes de usar cifras en producción.
+ */
+export const demoRates: RateTable = {
+  USD: 1,
+  COP: 4000,
+  EUR: 0.92,
+  GBP: 0.79,
+  AED: 3.67,
+};
+
+export const commissionPlans: readonly CommissionPlan[] = [
+  {
+    id: "plan-standard-brokerage",
+    name: { es: "Brokerage estándar", en: "Standard brokerage" },
+    currency: "USD",
+    isDemo: true,
+    rules: [
+      {
+        id: "rule-std-pct",
+        type: "percentage",
+        label: { es: "Comisión de intermediación", en: "Brokerage commission" },
+        scope: { kind: "global" },
+        rate: 0.03,
+        minAmount: 2500,
+        priority: 10,
+      },
+      {
+        id: "rule-std-admin",
+        type: "flat",
+        label: { es: "Fee de gestión documental", en: "Documentation handling fee" },
+        scope: { kind: "global" },
+        amount: 750,
+        currency: "USD",
+        priority: 20,
+      },
+    ],
+  },
+  {
+    id: "plan-real-estate",
+    name: { es: "Inmobiliario", en: "Real estate" },
+    currency: "USD",
+    isDemo: true,
+    rules: [
+      {
+        id: "rule-re-pct",
+        type: "percentage",
+        label: { es: "Comisión inmobiliaria", en: "Real estate commission" },
+        scope: { kind: "vertical", vertical: "real-estate" },
+        rate: 0.03,
+        priority: 10,
+      },
+      {
+        id: "rule-re-referral",
+        type: "referral_fee",
+        label: { es: "Fee de referido", en: "Referral fee" },
+        scope: { kind: "vertical", vertical: "real-estate" },
+        rate: 0.005,
+        priority: 30,
+      },
+    ],
+  },
+  {
+    id: "plan-partner-network",
+    name: { es: "Red de partners", en: "Partner network" },
+    currency: "USD",
+    isDemo: true,
+    rules: [
+      {
+        id: "rule-pn-subscription",
+        type: "subscription",
+        label: { es: "Suscripción de empresa", en: "Company subscription" },
+        scope: { kind: "global" },
+        amountPerMonth: 450,
+        currency: "USD",
+        priority: 10,
+      },
+      {
+        id: "rule-pn-lead",
+        type: "lead_fee",
+        label: { es: "Fee por lead calificado", en: "Qualified lead fee" },
+        scope: { kind: "global" },
+        amountPerLead: 120,
+        currency: "USD",
+        priority: 20,
+      },
+      {
+        id: "rule-pn-featured",
+        type: "featured_placement",
+        label: { es: "Publicación destacada", en: "Featured placement" },
+        scope: { kind: "global" },
+        amount: 600,
+        currency: "USD",
+        slots: 2,
+        priority: 30,
+      },
+    ],
+  },
+  {
+    id: "plan-services-recurring",
+    name: { es: "Servicios recurrentes", en: "Recurring services" },
+    currency: "USD",
+    isDemo: true,
+    rules: [
+      {
+        id: "rule-sr-revshare",
+        type: "revenue_share",
+        label: { es: "Participación en ingresos", en: "Revenue share" },
+        scope: { kind: "vertical", vertical: "private-services" },
+        rate: 0.08,
+        priority: 10,
+      },
+    ],
+  },
+];
+
+export const commissionPlansById = new Map(commissionPlans.map((plan) => [plan.id, plan]));
+
+/* --- Leads ------------------------------------------------------------------- */
+
+export const leads: readonly Lead[] = [
+  {
+    id: "lead-0001",
+    reference: "DCM-LD-8801",
+    source: "private_request",
+    status: "qualified",
+    locale: "es",
+    contact: { name: "Solicitante demo A", email: "demo-a@example.com", preferredChannel: "email" },
+    vertical: "aviation",
+    message: "Busco un jet para 8 pasajeros, ruta Medellín–Miami, uso recurrente.",
+    budget: { amount: 300000, currency: "USD" },
+    location: { country: "CO", city: "Medellín" },
+    timeline: "30-days",
+    confidentiality: "discreet",
+    timeline_events: [
+      { at: "2026-08-02T14:10:00.000Z", status: "new" },
+      { at: "2026-08-03T09:20:00.000Z", status: "qualified", note: "Presupuesto y ruta confirmados." },
+    ],
+    isDemo: true,
+    createdAt: "2026-08-02T14:10:00.000Z",
+  },
+  {
+    id: "lead-0002",
+    reference: "DCM-LD-8802",
+    source: "inquiry",
+    status: "contacted",
+    locale: "es",
+    contact: { name: "Solicitante demo B", email: "demo-b@example.com", preferredChannel: "phone" },
+    vertical: "real-estate",
+    opportunityId: "opp-re-001",
+    message: "Interesado en el penthouse. ¿Se puede coordinar una visita?",
+    confidentiality: "standard",
+    timeline_events: [
+      { at: "2026-08-05T11:00:00.000Z", status: "new" },
+      { at: "2026-08-05T16:30:00.000Z", status: "qualified" },
+      { at: "2026-08-06T10:05:00.000Z", status: "contacted", note: "Visita propuesta para el jueves." },
+    ],
+    isDemo: true,
+    createdAt: "2026-08-05T11:00:00.000Z",
+  },
+  {
+    id: "lead-0003",
+    reference: "DCM-LD-8803",
+    source: "partner_application",
+    status: "new",
+    locale: "es",
+    contact: { name: "Costa Luxury Rentals (Demo)", email: "demo-costa@example.com" },
+    providerId: "prv-pending-costa",
+    message: "Postulación de partner pendiente de revisión documental.",
+    confidentiality: "standard",
+    timeline_events: [{ at: "2026-07-29T10:00:00.000Z", status: "new" }],
+    isDemo: true,
+    createdAt: "2026-07-29T10:00:00.000Z",
+  },
+  {
+    id: "lead-0004",
+    reference: "DCM-LD-8804",
+    source: "private_request",
+    status: "negotiation",
+    locale: "en",
+    contact: { name: "Demo requester C", email: "demo-c@example.com", preferredChannel: "whatsapp" },
+    vertical: "motors",
+    message: "Looking for a B6 armoured SUV, delivery in Bogotá.",
+    budget: { amount: 180000, currency: "USD" },
+    location: { country: "CO", city: "Bogotá" },
+    timeline: "immediate",
+    confidentiality: "strictly_private",
+    timeline_events: [
+      { at: "2026-07-20T08:00:00.000Z", status: "new" },
+      { at: "2026-07-21T08:00:00.000Z", status: "qualified" },
+      { at: "2026-07-23T08:00:00.000Z", status: "contacted" },
+      { at: "2026-08-01T08:00:00.000Z", status: "negotiation", note: "Inspección independiente en curso." },
+    ],
+    isDemo: true,
+    createdAt: "2026-07-20T08:00:00.000Z",
+  },
+  {
+    id: "lead-0005",
+    reference: "DCM-LD-8805",
+    source: "contact",
+    status: "new",
+    locale: "en",
+    contact: { name: "Demo requester D", email: "demo-d@example.com" },
+    message: "B2B partnership enquiry for the logistics vertical.",
+    confidentiality: "standard",
+    timeline_events: [{ at: "2026-08-09T13:45:00.000Z", status: "new" }],
+    isDemo: true,
+    createdAt: "2026-08-09T13:45:00.000Z",
+  },
+  {
+    id: "lead-0006",
+    reference: "DCM-LD-8806",
+    source: "inquiry",
+    status: "commission",
+    locale: "es",
+    contact: { name: "Solicitante demo E", email: "demo-e@example.com" },
+    vertical: "real-estate",
+    opportunityId: "opp-re-003",
+    confidentiality: "standard",
+    timeline_events: [
+      { at: "2026-06-01T09:00:00.000Z", status: "new" },
+      { at: "2026-06-03T09:00:00.000Z", status: "qualified" },
+      { at: "2026-06-08T09:00:00.000Z", status: "contacted" },
+      { at: "2026-06-20T09:00:00.000Z", status: "negotiation" },
+      { at: "2026-07-04T09:00:00.000Z", status: "closed" },
+      { at: "2026-07-10T09:00:00.000Z", status: "commission", note: "Comisión liquidada." },
+    ],
+    isDemo: true,
+    createdAt: "2026-06-01T09:00:00.000Z",
+  },
+];
+
+/* --- Operaciones -------------------------------------------------------------- */
+
+export const deals: readonly Deal[] = [
+  {
+    id: "deal-0001",
+    reference: "DCM-DL-7701",
+    leadId: "lead-0001",
+    opportunityId: "opp-av-001",
+    providerId: "prv-cordillera",
+    vertical: "aviation",
+    stage: "source",
+    outcome: "open",
+    value: 294000,
+    currency: "USD",
+    commissionPlanId: "plan-standard-brokerage",
+    termMonths: 12,
+    leadCount: 1,
+    isDemo: true,
+    createdAt: "2026-08-03T09:30:00.000Z",
+    updatedAt: "2026-08-08T09:30:00.000Z",
+  },
+  {
+    id: "deal-0002",
+    reference: "DCM-DL-7702",
+    leadId: "lead-0002",
+    opportunityId: "opp-re-001",
+    providerId: "prv-meridian",
+    vertical: "real-estate",
+    stage: "connect",
+    outcome: "open",
+    value: 1450000,
+    currency: "USD",
+    commissionPlanId: "plan-real-estate",
+    leadCount: 1,
+    isDemo: true,
+    createdAt: "2026-08-06T10:15:00.000Z",
+    updatedAt: "2026-08-11T10:15:00.000Z",
+  },
+  {
+    id: "deal-0003",
+    reference: "DCM-DL-7703",
+    leadId: "lead-0004",
+    providerId: "prv-sentinel",
+    vertical: "motors",
+    stage: "negotiate",
+    outcome: "open",
+    value: 176000,
+    currency: "USD",
+    commissionPlanId: "plan-standard-brokerage",
+    leadCount: 2,
+    isDemo: true,
+    createdAt: "2026-07-23T08:30:00.000Z",
+    updatedAt: "2026-08-01T08:30:00.000Z",
+  },
+  {
+    id: "deal-0004",
+    reference: "DCM-DL-7704",
+    leadId: "lead-0006",
+    opportunityId: "opp-re-003",
+    providerId: "prv-meridian",
+    vertical: "real-estate",
+    stage: "close",
+    outcome: "won",
+    value: 216000000,
+    currency: "COP",
+    commissionPlanId: "plan-real-estate",
+    termMonths: 12,
+    leadCount: 1,
+    isDemo: true,
+    createdAt: "2026-06-20T09:00:00.000Z",
+    updatedAt: "2026-07-10T09:00:00.000Z",
+  },
+  /**
+   * Acuerdo de red con un proveedor. Existe para que los tres modelos que no
+   * dependen del valor de una venta —suscripción, fee por lead y publicación
+   * destacada— se puedan ver calculados, y no solo declarados en el tipo.
+   */
+  {
+    id: "deal-0006",
+    reference: "DCM-DL-7706",
+    leadId: "lead-0003",
+    providerId: "prv-meridian",
+    vertical: "real-estate",
+    stage: "connect",
+    outcome: "open",
+    value: 0,
+    currency: "USD",
+    commissionPlanId: "plan-partner-network",
+    termMonths: 12,
+    leadCount: 14,
+    isDemo: true,
+    createdAt: "2026-08-04T11:00:00.000Z",
+    updatedAt: "2026-08-12T11:00:00.000Z",
+  },
+  {
+    id: "deal-0005",
+    reference: "DCM-DL-7705",
+    leadId: "lead-0005",
+    providerId: "prv-sentinel",
+    vertical: "private-services",
+    stage: "request",
+    outcome: "open",
+    value: 48000,
+    currency: "USD",
+    commissionPlanId: "plan-services-recurring",
+    termMonths: 6,
+    leadCount: 3,
+    isDemo: true,
+    createdAt: "2026-08-09T14:00:00.000Z",
+    updatedAt: "2026-08-09T14:00:00.000Z",
+  },
+];

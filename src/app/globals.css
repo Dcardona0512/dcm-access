@@ -1,0 +1,749 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   DCM ACCESS — SISTEMA DE DISEÑO
+   ----------------------------------------------------------------------------
+   UNA SOLA IDENTIDAD: negro profundo y marfil, acento champagne.
+   Exclusividad, discreción, brokerage privado.
+
+   Los componentes nunca nombran un pigmento. Piden `surface`, `fg`, `accent`,
+   `line` — roles, no colores — y la tabla de aquí abajo decide qué pigmento
+   ocupa cada rol. Hubo un modo claro y se retiró: el fondo de vídeo del hero
+   fija el registro oscuro de toda la marca. Los roles se conservan porque
+   siguen siendo la forma correcta de nombrar el color.
+
+   REGLA DEL ACENTO — la marca debe verse costosa sin parecer ostentosa.
+   El dorado NUNCA se usa como relleno grande. Solo se permite en:
+     · filetes y reglas de 1px
+     · eyebrows en versalitas (uppercase, tracking amplio)
+     · anillo de foco
+     · UN solo CTA por vista
+   Si una pantalla tiene dos superficies doradas, una está de más.
+
+   `inverse` es la superficie contraria: marfil sobre la tinta. Sostiene las
+   secciones que cortan el ritmo editorial sin romper la identidad.
+   ========================================================================== */
+
+/* --- MODO OSCURO (por defecto) ----------------------------------------- */
+
+:root {
+  color-scheme: dark;
+
+  --c-surface: #08090a; /* negro profundo — fondo de página */
+  --c-surface-raised: #0e0f11; /* negro carbón — superficie elevada */
+  --c-surface-sunken: #17191c; /* grafito — cards y placas */
+  --c-surface-hover: #23262a;
+
+  --c-line: #2a2d32; /* filete hairline */
+  --c-line-soft: #1b1e22; /* filete apenas perceptible */
+
+  --c-fg: #f2efe9; /* texto principal — 17.4:1 */
+  --c-fg-muted: #a8abb0; /* texto atenuado — 8.7:1 */
+
+  --c-accent: #c9a96a; /* champagne — 8.9:1 */
+  --c-accent-dim: #8c7343;
+
+  --c-inverse: #f2efe9;
+  --c-inverse-fg: #12110e;
+  --c-inverse-muted: #55585c;
+  --c-inverse-accent: #7a5c31;
+  --c-inverse-line: #d9d3c8;
+  --c-inverse-hover: #e7e2d9;
+
+  --c-verified: #7fa88c;
+  --c-pending: #b9975b;
+  --c-danger: #c07a6e;
+
+  /* Realces que dependen del tema: halos, luz rasante, rejilla y placas. */
+  --c-glow-accent: 201 169 106;
+  --c-glow-soft: 255 255 255 / 0.03;
+  --c-edge-light: 255 255 255 / 0.045;
+  --c-grid-line: 255 255 255 / 0.014;
+  --c-plate-from: #1d2024;
+  --c-plate-mid: #131518;
+  --c-plate-to: #0c0e10;
+  --c-plate-grain: 255 255 255 / 0.028;
+  --c-plate-vignette: 0 0 0 / 0.45;
+  --c-plate-mark: 0.05;
+}
+
+/* ============================================================================
+   TOKENS
+   ----------------------------------------------------------------------------
+   `@theme inline` hace que las utilidades emitan `var(--c-*)` en lugar de un
+   valor congelado. Eso es exactamente lo que permite que `bg-surface` siga al
+   tema sin duplicar una sola clase en los componentes.
+   ========================================================================== */
+
+@theme inline {
+  --color-surface: var(--c-surface);
+  --color-surface-raised: var(--c-surface-raised);
+  --color-surface-sunken: var(--c-surface-sunken);
+  --color-surface-hover: var(--c-surface-hover);
+
+  --color-line: var(--c-line);
+  --color-line-soft: var(--c-line-soft);
+
+  --color-fg: var(--c-fg);
+  --color-fg-muted: var(--c-fg-muted);
+
+  --color-accent: var(--c-accent);
+  --color-accent-dim: var(--c-accent-dim);
+
+  --color-inverse: var(--c-inverse);
+  --color-inverse-fg: var(--c-inverse-fg);
+  --color-inverse-muted: var(--c-inverse-muted);
+  --color-inverse-accent: var(--c-inverse-accent);
+  --color-inverse-line: var(--c-inverse-line);
+  --color-inverse-hover: var(--c-inverse-hover);
+
+  --color-verified: var(--c-verified);
+  --color-pending: var(--c-pending);
+  --color-danger: var(--c-danger);
+
+  --font-display: var(--font-instrument-serif), "Iowan Old Style", Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+@theme {
+  /* --- Escala tipográfica ---------------------------------------------- */
+  --text-display-1: clamp(2.75rem, 7.5vw, 6.5rem);
+  --text-display-1--line-height: 0.98;
+  --text-display-1--letter-spacing: -0.02em;
+
+  --text-display-2: clamp(2.25rem, 5vw, 4rem);
+  --text-display-2--line-height: 1.03;
+  --text-display-2--letter-spacing: -0.015em;
+
+  --text-display-3: clamp(1.75rem, 3.2vw, 2.75rem);
+  --text-display-3--line-height: 1.1;
+  --text-display-3--letter-spacing: -0.01em;
+
+  --text-lede: clamp(1.0625rem, 1.4vw, 1.3125rem);
+  --text-lede--line-height: 1.6;
+
+  /* --- Ritmo y forma ---------------------------------------------------- */
+  --spacing-section: clamp(5rem, 11vw, 9.5rem);
+  --spacing-gutter: clamp(1.25rem, 4vw, 3rem);
+
+  --radius-card: 2px; /* casi recto: el lujo aquí es la línea, no la curva */
+  --radius-pill: 999px;
+
+  /* --- Movimiento (§31: transiciones discretas, nunca exageradas) ------ */
+  --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 180ms;
+  --duration-base: 320ms;
+  --duration-slow: 480ms;
+}
+
+/* ============================================================================
+   BASE
+   ========================================================================== */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--c-surface);
+    color: var(--c-fg);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Los precios y cifras siempre en numerales tabulares: columnas alineadas. */
+  :where(table, [data-numeric]) {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+  }
+
+  /* Foco visible en el acento — nunca se elimina, solo se estiliza (§39). */
+  :focus-visible {
+    outline: 1px solid var(--c-accent);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+
+  ::selection {
+    background-color: var(--c-accent);
+    color: var(--c-surface);
+  }
+
+  /* Respeta la preferencia del sistema: sin animación, sin scroll suave. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ============================================================================
+   UTILIDADES DE MARCA
+   ========================================================================== */
+
+/* El detalle que carga casi toda la señal de lujo: versalitas muy espaciadas. */
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* Filete horizontal de 1px que se desvanece hacia los extremos. */
+@utility hairline-fade {
+  height: 1px;
+  border: 0;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--c-line) 18%,
+    var(--c-line) 82%,
+    transparent
+  );
+}
+
+/* Luz rasante en el borde superior de las cards. En oscuro es un filo de luz;
+   en claro, el blanco del papel asomando bajo el filete. */
+@utility edge-light {
+  box-shadow: inset 0 1px 0 0 rgb(var(--c-edge-light));
+}
+
+@utility text-balance {
+  text-wrap: balance;
+}
+
+@utility text-pretty {
+  text-wrap: pretty;
+}
+
+/* Halo de fondo del hero y de las portadas, teñido con el acento del tema. */
+@utility brand-glow {
+  background:
+    radial-gradient(90% 60% at 15% 0%, rgb(var(--c-glow-accent) / 0.055) 0%, transparent 60%),
+    radial-gradient(70% 50% at 85% 20%, rgb(var(--c-glow-soft)) 0%, transparent 65%);
+}
+
+/* Rejilla de filetes finísimos: textura sin llamar la atención. */
+@utility brand-grid {
+  background-image:
+    linear-gradient(rgb(var(--c-grid-line)) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--c-grid-line)) 1px, transparent 1px);
+  background-size: 88px 88px;
+  mask-image: radial-gradient(80% 70% at 50% 20%, black, transparent 75%);
+}
+
+/* ============================================================================
+   PORTADA SOBRE VÍDEO
+   ----------------------------------------------------------------------------
+   El vídeo vive en una capa FIJA detrás de la portada y las secciones pasan
+   por encima. Para que se perciba durante todo el recorrido, esas secciones
+   dejan de ser opacas.
+
+   No se toca ni una clase de los componentes: basta con redefinir los tokens
+   de superficie dentro de este ámbito. Es exactamente para lo que existe la
+   capa de roles — `bg-surface` sigue diciendo "el fondo de la página", y aquí
+   ese fondo resulta ser translúcido.
+
+   Los valores no son estéticos, son de contraste. Medido contra el fotograma
+   más claro del metraje —blanco puro— un tinte al 90 % deja el texto marfil
+   por encima de 13:1, muy holgado sobre el 4.5:1 que exige AA.
+   ========================================================================== */
+
+.dcm-over-video {
+  --c-surface: rgb(8 9 10 / 0.9);
+  --c-surface-raised: rgb(14 15 17 / 0.88);
+  --c-surface-sunken: rgb(23 25 28 / 0.85);
+}
+
+/* La superficie invertida se mantiene OPACA a propósito: es el corte editorial
+   del recorrido, y translúcida perdería justo el contraste que la justifica. */
+.dcm-over-video [class*="bg-inverse"] {
+  --c-inverse: #f2efe9;
+}
+
+/* ============================================================================
+   EXPERIENCIA DE ENTRADA — TEXT SCRAMBLE
+   ----------------------------------------------------------------------------
+   Todo cuelga de `html[data-intro]`, que solo existe durante la primera visita
+   de la sesión. Cuando el atributo desaparece, no queda ni un estilo activo.
+
+   Usa los mismos tokens del sistema, así que la cortina sigue al tema: negra
+   con champagne en oscuro, hueso con bronce en claro.
+   ========================================================================== */
+
+/* Sin el atributo —sin JS, o visita repetida— la cortina no ocupa ni pinta. */
+html:not([data-intro]) .dcm-intro {
+  display: none;
+}
+
+.dcm-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background-color: var(--c-surface);
+  opacity: 1;
+  cursor: pointer;
+  transition: opacity var(--duration-slow) var(--ease-brand);
+}
+
+/**
+ * La salida es SECUENCIAL, no simultánea.
+ *
+ *   1. 0–320 ms    el wordmark y su mobiliario se retiran.
+ *   2. 200–800 ms  la cortina se disuelve.
+ *   3. 350–950 ms  la página entra enfocándose.
+ *
+ * Solapadas, las dos cosas se pisaban y se veía la palabra desvaneciéndose
+ * sobre la home apareciendo. Escalonadas se lee como lo que es: primero
+ * termina una escena, luego empieza la otra.
+ */
+html[data-intro="out"] .dcm-intro {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 600ms var(--ease-brand) 200ms;
+}
+
+html[data-intro="out"] .dcm-intro__stack {
+  opacity: 0;
+  transition: opacity 320ms var(--ease-brand);
+}
+
+/**
+ * Donde hay vídeo, la cortina deja de ser opaca: el metraje ES el fondo del
+ * scramble. Al 78 % el texto conserva más de 16:1 de contraste contra el
+ * fotograma más claro, así que se gana la imagen sin perder ni una pizca de
+ * legibilidad. En páginas sin vídeo la cortina sigue opaca, que es lo que
+ * evita el destello del contenido.
+ */
+body:has(.dcm-video-layer) .dcm-intro {
+  background-color: transparent;
+}
+
+/**
+ * Sombra local del hero.
+ *
+ * Misma idea que la del scramble, adaptada a un bloque alineado a la
+ * izquierda: la elipse se centra sobre el texto y se disuelve hacia los
+ * bordes. El vídeo se ve limpio en todo el plano salvo justo debajo de las
+ * líneas que hay que leer.
+ */
+.dcm-hero-pad {
+  /*
+    Centro desplazado hacia arriba y elipse más alta que la primera versión:
+    el eyebrow vive en la parte superior del bloque y con el centro en 62 % se
+    quedaba fuera, en 4.3:1. Con estos valores toda la columna de texto pasa
+    AA y la esquina superior derecha del plano sigue limpia.
+  */
+  background: radial-gradient(
+    86% 80% at 30% 54%,
+    rgb(8 9 10 / 0.9) 0%,
+    rgb(8 9 10 / 0.78) 34%,
+    rgb(8 9 10 / 0.52) 62%,
+    rgb(8 9 10 / 0.16) 84%,
+    transparent 100%
+  );
+}
+
+/**
+ * Sombra localizada bajo el wordmark.
+ *
+ * Es la solución cinematográfica al problema: en lugar de oscurecer todo el
+ * cuadro para salvar unas pocas palabras, se apoya el texto sobre una elipse
+ * suave. Con el vídeo ya sin velos, esta sombra es lo ÚNICO que sostiene la
+ * legibilidad — de ahí que sea la pieza que se ajusta si el texto costase.
+ */
+.dcm-intro__stack::before {
+  content: "";
+  position: absolute;
+  inset: -18vh -14vw;
+  z-index: -1;
+  background: radial-gradient(
+    58% 52% at 50% 50%,
+    rgb(8 9 10 / 0.88) 0%,
+    rgb(8 9 10 / 0.68) 45%,
+    rgb(8 9 10 / 0.26) 72%,
+    transparent 100%
+  );
+}
+
+/* Con el vídeo más visible, los caracteres pendientes necesitan algo más de
+   cuerpo para no diluirse en el metraje. */
+body:has(.dcm-video-layer) .dcm-intro__cell {
+  opacity: 0.9;
+}
+
+/* Mismo halo que el fondo del hero: la cortina pertenece a esta página. */
+.dcm-intro__glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70% 55% at 50% 42%, rgb(var(--c-glow-accent) / 0.06) 0%, transparent 62%),
+    radial-gradient(90% 70% at 50% 100%, rgb(var(--c-glow-soft)) 0%, transparent 70%);
+}
+
+.dcm-intro__stack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.75rem;
+  padding-inline: var(--spacing-gutter);
+}
+
+.dcm-intro__mark {
+  /* Escala con la ventana, como el wordmark: en pantallas grandes la marca
+     tiene que sostener la composición, no quedar de guarnición. */
+  width: clamp(3rem, 7vw, 5.5rem);
+  height: clamp(3rem, 7vw, 5.5rem);
+  color: var(--c-accent);
+  opacity: 0;
+  transition: opacity var(--duration-slow) var(--ease-brand);
+}
+
+.dcm-intro:not([data-phase="armed"]) .dcm-intro__mark {
+  opacity: 0.5;
+}
+
+/* --- El wordmark ------------------------------------------------------------
+   Inter en versalitas, el mismo lenguaje del wordmark del logo. El tracking se
+   consigue con el ANCHO DE CELDA en vez de con `letter-spacing`: así cada
+   glifo cae siempre en la misma posición y la sustitución no desplaza nada. */
+
+.dcm-intro__word {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: clamp(1.5rem, 7vw, 3.5rem);
+  font-weight: 500;
+  line-height: 1;
+  text-transform: uppercase;
+  /* Cifras y letras de caja alta con el mismo avance: cero temblor. */
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.dcm-intro__cell {
+  display: inline-block;
+  width: 0.92em;
+  text-align: center;
+  /* Lo aún no resuelto vive apagado; al fijarse, se enciende. */
+  color: var(--c-fg-muted);
+  opacity: 0.75;
+  transition:
+    color var(--duration-fast) var(--ease-brand),
+    opacity var(--duration-fast) var(--ease-brand);
+}
+
+.dcm-intro__cell[data-space] {
+  width: 0.5em;
+}
+
+.dcm-intro__cell[data-resolved] {
+  color: var(--c-fg);
+  opacity: 1;
+}
+
+/* Antes de arrancar la palabra está puesta pero invisible: evita el destello
+   del texto final antes de que empiece a revolverse. */
+.dcm-intro[data-phase="armed"] .dcm-intro__cell {
+  opacity: 0;
+}
+
+/* --- Filete y descriptor ----------------------------------------------------
+   Aparecen solo cuando la palabra ya está resuelta: cierran la secuencia. */
+
+.dcm-intro__rule {
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--c-accent), transparent);
+  transition: width var(--duration-slow) var(--ease-brand);
+}
+
+.dcm-intro[data-phase="resolved"] .dcm-intro__rule,
+.dcm-intro[data-phase="out"] .dcm-intro__rule {
+  width: min(18rem, 60vw);
+}
+
+.dcm-intro__descriptor {
+  font-family: var(--font-sans);
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-fg-muted);
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity var(--duration-slow) var(--ease-brand),
+    transform var(--duration-slow) var(--ease-brand);
+}
+
+.dcm-intro[data-phase="resolved"] .dcm-intro__descriptor,
+.dcm-intro[data-phase="out"] .dcm-intro__descriptor {
+  /* 0.85 y no 0.7: a 9 px con tracking amplio, la línea tiene que poder
+     leerse de verdad, no solo insinuarse. */
+  opacity: 0.85;
+  transform: none;
+}
+
+/* --- Revelado del sitio -----------------------------------------------------
+   El contenido no se oculta: espera detrás de la cortina, ligeramente
+   desenfocado, y entra en foco al retirarse. Se aplica a los tres hijos
+   directos del body por separado —nunca a un ancestro común— porque `filter`
+   crea bloque contenedor y rompería la cabecera fija. */
+
+/**
+ * Durante la introducción se ve el VÍDEO Y NADA MÁS.
+ *
+ * El contenido no solo se desenfoca: se oculta con `opacity: 0`. La cortina
+ * es translúcida para dejar pasar el vídeo, y si el contenido siguiera
+ * pintado se colaría borroso por detrás del scramble y ensuciaría la
+ * composición. Oculto, lo único que hay tras las letras es el metraje.
+ *
+ * El desenfoque se aplica a los HIJOS de `main`, no a `main`: un `filter`
+ * crea bloque contenedor, y con el filtro sobre `main` la capa de vídeo
+ * —que es `fixed`— pasaría a medir toda la página en vez de la ventana.
+ * Excluyéndola, el vídeo se queda fijo y nítido.
+ */
+html[data-intro] body > header,
+html[data-intro] body > main > *:not(.dcm-video-layer),
+html[data-intro] body > footer {
+  opacity: 0;
+  filter: blur(6px);
+  transform: scale(1.008);
+}
+
+/**
+ * Corta en seco cualquier transición en vuelo.
+ *
+ * Red de seguridad para el caso peor: si el documento se oculta a mitad del
+ * revelado, el navegador CONGELA las transiciones, y una opacidad congelada en
+ * 0 dejaría la página en blanco. `finish()` activa esta clase un instante
+ * antes de retirar el atributo, forzando que los valores finales se apliquen
+ * de golpe. Un desenfoque pegado es feo; una página invisible es un fallo.
+ */
+html.dcm-intro-cut body > header,
+html.dcm-intro-cut body > main > *,
+html.dcm-intro-cut body > footer,
+html.dcm-intro-cut .dcm-intro {
+  transition: none !important;
+}
+
+/* La salida es la de siempre: la página entra enfocándose mientras la cortina
+   se disuelve. Lo único que cambia respecto a antes es que el vídeo ya estaba
+   ahí y se queda. */
+html[data-intro="out"] body > header,
+html[data-intro="out"] body > main > *:not(.dcm-video-layer),
+html[data-intro="out"] body > footer {
+  opacity: 1;
+  filter: blur(0);
+  transform: none;
+  transition:
+    opacity 600ms var(--ease-brand) 350ms,
+    filter 600ms var(--ease-brand) 350ms,
+    transform 600ms var(--ease-brand) 350ms;
+}
+
+@media (max-width: 767px) {
+  /* Desenfocar una página entera cuesta en móvil; basta con insinuarlo. */
+  html[data-intro] body > header,
+  html[data-intro] body > main > *:not(.dcm-video-layer),
+  html[data-intro] body > footer {
+    filter: blur(3px);
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Sin desenfoque ni escalado: solo el fundido, que la regla global de
+     `prefers-reduced-motion` ya reduce a un instante. */
+  /* Sin desenfoque ni escalado, pero el contenido sigue oculto: la cortina
+     debe mostrar el vídeo limpio también aquí. */
+  html[data-intro] body > header,
+  html[data-intro] body > main > *:not(.dcm-video-layer),
+  html[data-intro] body > footer {
+    filter: none;
+    transform: none;
+  }
+
+  .dcm-intro__rule,
+  .dcm-intro__descriptor,
+  .dcm-intro__cell,
+  .dcm-intro__mark {
+    transition: none;
+  }
+}
+
+/* ============================================================================
+   GRADACIÓN DE LA CABECERA DE VERTICAL SOBRE VÍDEO
+   ----------------------------------------------------------------------------
+   Aquí hubo una elipse radial centrada en el texto. Sobre un cielo liso se
+   leía como un BORRÓN con borde visible: una mancha ovalada flotando sobre el
+   plano. El fallo no era la densidad, era la forma.
+
+   Regla que lo gobierna todo: una sombra que NACE EN EL BORDE del cuadro no se
+   percibe como forma, se percibe como iluminación. Una que flota en mitad del
+   plano siempre se ve como una mancha, por suave que sea su caída.
+
+   De ahí que sean tres gradaciones lineales ancladas a tres bordes, y ninguna
+   radial:
+
+   1. LATERAL — nace en el borde izquierdo y muere antes del derecho. Es la que
+      sostiene el texto, y deja el sujeto de la derecha limpio.
+   2. SUPERIOR — el nav va en gris sobre cielo claro y se perdía. Corta a la
+      altura de la cabecera y desaparece.
+   3. INFERIOR — asienta el pie y ata la composición al marco, que si no el
+      plano se cae por abajo.
+
+   El contraste fino no lo pone la gradación sino el halo por glifo, que cuesta
+   cero área de pantalla. Los dos juntos permiten MENOS negro que la elipse y
+   más legibilidad.
+   ========================================================================== */
+
+.dcm-vertical-scrim {
+  background:
+    linear-gradient(
+      to bottom,
+      rgb(8 9 10 / 0.74) 0%,
+      rgb(8 9 10 / 0.46) 7%,
+      rgb(8 9 10 / 0.12) 14%,
+      transparent 22%
+    ),
+    linear-gradient(to top, rgb(8 9 10 / 0.58) 0%, rgb(8 9 10 / 0.22) 14%, transparent 34%),
+    linear-gradient(
+      96deg,
+      rgb(8 9 10 / 0.92) 0%,
+      rgb(8 9 10 / 0.88) 28%,
+      rgb(8 9 10 / 0.76) 46%,
+      rgb(8 9 10 / 0.48) 62%,
+      rgb(8 9 10 / 0.18) 76%,
+      rgb(8 9 10 / 0.04) 88%,
+      transparent 96%
+    );
+}
+
+/*
+  En pantallas estrechas el texto ocupa todo el ancho, así que la caída lateral
+  no puede morir a media pantalla: se convierte en vertical, que es la que
+  respeta una columna de texto a ancho completo.
+*/
+@media (width < 48rem) {
+  .dcm-vertical-scrim {
+    background: linear-gradient(
+      to bottom,
+      rgb(8 9 10 / 0.78) 0%,
+      rgb(8 9 10 / 0.6) 8%,
+      rgb(8 9 10 / 0.76) 26%,
+      rgb(8 9 10 / 0.86) 44%,
+      rgb(8 9 10 / 0.88) 78%,
+      rgb(8 9 10 / 0.72) 100%
+    );
+  }
+}
+
+/*
+  Halo por glifo. Dos sombras: una muy ceñida que separa el trazo del fondo y
+  otra amplia y suave que asienta el bloque. Cuesta cero área de pantalla, que
+  es justo lo que aquí escasea.
+
+  Solo el texto editorial. Los botones quedan fuera: el relleno lleva texto
+  oscuro sobre marfil y un halo negro ahí ensucia el trazo.
+*/
+.dcm-text-halo :where(h1, p) {
+  text-shadow:
+    0 1px 2px rgb(8 9 10 / 0.55),
+    0 2px 14px rgb(8 9 10 / 0.45);
+}
+
+/* ============================================================================
+   LA CORTINA DE ENTRADA SOBRE METRAJE CLARO
+   ----------------------------------------------------------------------------
+   El halo del scramble se diseñó contra el vídeo de la portada, que promedia
+   0,06 de luminancia. Los metrajes de las verticales llegan a 0,91-0,98 de
+   pico, y ahí la misma cortina deja el descriptor en 2,55:1 — ilegible.
+
+   Se corrige en dos frentes, porque uno solo no basta:
+
+   1. EL HALO SE ESPESA. Misma elipse y mismas proporciones: solo se sostiene
+      la densidad más lejos del centro, que es donde vive el descriptor.
+
+   2. EL DESCRIPTOR SUBE A MARFIL. El gris `mist` tiene luminancia 0,41; sobre
+      un fondo claro no alcanza 4,5:1 ni con el halo completamente opaco.
+      Ningún ajuste de fondo arregla un color que no da de sí.
+
+   Las cifras salen de evaluar cuatro juegos de paradas contra los TRES
+   metrajes a la vez. Las anteriores se calibraron solo contra Aviación y
+   dejaban Inmobiliario en 3,14:1 y Motors en 4,58:1 — el primero suspende y
+   el segundo pasa sin margen. Estas dan 5,9 / 7,6 / 8,6 respectivamente.
+
+   Se eligió el juego MÁS SUAVE de los que aprueban: espesar más el halo sube
+   el contraste pero tapa el vídeo, que es justo lo que no se quiere.
+
+   La portada no se entera: todo cuelga de `data-tone="bright"`.
+   ========================================================================== */
+
+body:has(.dcm-video-layer[data-tone="bright"]) .dcm-intro__stack::before {
+  background: radial-gradient(
+    58% 52% at 50% 50%,
+    rgb(8 9 10 / 0.95) 0%,
+    rgb(8 9 10 / 0.9) 45%,
+    rgb(8 9 10 / 0.62) 75%,
+    rgb(8 9 10 / 0.2) 90%,
+    transparent 100%
+  );
+}
+
+body:has(.dcm-video-layer[data-tone="bright"]) .dcm-intro__descriptor {
+  color: var(--c-fg);
+}
+
+/**
+ * Cabecera sobre metraje claro.
+ *
+ * El nav va en `fg-muted` y su gradación de serie (negro al 55 %) se calculó
+ * contra el vídeo de la portada. Sobre un cielo con blancos casi puros los
+ * enlaces de la derecha caen a 3:1 — se pierden, tal como se ve a simple vista.
+ *
+ * Se corrige por los dos lados, porque ninguno basta solo: la banda se espesa
+ * y el gris sube. Con el gris de serie el margen quedaba en 4,5:1 justo, y un
+ * margen justo sobre un fondo que cambia cada fotograma no es margen.
+ *
+ * Solo mientras la cabecera es transparente: en cuanto entra en scroll adopta
+ * su superficie sólida y vuelve a ser la de siempre, sin una banda oscura
+ * pegada encima.
+ */
+body:has(.dcm-video-layer[data-tone="bright"]) > header:not([class*="backdrop-blur"]) {
+  --c-fg-muted: #c4c7cb;
+  background-image: linear-gradient(
+    to bottom,
+    rgb(8 9 10 / 0.8) 0%,
+    rgb(8 9 10 / 0.52) 52%,
+    rgb(8 9 10 / 0.16) 82%,
+    transparent 100%
+  );
+}
