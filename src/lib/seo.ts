@@ -22,7 +22,7 @@ export function absoluteUrl(path: string): string {
 
 /**
  * Construye `alternates` con hreflang para los dos idiomas más `x-default`.
- * `path` es la ruta SIN el prefijo de idioma: "/opportunities", "/".
+ * `path` es la ruta SIN el prefijo de idioma: "/motors", "/".
  */
 export function alternatesFor(path: string) {
   const clean = path === "/" ? "" : path;
@@ -129,14 +129,9 @@ export function websiteSchema(locale: Locale, description: string) {
     url: `${siteUrl}/${locale}`,
     description,
     inLanguage: localeMeta[locale].hreflang,
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${siteUrl}/${locale}/opportunities?q={search_term_string}`,
-      },
-      "query-input": "required name=search_term_string",
-    },
+    // Sin `potentialAction`: ya no hay una búsqueda global a la que apuntar, y
+    // declarar un SearchAction cuyo destino ignora el término sería mentir en
+    // los datos estructurados.
   };
 }
 

@@ -19,34 +19,47 @@ import { formatDate, formatLocation } from "@/lib/format";
 import { isLocale, localizePath, locales, type Locale } from "@/lib/i18n/config";
 import { breadcrumbSchema, buildMetadata, jsonLd, siteUrl } from "@/lib/seo";
 
-/** Prerenderiza las fichas públicas; las reservadas se sirven bajo demanda. */
-export async function generateStaticParams() {
+/* ============================================================================
+   FICHA DE OPORTUNIDAD
+   ----------------------------------------------------------------------------
+   Un solo componente para las cinco verticales, montado por cinco envoltorios
+   de ruta: `/motors/[slug]`, `/real-estate/[slug]`, y así. Ya no hay catálogo
+   general, de modo que cada ficha vive dentro de su categoría y su URL lo dice.
+
+   Se descartó un único `[vertical]/[slug]` porque obliga a validar la vertical
+   a mano y parte las cinco categorías en dos subárboles: un futuro
+   `motors/layout.tsx` envolvería la portada de la categoría pero no sus fichas.
+   ========================================================================== */
+
+/** Prerenderiza las fichas públicas de una vertical; las reservadas van bajo demanda. */
+export async function opportunityStaticParams(vertical: Vertical) {
   const { opportunities } = getRepositories();
   const published = await opportunities.allPublished();
 
   return locales.flatMap((locale) =>
-    published.map((opportunity) => ({ locale, slug: opportunity.slug })),
+    published
+      .filter((opportunity) => opportunity.vertical === vertical)
+      .map((opportunity) => ({ locale, slug: opportunity.slug })),
   );
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string; slug: string }>;
-}): Promise<Metadata> {
-  const { locale, slug } = await params;
+export async function opportunityMetadata(
+  vertical: Vertical,
+  locale: string,
+  slug: string,
+): Promise<Metadata> {
   if (!isLocale(locale)) return {};
 
   const { opportunities } = getRepositories();
   const opportunity = await opportunities.bySlug(slug);
-  if (!opportunity) return {};
+  if (!opportunity || opportunity.vertical !== vertical) return {};
 
   const dict = getDictionary(locale);
   const restricted = opportunity.visibility !== "public";
 
   return buildMetadata({
     locale,
-    path: `/opportunities/${slug}`,
+    path: `/${vertical}/${slug}`,
     title: localized(opportunity.title, locale),
     description: localized(opportunity.summary, locale) || dict.meta.siteDescription,
     // Lo reservado no se indexa: publicarlo en buscadores contradiría el
@@ -55,19 +68,32 @@ export async function generateMetadata({
   });
 }
 
-export default async function OpportunityPage({
-  params,
+export async function OpportunityDetail({
+  vertical,
+  localeRaw,
+  slug,
 }: {
-  params: Promise<{ locale: string; slug: string }>;
+  readonly vertical: Vertical;
+  readonly localeRaw: string;
+  readonly slug: string;
 }) {
-  const { locale, slug } = await params;
-  if (!isLocale(locale)) notFound();
+  if (!isLocale(localeRaw)) notFound();
 
+  const locale: Locale = localeRaw;
   const dict = getDictionary(locale);
   const { opportunities, categories, providers } = getRepositories();
 
   const opportunity = await opportunities.bySlug(slug);
-  if (!opportunity || opportunity.status !== "published") notFound();
+
+  /**
+   * La comprobación de vertical NO es opcional. `dynamicParams` vale `true` por
+   * defecto, así que sin ella `/es/motors/{slug-de-una-finca}` renderizaría esa
+   * finca bajo la ruta de vehículos: cinco URLs para una misma ficha y cinco
+   * canónicas peleándose. Ni el compilador ni el build avisan de esto.
+   */
+  if (!opportunity || opportunity.status !== "published" || opportunity.vertical !== vertical) {
+    notFound();
+  }
 
   const [category, provider, related] = await Promise.all([
     categories.byId(opportunity.categoryId),
@@ -90,8 +116,8 @@ export default async function OpportunityPage({
           __html: jsonLd(
             breadcrumbSchema(locale, [
               { name: "DCM ACCESS", path: "/" },
-              { name: dict.catalog.title, path: "/opportunities" },
-              { name: localized(opportunity.title, locale), path: `/opportunities/${slug}` },
+              { name: dict.verticals[vertical].eyebrow, path: `/${vertical}` },
+              { name: localized(opportunity.title, locale), path: `/${vertical}/${slug}` },
             ]),
           ),
         }}
@@ -106,11 +132,11 @@ export default async function OpportunityPage({
       <Container width="wide" as="div">
         <div className="pt-32 pb-6 md:pt-40">
           <Link
-            href={localizePath("/opportunities", locale)}
+            href={localizePath(`/${vertical}`, locale)}
             className="eyebrow text-fg-muted hover:text-fg inline-flex items-center gap-2 transition-colors"
           >
             <span aria-hidden="true">←</span>
-            {dict.catalog.title}
+            {dict.verticals[vertical].eyebrow}
           </Link>
         </div>
       </Container>
@@ -198,14 +224,12 @@ export default async function OpportunityPage({
                   <VerificationBadge status={provider.verification} dict={dict} />
                 </div>
 
-                {provider.status === "approved" ? (
-                  <Link
-                    href={localizePath(`/partners/${provider.slug}`, locale)}
-                    className="eyebrow text-accent hover:text-fg w-fit transition-colors"
-                  >
-                    {dict.common.learnMore}
-                  </Link>
-                ) : null}
+                {/*
+                  Ya no existe un perfil público de proveedor al que enlazar,
+                  pero el bloque se queda: el nombre, la descripción y el
+                  distintivo de verificación son la distinción entre lo
+                  comprobado y lo declarado (§26), que es su razón de ser.
+                */}
               </section>
             ) : null}
           </div>
@@ -243,15 +267,12 @@ export default async function OpportunityPage({
                 </div>
               </dl>
 
-              <div className="flex flex-col gap-3">
-                <Button href="#inquiry" variant="accent" fullWidth>
-                  {dict.common.requestDetails}
-                  <ArrowEast />
-                </Button>
-                <Button href={localizePath("/private/request", locale)} variant="outline" fullWidth>
-                  {dict.common.privateRequest}
-                </Button>
-              </div>
+              {/* Un solo CTA: la solicitud privada ya no existe, y §42 pide
+                  no acumular llamadas a la acción compitiendo entre sí. */}
+              <Button href="#inquiry" variant="accent" fullWidth>
+                {dict.common.requestDetails}
+                <ArrowEast />
+              </Button>
             </div>
           </aside>
         </div>
@@ -311,8 +332,8 @@ function listingSchema(opportunity: Opportunity, locale: Locale) {
     "real-estate": "RealEstateListing",
     motors: "Product",
     aviation: "Service",
-    "private-services": "Service",
-    business: "Product",
+    servicios: "Service",
+    negocios: "Product",
   };
 
   const offers =
@@ -330,7 +351,7 @@ function listingSchema(opportunity: Opportunity, locale: Locale) {
     "@type": schemaTypes[opportunity.vertical],
     name: localized(opportunity.title, locale),
     description: localized(opportunity.summary, locale),
-    url: `${siteUrl}/${locale}/opportunities/${opportunity.slug}`,
+    url: `${siteUrl}/${locale}/${opportunity.vertical}/${opportunity.slug}`,
     sku: opportunity.reference,
     ...(offers ? { offers } : {}),
     ...(opportunity.location.city

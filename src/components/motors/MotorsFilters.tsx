@@ -22,6 +22,8 @@ import { cn } from "@/lib/utils";
    ========================================================================== */
 
 export type MotorsFilterState = {
+  /** Texto libre. Lo interpreta `parseQuery`, que entiende marca y ciudad. */
+  readonly q?: string;
   readonly categoryId?: string;
   readonly make?: string;
   readonly city?: string;
@@ -86,6 +88,25 @@ export function MotorsFilters({
         aria-label={copy.legend}
         className="border-line-soft flex flex-col gap-6 border-t px-6 pt-6 pb-6"
       >
+        {/*
+          Texto libre por delante de los desplegables: es como busca la gente
+          —"porsche madrid"— y el analizador de consultas ya sabe reconocer
+          marca, ciudad y tipo dentro de una frase suelta.
+        */}
+        <div className="flex flex-col gap-2">
+          <label htmlFor="filter-q" className="eyebrow text-fg-muted text-[0.5625rem]">
+            {copy.queryLabel}
+          </label>
+          <input
+            id="filter-q"
+            type="search"
+            name="q"
+            defaultValue={state.q ?? ""}
+            placeholder={copy.queryPlaceholder}
+            className="border-line text-fg placeholder:text-fg-muted/50 h-11 w-full rounded-(--radius-card) border bg-transparent px-3 text-sm outline-none"
+          />
+        </div>
+
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           <Select
             name="categoryId"

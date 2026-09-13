@@ -34,13 +34,7 @@ export function localized(value: Localized | undefined, locale: Locale): string 
 
 /* --- Verticales y taxonomía ----------------------------------------------- */
 
-export const verticals = [
-  "real-estate",
-  "motors",
-  "aviation",
-  "private-services",
-  "business",
-] as const;
+export const verticals = ["real-estate", "motors", "aviation", "servicios", "negocios"] as const;
 
 export type Vertical = (typeof verticals)[number];
 

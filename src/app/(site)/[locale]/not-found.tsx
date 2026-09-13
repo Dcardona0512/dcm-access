@@ -31,8 +31,8 @@ export default function NotFound() {
             {dict.errors.notFoundCta}
             <ArrowEast />
           </Button>
-          <Button href={`/${defaultLocale}/private/request`} variant="outline">
-            {dict.privateRequest.eyebrow}
+          <Button href={`/${defaultLocale}/motors`} variant="outline">
+            {dict.navLabels.motors}
           </Button>
         </div>
       </div>

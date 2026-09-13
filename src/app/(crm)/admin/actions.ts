@@ -65,14 +65,20 @@ export async function approveSubmission(formData: FormData) {
   assert(id.length > 0, "Solicitud no válida.");
 
   const { submissions } = getRepositories();
-  await submissions.approve(id);
+  const opportunity = await submissions.approve(id);
 
   revalidatePath("/admin/submissions");
   revalidatePath("/admin/opportunities");
-  // El vehículo aparece en el mercado y en el catálogo en los dos idiomas.
+
+  /**
+   * La parrilla Y la ficha. La ficha está prerenderizada por
+   * `generateStaticParams`, así que sin revalidarla el vehículo aparece en el
+   * listado pero su página da 404 hasta el siguiente despliegue. Nada en el
+   * build avisa de esto.
+   */
   for (const locale of locales) {
-    revalidatePath(`/${locale}/motors`);
-    revalidatePath(`/${locale}/opportunities`);
+    revalidatePath(`/${locale}/${opportunity.vertical}`);
+    revalidatePath(`/${locale}/${opportunity.vertical}/${opportunity.slug}`);
   }
 }
 

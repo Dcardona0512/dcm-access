@@ -6,17 +6,11 @@ import { getDictionary } from "@/content";
 import { getRepositories } from "@/lib/data";
 import type { LeadInput } from "@/lib/data/repositories";
 import { track } from "@/lib/analytics";
-import { isVertical, type Currency, type Vertical } from "@/lib/domain/types";
+import { isVertical } from "@/lib/domain/types";
 import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
 import { checkRateLimit, isHoneypotTripped } from "@/lib/security/rate-limit";
 
-import {
-  contactSchema,
-  flattenIssues,
-  inquirySchema,
-  partnerApplicationSchema,
-  privateRequestSchema,
-} from "./schemas";
+import { contactSchema, flattenIssues, inquirySchema } from "./schemas";
 import type { FormState } from "./state";
 
 /* ============================================================================
@@ -152,122 +146,6 @@ export async function submitContact(
     });
 
     track({ name: "contact_submitted" });
-    return { status: "success", reference: lead.reference };
-  } catch {
-    return { status: "error", message: dict.errors.generic };
-  }
-}
-
-/* --- Búsqueda privada ----------------------------------------------------------- */
-
-export async function submitPrivateRequest(
-  _previous: FormState,
-  formData: FormData,
-): Promise<FormState> {
-  const locale = readLocale(formData);
-  const dict = getDictionary(locale);
-
-  const check = await guard(formData, "private-request", locale);
-  if (!check.ok) return check.state;
-
-  const parsed = privateRequestSchema(dict).safeParse(values(formData));
-  if (!parsed.success) {
-    return { status: "error", errors: flattenIssues(parsed.error) };
-  }
-
-  const data = parsed.data;
-
-  try {
-    const lead = await createLead({
-      source: "private_request",
-      locale,
-      contact: {
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        preferredChannel: data.contactMethod,
-      },
-      vertical: data.vertical as Vertical | undefined,
-      message: [data.what, data.requirements].filter(Boolean).join("\n\n"),
-      budget: data.budget ? { amount: data.budget, currency: data.currency as Currency } : undefined,
-      location: data.location ? { country: "", city: data.location } : undefined,
-      timeline: data.timeline,
-      confidentiality: data.confidentiality,
-    });
-
-    track({
-      name: "private_request_submitted",
-      vertical: data.vertical as Vertical | undefined,
-      confidentiality: data.confidentiality,
-    });
-
-    return { status: "success", reference: lead.reference };
-  } catch {
-    return { status: "error", message: dict.errors.generic };
-  }
-}
-
-/* --- Postulación de partner ------------------------------------------------------ */
-
-export async function submitPartnerApplication(
-  _previous: FormState,
-  formData: FormData,
-): Promise<FormState> {
-  const locale = readLocale(formData);
-  const dict = getDictionary(locale);
-
-  const check = await guard(formData, "partner", locale);
-  if (!check.ok) return check.state;
-
-  const raw = {
-    ...values(formData),
-    // Las casillas múltiples llegan repetidas; `values()` solo conserva la última.
-    verticals: formData.getAll("verticals").filter((v): v is string => typeof v === "string"),
-  };
-
-  const parsed = partnerApplicationSchema(dict).safeParse(raw);
-  if (!parsed.success) {
-    return { status: "error", errors: flattenIssues(parsed.error) };
-  }
-
-  const data = parsed.data;
-  const split = (value: string | undefined) =>
-    (value ?? "")
-      .split(",")
-      .map((entry) => entry.trim())
-      .filter(Boolean);
-
-  try {
-    const { providers } = getRepositories();
-
-    const provider = await providers.createApplication({
-      name: data.company,
-      country: data.country,
-      city: data.city,
-      verticals: data.verticals,
-      services: split(data.services),
-      website: data.website,
-      email: data.email,
-      phone: data.phone,
-      description: data.description,
-      operatingAreas: split(data.operatingAreas),
-      commercialInfo: data.commercialInfo,
-      certifications: split(data.certifications),
-      licences: data.licences,
-      documentation: data.documentation,
-    });
-
-    // La postulación es también un lead: entra en el mismo embudo que el resto
-    // y se gestiona desde la misma bandeja del CRM (§23).
-    const lead = await createLead({
-      source: "partner_application",
-      locale,
-      contact: { name: data.company, email: data.email, phone: data.phone },
-      providerId: provider.id,
-      message: data.description,
-    });
-
-    track({ name: "partner_applied", verticals: data.verticals });
     return { status: "success", reference: lead.reference };
   } catch {
     return { status: "error", message: dict.errors.generic };

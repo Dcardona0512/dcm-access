@@ -14,8 +14,8 @@ const tones: Record<Vertical, MediaTone> = {
   "real-estate": "architecture",
   motors: "motors",
   aviation: "aviation",
-  "private-services": "services",
-  business: "business",
+  servicios: "services",
+  negocios: "business",
 };
 
 /**

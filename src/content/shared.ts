@@ -38,16 +38,11 @@ export const contact = {
 
 /** Ruta de cada destino. La etiqueta la pone `dict.navLabels[key]`. */
 export const navHrefs: Record<NavKey, string> = {
-  opportunities: "/opportunities",
   "real-estate": "/real-estate",
   motors: "/motors",
   aviation: "/aviation",
-  "private-services": "/private-services",
-  business: "/business",
-  private: "/private",
-  brokerage: "/brokerage",
-  partners: "/partners",
-  about: "/about",
+  servicios: "/servicios",
+  negocios: "/negocios",
   contact: "/contact",
 };
 
@@ -56,15 +51,18 @@ export const verticalNav: readonly { readonly key: NavKey; readonly vertical: Ve
   { key: "real-estate", vertical: "real-estate" },
   { key: "motors", vertical: "motors" },
   { key: "aviation", vertical: "aviation" },
-  { key: "private-services", vertical: "private-services" },
-  { key: "business", vertical: "business" },
+  { key: "servicios", vertical: "servicios" },
+  { key: "negocios", vertical: "negocios" },
 ];
 
-/** Destinos de la barra principal, además del desplegable de categorías (§30). */
-export const primaryNavKeys: readonly NavKey[] = ["private", "brokerage", "partners", "about"];
-
-/** Destino del CTA destacado único (§30, §42). Su texto es `dict.common.requestAccess`. */
-export const primaryCtaHref = "/private/request";
+/**
+ * Destino del CTA destacado único (§30, §42). Su texto es `dict.common.sell`.
+ *
+ * La barra son las cinco categorías y nada más, así que ya no hay una lista de
+ * "otros destinos": el único botón empuja la captación de inventario, que es
+ * lo que hace falta para que el mercado tenga qué mostrar.
+ */
+export const primaryCtaHref = "/motors/sell";
 
 /** Regiones de la red (§35). Su nombre lo pone `dict.regions[key]`. */
 export const regionKeys: readonly RegionKey[] = [

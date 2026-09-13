@@ -48,6 +48,17 @@ function nextReference(counter: number): string {
 }
 
 /**
+ * Segmentos de ruta que una ficha no puede ocupar.
+ *
+ * `/motors/sell` es una ruta estática y gana siempre a `/motors/[slug]`, así
+ * que un vehículo cuyo slug fuera `sell` quedaría inalcanzable para siempre:
+ * su tarjeta llevaría al formulario de venta. Y es alcanzable de verdad —la
+ * ciudad es opcional, de modo que un anuncio titulado "Sell" produce
+ * exactamente ese slug.
+ */
+const RESERVED_SEGMENTS: ReadonlySet<string> = new Set(["sell"]);
+
+/**
  * Slug único dentro del conjunto ya publicado.
  *
  * Dos Porsche 911 en Madrid producen el mismo slug, y el segundo dejaría al
@@ -55,9 +66,12 @@ function nextReference(counter: number): string {
  * romperse por una colisión de nombres.
  */
 function uniqueSlug(base: string, taken: ReadonlySet<string>): string {
-  if (!taken.has(base)) return base;
+  const isFree = (candidate: string) =>
+    !taken.has(candidate) && !RESERVED_SEGMENTS.has(candidate);
+
+  if (isFree(base)) return base;
   let n = 2;
-  while (taken.has(`${base}-${n}`)) n += 1;
+  while (!isFree(`${base}-${n}`)) n += 1;
   return `${base}-${n}`;
 }
 

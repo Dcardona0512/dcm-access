@@ -13,16 +13,11 @@
 
 /** Claves de navegación. La ruta vive en `shared.ts`; la etiqueta, aquí. */
 export type NavKey =
-  | "opportunities"
   | "real-estate"
   | "motors"
   | "aviation"
-  | "private-services"
-  | "business"
-  | "private"
-  | "brokerage"
-  | "partners"
-  | "about"
+  | "servicios"
+  | "negocios"
   | "contact";
 
 export type RegionKey = "latam" | "north-america" | "europe" | "middle-east" | "other";
@@ -96,7 +91,7 @@ export type Dictionary = {
     readonly requestDetails: string;
     readonly contactBroker: string;
     readonly privateRequest: string;
-    readonly requestAccess: string;
+    readonly sell: string;
     readonly learnMore: string;
     readonly back: string;
     readonly submit: string;
@@ -130,14 +125,7 @@ export type Dictionary = {
       readonly secondaryCta: string;
       readonly scrollHint: string;
     };
-    readonly search: {
-      readonly heading: string;
-      readonly label: string;
-      readonly placeholder: string;
-      readonly categoryLabel: string;
-      readonly anyCategory: string;
-      readonly action: string;
-    };
+
     readonly verticals: {
       readonly eyebrow: string;
       readonly heading: string;
@@ -167,26 +155,15 @@ export type Dictionary = {
       readonly disclaimer: string;
       readonly regions: readonly { readonly key: string; readonly note: string }[];
     };
-    readonly privateTeaser: {
-      readonly eyebrow: string;
-      readonly heading: string;
-      readonly lede: string;
-      readonly cta: string;
-    };
-    readonly partnerTeaser: {
-      readonly eyebrow: string;
-      readonly heading: string;
-      readonly lede: string;
-      readonly cta: string;
-    };
+
   };
 
   readonly verticals: {
     readonly "real-estate": VerticalCopy;
     readonly motors: VerticalCopy;
     readonly aviation: VerticalCopy;
-    readonly "private-services": VerticalCopy;
-    readonly business: VerticalCopy;
+    readonly servicios: VerticalCopy;
+    readonly negocios: VerticalCopy;
   };
 
   /**
@@ -208,6 +185,8 @@ export type Dictionary = {
     readonly offeringsHeading: string;
     readonly filters: {
       readonly legend: string;
+      readonly queryLabel: string;
+      readonly queryPlaceholder: string;
       readonly make: string;
       readonly year: string;
       readonly yearFrom: string;
@@ -331,126 +310,13 @@ export type Dictionary = {
     readonly confidentialBody: string;
   };
 
-  readonly privateAccess: {
-    readonly eyebrow: string;
-    readonly heading: string;
-    readonly statement: string;
-    readonly lede: string;
-    readonly includes: readonly string[];
-    readonly cta: string;
-    readonly offMarketHeading: string;
-    readonly offMarketLede: string;
-    readonly discretionHeading: string;
-    readonly discretionBody: string;
-  };
-
-  readonly privateRequest: {
-    readonly eyebrow: string;
-    readonly heading: string;
-    readonly lede: string;
-    readonly examplesHeading: string;
-    readonly examples: readonly string[];
-    readonly fields: {
-      readonly what: FieldCopy;
-      readonly vertical: FieldCopy;
-      readonly location: FieldCopy;
-      readonly budget: FieldCopy;
-      readonly currency: FieldCopy;
-      readonly timeline: FieldCopy;
-      readonly requirements: FieldCopy;
-      readonly name: FieldCopy;
-      readonly email: FieldCopy;
-      readonly phone: FieldCopy;
-      readonly contactMethod: FieldCopy;
-      readonly confidentiality: FieldCopy;
-    };
-    readonly timelineOptions: readonly { readonly value: string; readonly label: string }[];
-    readonly contactOptions: readonly { readonly value: string; readonly label: string }[];
-    readonly confidentialityOptions: readonly {
-      readonly value: string;
-      readonly label: string;
-      readonly description: string;
-    }[];
-    readonly submit: string;
-    readonly successHeading: string;
-    readonly successBody: string;
-    readonly consent: string;
-  };
-
+  /**
+   * El proceso de intermediación. La página `/brokerage` ya no existe, pero
+   * las etapas siguen siendo el contenido de la sección de proceso de la
+   * portada, así que el bloque se queda reducido a ellas.
+   */
   readonly brokerage: {
-    readonly eyebrow: string;
-    readonly heading: string;
-    readonly statement: string;
-    readonly lede: string;
     readonly steps: readonly ProcessStep[];
-    readonly scopeHeading: string;
-    readonly scopeBody: string;
-    readonly cta: string;
-  };
-
-  readonly partners: {
-    readonly eyebrow: string;
-    readonly heading: string;
-    readonly lede: string;
-    readonly benefitsHeading: string;
-    readonly benefits: readonly Pillar[];
-    readonly whoHeading: string;
-    readonly who: readonly string[];
-    readonly curationHeading: string;
-    readonly curationBody: string;
-    readonly cta: string;
-    readonly directoryHeading: string;
-    readonly directoryLede: string;
-    readonly directoryEmpty: string;
-  };
-
-  readonly partnerApply: {
-    readonly heading: string;
-    readonly lede: string;
-    readonly steps: readonly string[];
-    readonly fields: {
-      readonly company: FieldCopy;
-      readonly country: FieldCopy;
-      readonly city: FieldCopy;
-      readonly verticals: FieldCopy;
-      readonly services: FieldCopy;
-      readonly website: FieldCopy;
-      readonly email: FieldCopy;
-      readonly phone: FieldCopy;
-      readonly description: FieldCopy;
-      readonly operatingAreas: FieldCopy;
-      readonly commercialInfo: FieldCopy;
-      readonly certifications: FieldCopy;
-      readonly licences: FieldCopy;
-      readonly documentation: FieldCopy;
-    };
-    readonly reviewNotice: string;
-    readonly submit: string;
-    readonly successHeading: string;
-    readonly successBody: string;
-  };
-
-  readonly provider: {
-    readonly about: string;
-    readonly services: string;
-    readonly coverage: string;
-    readonly certifications: string;
-    readonly openOpportunities: string;
-    readonly contact: string;
-    readonly verificationHeading: string;
-    readonly verificationBody: string;
-  };
-
-  readonly about: {
-    readonly eyebrow: string;
-    readonly heading: string;
-    readonly lede: string;
-    readonly originHeading: string;
-    readonly originBody: readonly string[];
-    readonly modelHeading: string;
-    readonly modelBody: readonly string[];
-    readonly principlesHeading: string;
-    readonly principles: readonly Pillar[];
   };
 
   readonly contact: {
@@ -482,24 +348,6 @@ export type Dictionary = {
     readonly successBody: string;
   };
 
-  readonly account: {
-    readonly heading: string;
-    readonly lede: string;
-    readonly nav: {
-      readonly overview: string;
-      readonly favorites: string;
-      readonly requests: string;
-      readonly messages: string;
-      readonly profile: string;
-    };
-    readonly empty: {
-      readonly favorites: string;
-      readonly requests: string;
-      readonly messages: string;
-    };
-    readonly demoSession: string;
-  };
-
   readonly legal: {
     readonly heading: string;
     readonly lede: string;
@@ -516,7 +364,6 @@ export type Dictionary = {
   readonly footer: {
     readonly tagline: string;
     readonly exploreHeading: string;
-    readonly companyHeading: string;
     readonly legalHeading: string;
     readonly contactHeading: string;
     readonly rights: string;

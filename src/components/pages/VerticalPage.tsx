@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 
 import { OpportunityCard } from "@/components/opportunities/OpportunityCard";
 import { HeroVideo, type VideoTone } from "@/components/sections/HeroVideo";
-import { SearchPanel } from "@/components/search/SearchPanel";
 import { ArrowEast, Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { EditorialImage } from "@/components/ui/EditorialImage";
@@ -18,8 +17,8 @@ const tones: Record<Vertical, MediaTone> = {
   "real-estate": "architecture",
   motors: "motors",
   aviation: "aviation",
-  "private-services": "services",
-  business: "business",
+  servicios: "services",
+  negocios: "business",
 };
 
 export async function verticalMetadata(vertical: Vertical, localeRaw: string) {
@@ -142,20 +141,12 @@ export async function VerticalPage({
                   {copy.lede}
                 </p>
 
+                {/* Sin catálogo general al que remitir, explorar es bajar al
+                    listado de esta misma categoría. */}
                 <div className="flex flex-col gap-3 pt-2 sm:flex-row">
-                  <Button
-                    href={`${localizePath("/opportunities", locale)}?vertical=${vertical}`}
-                    size="lg"
-                  >
+                  <Button href="#publicadas" size="lg">
                     {dict.common.explore}
                     <ArrowEast />
-                  </Button>
-                  <Button
-                    href={`${localizePath("/private/request", locale)}?vertical=${vertical}`}
-                    variant="outline"
-                    size="lg"
-                  >
-                    {dict.common.privateRequest}
                   </Button>
                 </div>
               </div>
@@ -223,21 +214,8 @@ export async function VerticalPage({
         </Section>
 
         {/* --- Oportunidades publicadas ------------------------------------- */}
-        <Section width="wide" divider>
-          <SectionHeading
-            eyebrow={dict.home.selected.eyebrow}
-            heading={dict.catalog.title}
-            action={
-              <Button
-                href={`${localizePath("/opportunities", locale)}?vertical=${vertical}`}
-                variant="outline"
-                size="sm"
-              >
-                {dict.home.selected.cta}
-                <ArrowEast />
-              </Button>
-            }
-          />
+        <Section id="publicadas" width="wide" divider>
+          <SectionHeading eyebrow={dict.home.selected.eyebrow} heading={dict.catalog.title} />
 
           {results.items.length === 0 ? (
             <EmptyState
@@ -245,10 +223,7 @@ export async function VerticalPage({
               heading={dict.catalog.empty.heading}
               body={dict.catalog.empty.body}
               action={
-                <Button
-                  href={`${localizePath("/private/request", locale)}?vertical=${vertical}`}
-                  variant="accent"
-                >
+                <Button href={localizePath("/contact", locale)} variant="accent">
                   {dict.catalog.empty.cta}
                   <ArrowEast />
                 </Button>
@@ -272,23 +247,6 @@ export async function VerticalPage({
           )}
         </Section>
 
-        {/* --- Buscador ------------------------------------------------------ */}
-        <Section width="wide" divider>
-          <div className="flex flex-col gap-8">
-            <SectionHeading
-              eyebrow={dict.home.search.heading}
-              heading={dict.catalog.empty.heading}
-              lede={dict.catalog.empty.body}
-              size="sm"
-            />
-            <SearchPanel
-              locale={locale}
-              dict={dict}
-              defaultVertical={vertical}
-              overVideo={Boolean(backgroundVideo)}
-            />
-          </div>
-        </Section>
       </div>
     </>
   );

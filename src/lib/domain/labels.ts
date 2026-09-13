@@ -38,8 +38,8 @@ export const verticalLabels: Record<Vertical, Localized> = {
   "real-estate": { es: "Inmobiliario", en: "Real Estate" },
   motors: { es: "Vehículos", en: "Motors" },
   aviation: { es: "Aviación", en: "Aviation" },
-  "private-services": { es: "Servicios privados", en: "Private Services" },
-  business: { es: "Oportunidades de negocio", en: "Business Opportunities" },
+  servicios: { es: "Servicios", en: "Services" },
+  negocios: { es: "Negocios", en: "Business" },
 };
 
 export const leadStatusLabels: Record<LeadStatus, Localized> = {

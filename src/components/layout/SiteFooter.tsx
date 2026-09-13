@@ -8,17 +8,7 @@ import type { Dictionary } from "@/content/types";
 import { localizePath, type Locale } from "@/lib/i18n/config";
 
 /** Solo claves: las etiquetas salen de `dict.navLabels` en el idioma activo. */
-const EXPLORE_KEYS = [
-  "opportunities",
-  "real-estate",
-  "motors",
-  "aviation",
-  "private-services",
-  "business",
-  "private",
-] as const;
-
-const COMPANY_KEYS = ["about", "brokerage", "partners", "contact"] as const;
+const EXPLORE_KEYS = ["real-estate", "motors", "aviation", "servicios", "negocios"] as const;
 
 export function SiteFooter({
   locale,
@@ -33,7 +23,7 @@ export function SiteFooter({
   return (
     <footer className="bg-surface-raised border-line border-t">
       <Container width="wide">
-        <div className="grid gap-14 py-20 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-12">
+        <div className="grid gap-14 py-20 lg:grid-cols-[1.6fr_1fr_1fr] lg:gap-12">
           <div className="flex flex-col gap-6">
             <Link href={to("/")} className="text-fg hover:text-accent w-fit transition-colors">
               <Logo descriptor={dict.brand.descriptor} />
@@ -57,14 +47,6 @@ export function SiteFooter({
             ))}
           </FooterColumn>
 
-          <FooterColumn heading={dict.footer.companyHeading}>
-            {COMPANY_KEYS.map((key) => (
-              <FooterLink key={key} href={to(navHrefs[key])}>
-                {dict.navLabels[key]}
-              </FooterLink>
-            ))}
-          </FooterColumn>
-
           <div className="flex flex-col gap-10">
             <FooterColumn heading={dict.footer.legalHeading}>
               {dict.legal.documents.map((doc) => (
@@ -75,6 +57,7 @@ export function SiteFooter({
             </FooterColumn>
 
             <FooterColumn heading={dict.footer.contactHeading}>
+              <FooterLink href={to(navHrefs.contact)}>{dict.navLabels.contact}</FooterLink>
               <FooterLink href={`mailto:${contact.email}`}>{contact.email}</FooterLink>
               {contact.phone ? (
                 <FooterLink href={`tel:${contact.phone.replace(/\s/g, "")}`}>

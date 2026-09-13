@@ -6,9 +6,8 @@ import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Section";
 import { getDictionary } from "@/content";
 import { contact } from "@/content/shared";
-import { isLocale, localizePath } from "@/lib/i18n/config";
+import { isLocale } from "@/lib/i18n/config";
 import { buildMetadata } from "@/lib/seo";
-import Link from "next/link";
 
 export async function generateMetadata({
   params,
@@ -52,12 +51,6 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
             >
               {contact.email}
             </a>
-            <Link
-              href={localizePath("/private/request", locale)}
-              className="eyebrow text-accent hover:text-fg w-fit transition-colors"
-            >
-              {dict.privateRequest.eyebrow}
-            </Link>
           </div>
         </div>
 

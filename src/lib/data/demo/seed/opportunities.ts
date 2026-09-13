@@ -479,7 +479,7 @@ export const opportunities: readonly Opportunity[] = [
     id: "opp-ps-001",
     slug: "transporte-ejecutivo-con-conductor-bogota",
     reference: "DCM-PS-4008",
-    vertical: "private-services",
+    vertical: "servicios",
     categoryId: "cat-ps-transport",
     title: {
       es: "Transporte ejecutivo con conductor en Bogotá",
@@ -513,7 +513,7 @@ export const opportunities: readonly Opportunity[] = [
     id: "opp-ps-002",
     slug: "proteccion-ejecutiva-bajo-contrato",
     reference: "DCM-PS-4015",
-    vertical: "private-services",
+    vertical: "servicios",
     categoryId: "cat-ps-protection",
     title: {
       es: "Protección ejecutiva bajo contrato",
@@ -552,7 +552,7 @@ export const opportunities: readonly Opportunity[] = [
     id: "opp-bu-001",
     slug: "linea-maquinaria-construccion",
     reference: "DCM-BU-5004",
-    vertical: "business",
+    vertical: "negocios",
     categoryId: "cat-bu-machinery",
     title: {
       es: "Línea de maquinaria de construcción",
@@ -585,7 +585,7 @@ export const opportunities: readonly Opportunity[] = [
     id: "opp-bu-002",
     slug: "participacion-operacion-logistica",
     reference: "DCM-BU-5011",
-    vertical: "business",
+    vertical: "negocios",
     categoryId: "cat-bu-company",
     title: {
       es: "Participación en operación logística — confidencial",

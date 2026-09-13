@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { MotorsFilters, type MotorsFilterState } from "@/components/motors/MotorsFilters";
 import { MotorsCard } from "@/components/opportunities/MotorsCard";
 import { HeroVideo, type VideoTone } from "@/components/sections/HeroVideo";
-import { SearchPanel } from "@/components/search/SearchPanel";
 import { ArrowEast, Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -84,6 +83,7 @@ export async function MotorsMarketplace({
   const market = dict.motorsMarket;
 
   const state: MotorsFilterState = {
+    q: one(searchParams.q),
     categoryId: one(searchParams.categoryId),
     make: one(searchParams.make),
     city: one(searchParams.city),
@@ -102,6 +102,7 @@ export async function MotorsMarketplace({
   };
 
   const query: OpportunityQuery = {
+    q: state.q,
     vertical: VERTICAL,
     categoryId: state.categoryId,
     city: state.city,
@@ -109,7 +110,13 @@ export async function MotorsMarketplace({
     maxPrice: toNumber(state.maxPrice),
     attributes: state.make ? { make: state.make } : undefined,
     attributeRanges: Object.keys(attributeRanges).length > 0 ? attributeRanges : undefined,
-    sort: "newest",
+    /**
+     * Con texto libre manda la relevancia; sin él, lo más nuevo primero.
+     * Ordenar por fecha una búsqueda de "porsche" calcula la puntuación y
+     * luego la tira: el Porsche quedaría tercero detrás de dos coches que solo
+     * comparten categoría.
+     */
+    sort: state.q ? "relevance" : "newest",
     limit: PAGE_SIZE,
     offset: (page - 1) * PAGE_SIZE,
   };
@@ -161,7 +168,7 @@ export async function MotorsMarketplace({
                 "@type": "ListItem",
                 position: (page - 1) * PAGE_SIZE + index + 1,
                 name: localized(item.title, locale),
-                url: `${siteUrl}/${locale}/opportunities/${item.slug}`,
+                url: `${siteUrl}/${locale}/motors/${item.slug}`,
               })),
             }),
           }}
@@ -259,11 +266,8 @@ export async function MotorsMarketplace({
               heading={dict.catalog.empty.heading}
               body={dict.catalog.empty.body}
               action={
-                <Button
-                  href={`${localizePath("/private/request", locale)}?vertical=${VERTICAL}`}
-                  variant="outline"
-                >
-                  {dict.catalog.empty.cta}
+                <Button href={localizePath("/motors/sell", locale)} variant="outline">
+                  {market.sellCta}
                   <ArrowEast />
                 </Button>
               }
@@ -332,23 +336,6 @@ export async function MotorsMarketplace({
           </div>
         </Section>
 
-        {/* --- Búsqueda privada: lo que no se publica ------------------------ */}
-        <Section width="wide" divider>
-          <div className="flex flex-col gap-8">
-            <SectionHeading
-              eyebrow={dict.home.search.heading}
-              heading={dict.catalog.empty.heading}
-              lede={dict.catalog.empty.body}
-              size="sm"
-            />
-            <SearchPanel
-              locale={locale}
-              dict={dict}
-              defaultVertical={VERTICAL}
-              overVideo={Boolean(backgroundVideo)}
-            />
-          </div>
-        </Section>
       </div>
     </>
   );

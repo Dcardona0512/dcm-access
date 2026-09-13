@@ -69,7 +69,7 @@ export default async function AdminOpportunitiesPage() {
               <Cell>
                 <span className="flex items-center gap-2">
                   <Link
-                    href={`/es/opportunities/${opportunity.slug}`}
+                    href={`/es/${opportunity.vertical}/${opportunity.slug}`}
                     className="hover:text-accent transition-colors"
                   >
                     {localized(opportunity.title, "es")}

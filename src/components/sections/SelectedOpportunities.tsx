@@ -36,7 +36,7 @@ export async function SelectedOpportunities({
         heading={dict.home.selected.heading}
         lede={dict.home.selected.lede}
         action={
-          <Button href={localizePath("/opportunities", locale)} variant="outline" size="sm">
+          <Button href="#categories" variant="outline" size="sm">
             {dict.home.selected.cta}
             <ArrowEast />
           </Button>
@@ -49,7 +49,7 @@ export async function SelectedOpportunities({
           heading={dict.catalog.empty.heading}
           body={dict.catalog.empty.body}
           action={
-            <Button href={localizePath("/private/request", locale)} variant="accent">
+            <Button href={localizePath("/motors/sell", locale)} variant="accent">
               {dict.catalog.empty.cta}
               <ArrowEast />
             </Button>

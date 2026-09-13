@@ -1,14 +1,13 @@
-import { SearchPanel } from "@/components/search/SearchPanel";
 import { ArrowEast, Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
-import { brand, navHrefs } from "@/content/shared";
+import { brand } from "@/content/shared";
 import type { Dictionary } from "@/content/types";
-import { localizePath, type Locale } from "@/lib/i18n/config";
+import type { Locale } from "@/lib/i18n/config";
 
 /**
  * Hero (§12).
  *
- * Nombre, promesa, una frase y dos acciones, sobre el vídeo de marca. Nada
+ * Nombre, promesa, una frase y una acción, sobre el vídeo de marca. Nada
  * más: la persona debe entender en pocos segundos qué es DCM ACCESS (§11), y
  * cada elemento que se añade aquí retrasa ese momento.
  *
@@ -64,18 +63,18 @@ export function Hero({ locale, dict }: { readonly locale: Locale; readonly dict:
               </p>
             </div>
 
+            {/*
+              Un solo CTA, y ancla en vez de ruta: las cinco categorías están
+              justo debajo, en `VerticalsGrid`. Bajar a ellas es la acción
+              honesta desde una portada que ya no tiene catálogo general.
+            */}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-              <Button href={localizePath(navHrefs.opportunities, locale)} size="lg">
+              <Button href="#categories" size="lg">
                 {dict.home.hero.primaryCta}
                 <ArrowEast />
               </Button>
-              <Button href={localizePath("/private/request", locale)} variant="outline" size="lg">
-                {dict.home.hero.secondaryCta}
-              </Button>
             </div>
           </div>
-
-          <SearchPanel locale={locale} dict={dict} className="max-w-5xl" overVideo />
         </div>
       </Container>
     </section>

@@ -68,7 +68,7 @@ export function MotorsCard({ opportunity, locale, dict, eager = false, className
   return (
     <article className={cn("group", className)}>
       <Link
-        href={localizePath(`/opportunities/${opportunity.slug}`, locale)}
+        href={localizePath(`/${opportunity.vertical}/${opportunity.slug}`, locale)}
         className="flex h-full flex-col gap-4 rounded-(--radius-card)"
       >
         <div className="relative overflow-hidden rounded-(--radius-card)">

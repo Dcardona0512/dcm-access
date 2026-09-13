@@ -6,7 +6,6 @@ import { Hero } from "@/components/sections/Hero";
 import { HeroVideo } from "@/components/sections/HeroVideo";
 import { ProcessSteps } from "@/components/sections/ProcessSteps";
 import { SelectedOpportunities } from "@/components/sections/SelectedOpportunities";
-import { PartnerTeaser, PrivateTeaser } from "@/components/sections/Teasers";
 import { VerticalsGrid } from "@/components/sections/VerticalsGrid";
 import { WhyPillars } from "@/components/sections/WhyPillars";
 import { getDictionary } from "@/content";
@@ -68,8 +67,6 @@ export default async function HomePage({
         <WhyPillars dict={dict} />
         <ProcessSteps locale={locale} dict={dict} />
         <GlobalNetwork dict={dict} />
-        <PrivateTeaser locale={locale} dict={dict} />
-        <PartnerTeaser locale={locale} dict={dict} />
       </div>
     </>
   );

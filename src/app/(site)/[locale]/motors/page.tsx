@@ -18,8 +18,7 @@ export default async function Page({
   params: Promise<{ locale: string }>;
   /**
    * Leer los filtros de la URL vuelve la página dinámica y le quita el
-   * prerenderizado estático. Es el precio de filtrar sin JavaScript, y es el
-   * mismo que ya paga `/opportunities`.
+   * prerenderizado estático. Es el precio de filtrar sin JavaScript.
    */
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {

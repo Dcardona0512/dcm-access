@@ -77,7 +77,7 @@ export const providers: readonly Provider[] = [
       es: "Empresa de demostración de transporte ejecutivo y servicios de protección. En la operación real, este perfil requeriría licencia vigente acreditada antes de publicarse.",
       en: "Demonstration executive transport and protection services company. In live operation this profile would require current, evidenced licensing before publication.",
     },
-    verticals: ["private-services", "motors"],
+    verticals: ["servicios", "motors"],
     locations: [
       { country: "CO", city: "Bogotá" },
       { country: "CO", city: "Medellín" },
@@ -133,7 +133,7 @@ export const providers: readonly Provider[] = [
       es: "Intermediario de demostración en maquinaria pesada, equipos industriales y activos empresariales.",
       en: "Demonstration intermediary in heavy machinery, industrial equipment and business assets.",
     },
-    verticals: ["business"],
+    verticals: ["negocios"],
     locations: [{ country: "CO", city: "Barranquilla" }],
     services: [
       { es: "Maquinaria pesada", en: "Heavy machinery" },
@@ -158,7 +158,7 @@ export const providers: readonly Provider[] = [
       es: "Postulación de demostración pendiente de revisión. Ilustra que ningún perfil se publica de forma automática (§18).",
       en: "Demonstration application awaiting review. Illustrates that no profile is published automatically (§18).",
     },
-    verticals: ["real-estate", "private-services"],
+    verticals: ["real-estate", "servicios"],
     locations: [{ country: "CO", city: "Cartagena" }],
     services: [{ es: "Alquiler vacacional premium", en: "Premium holiday rentals" }],
     gallery: [],

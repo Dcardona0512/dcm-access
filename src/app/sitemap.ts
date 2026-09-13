@@ -15,12 +15,8 @@ import { siteUrl } from "@/lib/seo";
  * funcione de verdad y no solo esté "preparado".
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const { opportunities, providers } = getRepositories();
-
-  const [published, approved] = await Promise.all([
-    opportunities.allPublished(),
-    providers.listApproved(),
-  ]);
+  const { opportunities } = getRepositories();
+  const published = await opportunities.allPublished();
 
   type Entry = {
     readonly path: string;
@@ -31,18 +27,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticPaths: readonly Entry[] = [
     { path: "/", priority: 1, changeFrequency: "weekly" },
-    { path: "/opportunities", priority: 0.9, changeFrequency: "daily" },
     ...verticals.map((vertical) => ({
       path: `/${vertical}`,
-      priority: 0.8,
-      changeFrequency: "weekly" as const,
+      priority: 0.9,
+      changeFrequency: "daily" as const,
     })),
-    { path: "/private", priority: 0.7, changeFrequency: "weekly" },
-    { path: "/private/request", priority: 0.7, changeFrequency: "monthly" },
-    { path: "/brokerage", priority: 0.7, changeFrequency: "monthly" },
-    { path: "/partners", priority: 0.7, changeFrequency: "weekly" },
-    { path: "/partners/apply", priority: 0.6, changeFrequency: "monthly" },
-    { path: "/about", priority: 0.5, changeFrequency: "monthly" },
+    { path: "/motors/sell", priority: 0.6, changeFrequency: "monthly" },
     { path: "/contact", priority: 0.5, changeFrequency: "monthly" },
     ...legalSlugs.map((slug) => ({
       path: `/legal/${slug}`,
@@ -51,20 +41,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   ];
 
-  const dynamicPaths: readonly Entry[] = [
-    ...published.map((opportunity) => ({
-      path: `/opportunities/${opportunity.slug}`,
-      priority: 0.8,
-      changeFrequency: "weekly" as const,
-      lastModified: new Date(opportunity.updatedAt),
-    })),
-    ...approved.map((provider) => ({
-      path: `/partners/${provider.slug}`,
-      priority: 0.6,
-      changeFrequency: "monthly" as const,
-      lastModified: provider.approvedAt ? new Date(provider.approvedAt) : undefined,
-    })),
-  ];
+  // Cada ficha vive dentro de su categoría: no hay catálogo general.
+  const dynamicPaths: readonly Entry[] = published.map((opportunity) => ({
+    path: `/${opportunity.vertical}/${opportunity.slug}`,
+    priority: 0.8,
+    changeFrequency: "weekly" as const,
+    lastModified: new Date(opportunity.updatedAt),
+  }));
 
   const alternates = (path: string) => ({
     languages: Object.fromEntries(

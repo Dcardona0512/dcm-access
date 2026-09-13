@@ -3,10 +3,10 @@
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Logo } from "@/components/brand/Logo";
-import { navHrefs, primaryCtaHref, primaryNavKeys, verticalNav } from "@/content/shared";
+import { navHrefs, primaryCtaHref, verticalNav } from "@/content/shared";
 import { ArrowEast, Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import type { Dictionary } from "@/content/types";
@@ -19,9 +19,10 @@ import { LocaleSwitcher } from "./LocaleSwitcher";
 /* ============================================================================
    CABECERA (§30)
    ----------------------------------------------------------------------------
-   Cinco destinos visibles y un solo CTA. Las cinco verticales cuelgan de
-   "Opportunities" en un desplegable, porque listarlas todas en la barra es
-   exactamente lo que §30 pide evitar: sobrecargar el menú.
+   Cinco destinos visibles y un solo CTA. Los destinos SON las cinco categorías,
+   planas: ya no cuelgan de un desplegable "Oportunidades" porque ya no hay
+   catálogo general del que colgar, y cinco entradas son exactamente el techo
+   que §30 fija para la barra.
    ========================================================================== */
 
 /**
@@ -40,7 +41,6 @@ export function SiteHeader({
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const to = useCallback((href: string) => localizePath(href, locale), [locale]);
 
@@ -64,7 +64,6 @@ export function SiteHeader({
   // llama a setState provoca un render en cascada por cada navegación.
   const closeAll = useCallback(() => {
     setDrawerOpen(false);
-    setMenuOpen(false);
   }, []);
 
   return (
@@ -104,16 +103,7 @@ export function SiteHeader({
 
           <nav aria-label={dict.nav.primaryLabel} className="hidden lg:block">
             <ul className="flex items-center gap-1">
-              <li>
-                <OpportunitiesMenu
-                  locale={locale}
-                  dict={dict}
-                  open={menuOpen}
-                  onOpenChange={setMenuOpen}
-                  pathname={pathname}
-                />
-              </li>
-              {primaryNavKeys.map((key) => (
+              {VERTICAL_KEYS.map((key) => (
                 <li key={key}>
                   <NavAnchor
                     href={to(navHrefs[key])}
@@ -135,7 +125,7 @@ export function SiteHeader({
               size="sm"
               className="hidden sm:inline-flex"
             >
-              {dict.common.requestAccess}
+              {dict.common.sell}
               <ArrowEast />
             </Button>
 
@@ -189,110 +179,6 @@ function NavAnchor({
     >
       {children}
     </Link>
-  );
-}
-
-/* --- Desplegable de categorías ------------------------------------------------ */
-
-function OpportunitiesMenu({
-  locale,
-  dict,
-  open,
-  onOpenChange,
-  pathname,
-}: {
-  readonly locale: Locale;
-  readonly dict: Dictionary;
-  readonly open: boolean;
-  readonly onOpenChange: (open: boolean) => void;
-  readonly pathname: string;
-}) {
-  const menuId = useId();
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const to = (href: string) => localizePath(href, locale);
-
-  useEffect(() => {
-    if (!open) return;
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onOpenChange(false);
-    };
-    const onPointerDown = (event: PointerEvent) => {
-      if (!wrapperRef.current?.contains(event.target as Node)) onOpenChange(false);
-    };
-
-    document.addEventListener("keydown", onKeyDown);
-    document.addEventListener("pointerdown", onPointerDown);
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      document.removeEventListener("pointerdown", onPointerDown);
-    };
-  }, [open, onOpenChange]);
-
-  return (
-    <div
-      ref={wrapperRef}
-      className="relative"
-      onMouseEnter={() => onOpenChange(true)}
-      onMouseLeave={() => onOpenChange(false)}
-    >
-      <div className="flex items-center">
-        <NavAnchor
-          href={to(navHrefs.opportunities)}
-          active={pathname.startsWith(to(navHrefs.opportunities))}
-          className="pr-1"
-        >
-          {dict.catalog.title}
-        </NavAnchor>
-        <button
-          type="button"
-          onClick={() => onOpenChange(!open)}
-          aria-expanded={open}
-          aria-controls={menuId}
-          className="text-fg-muted hover:text-fg rounded-(--radius-card) p-1.5 transition-colors"
-        >
-          <span className="sr-only">{dict.nav.verticalsLabel}</span>
-          <ChevronIcon className={cn("transition-transform", open && "rotate-180")} />
-        </button>
-      </div>
-
-      <AnimatePresence>
-        {open ? (
-          <motion.div
-            id={menuId}
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute top-full left-0 pt-3"
-          >
-            <ul
-              className="bg-surface-raised border-line edge-light min-w-64 rounded-(--radius-card) border p-2"
-              aria-label={dict.nav.verticalsLabel}
-            >
-              {VERTICAL_KEYS.map((key) => (
-                <li key={key}>
-                  <Link
-                    href={to(navHrefs[key])}
-                    onClick={() => onOpenChange(false)}
-                    className={cn(
-                      "eyebrow hover:bg-surface-sunken flex items-center justify-between gap-6 px-3 py-3",
-                      "rounded-(--radius-card) transition-colors",
-                      pathname.startsWith(to(navHrefs[key]))
-                        ? "text-accent"
-                        : "text-fg-muted hover:text-fg",
-                    )}
-                  >
-                    {dict.navLabels[key]}
-                    <ArrowEast className="opacity-0 transition-opacity group-hover:opacity-100" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
-    </div>
   );
 }
 
@@ -379,25 +265,7 @@ function MobileDrawer({
             <Container>
               <nav aria-label={dict.nav.primaryLabel} className="flex flex-col gap-8 py-8">
                 <ul className="flex flex-col">
-                  <DrawerItem
-                    href={to(navHrefs.opportunities)}
-                    pathname={pathname}
-                    onNavigate={onClose}
-                  >
-                    {dict.catalog.title}
-                  </DrawerItem>
                   {VERTICAL_KEYS.map((key) => (
-                    <DrawerItem
-                      key={key}
-                      href={to(navHrefs[key])}
-                      pathname={pathname}
-                      onNavigate={onClose}
-                      nested
-                    >
-                      {dict.navLabels[key]}
-                    </DrawerItem>
-                  ))}
-                  {primaryNavKeys.map((key) => (
                     <DrawerItem
                       key={key}
                       href={to(navHrefs[key])}
@@ -411,7 +279,7 @@ function MobileDrawer({
 
                 <div className="flex flex-col gap-6">
                   <Button href={to(primaryCtaHref)} variant="accent" fullWidth onClick={onClose}>
-                    {dict.common.requestAccess}
+                    {dict.common.sell}
                     <ArrowEast />
                   </Button>
                   <LocaleSwitcher locale={locale} dict={dict} />
@@ -480,15 +348,3 @@ function BurgerIcon({ open }: { readonly open: boolean }) {
   );
 }
 
-function ChevronIcon({ className }: { readonly className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 12 12"
-      className={cn("h-2.5 w-2.5", className)}
-      fill="none"
-      aria-hidden="true"
-    >
-      <path d="M2 4.5 6 8.5l4-4" stroke="currentColor" strokeWidth="1.5" />
-    </svg>
-  );
-}

@@ -39,13 +39,13 @@ const verticalLexicon: Lexicon = {
     "helicopter", "charter", "vuelo", "vuelos", "flight", "flights", "aeronave", "aeronaves",
     "aviacion", "aviation", "turbohelice", "turboprop", "hangar",
   ],
-  "private-services": [
+  servicios: [
     "conductor", "conductores", "driver", "drivers", "chofer", "transporte", "transport",
     "concierge", "escolta", "escoltas", "guardaespaldas", "bodyguard", "seguridad", "security",
     "proteccion", "protection", "logistica", "logistics", "servicio", "servicios", "service",
     "services", "niñera", "asistente",
   ],
-  business: [
+  negocios: [
     "maquinaria", "machinery", "equipo", "equipos", "equipment", "negocio", "negocios",
     "business", "empresa", "empresas", "company", "participacion", "stake", "alianza",
     "alianzas", "partnership", "activo", "activos", "asset", "assets", "proveedor",

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { VerticalPage, verticalMetadata } from "@/components/pages/VerticalPage";
 
-const VERTICAL = "business" as const;
+const VERTICAL = "negocios" as const;
 
 export async function generateMetadata({
   params,

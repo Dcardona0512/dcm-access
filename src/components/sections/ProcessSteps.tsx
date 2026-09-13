@@ -8,33 +8,28 @@ import { cn } from "@/lib/utils";
 /**
  * El proceso de brokerage en seis etapas (§5).
  *
- * Se reutiliza tal cual en la home y en la página de Brokerage: es el mismo
- * contenido y debe leerse idéntico en ambos sitios.
+ * Tuvo una variante para la página de Brokerage, que ya no existe; con un solo
+ * sitio de uso, la rama sobraba. Las etapas siguen viviendo en `dict.brokerage`
+ * porque son el proceso, no un texto de la portada.
  */
 export function ProcessSteps({
   locale,
   dict,
-  variant = "home",
 }: {
   readonly locale: Locale;
   readonly dict: Dictionary;
-  readonly variant?: "home" | "page";
 }) {
-  const copy = variant === "home" ? dict.home.process : dict.brokerage;
-
   return (
-    <Section width="wide" divider={variant === "home"}>
+    <Section width="wide" divider>
       <SectionHeading
-        eyebrow={variant === "home" ? dict.home.process.eyebrow : undefined}
-        heading={variant === "home" ? dict.home.process.heading : dict.brokerage.statement}
-        lede={"lede" in copy ? copy.lede : undefined}
+        eyebrow={dict.home.process.eyebrow}
+        heading={dict.home.process.heading}
+        lede={dict.home.process.lede}
         action={
-          variant === "home" ? (
-            <Button href={localizePath("/brokerage", locale)} variant="outline" size="sm">
-              {dict.home.process.cta}
-              <ArrowEast />
-            </Button>
-          ) : undefined
+          <Button href={localizePath("/contact", locale)} variant="outline" size="sm">
+            {dict.home.process.cta}
+            <ArrowEast />
+          </Button>
         }
       />
 

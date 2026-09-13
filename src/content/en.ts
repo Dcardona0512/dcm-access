@@ -18,16 +18,11 @@ export const en: Dictionary = {
   },
 
   navLabels: {
-    opportunities: "Opportunities",
     "real-estate": "Real Estate",
     motors: "Motors",
     aviation: "Aviation",
-    "private-services": "Private Services",
-    business: "Business",
-    private: "Private Access",
-    brokerage: "Brokerage",
-    partners: "Become a Partner",
-    about: "About",
+    servicios: "Services",
+    negocios: "Business",
     contact: "Contact",
   },
 
@@ -51,7 +46,7 @@ export const en: Dictionary = {
     requestDetails: "Request details",
     contactBroker: "Contact broker",
     privateRequest: "Private request",
-    requestAccess: "Request access",
+    sell: "Sell",
     learnMore: "Learn more",
     back: "Back",
     submit: "Submit",
@@ -86,14 +81,7 @@ export const en: Dictionary = {
       secondaryCta: "Request a private search",
       scrollHint: "Scroll",
     },
-    search: {
-      heading: "What are you looking for?",
-      label: "Describe what you need",
-      placeholder: "An estate in Antioquia, a Medellín–Miami charter, an armoured SUV…",
-      categoryLabel: "Category",
-      anyCategory: "All categories",
-      action: "Search",
-    },
+
     verticals: {
       eyebrow: "Categories",
       heading: "Five fronts, one way in",
@@ -161,18 +149,7 @@ export const en: Dictionary = {
         { key: "other", note: "Assessed as network demand appears." },
       ],
     },
-    privateTeaser: {
-      eyebrow: "DCM ACCESS PRIVATE",
-      heading: "Not every opportunity needs to be public",
-      lede: "Part of what we move is never listed: off-market property, aircraft, specific vehicles and business opportunities shared strictly on request.",
-      cta: "Enter Private Access",
-    },
-    partnerTeaser: {
-      eyebrow: "Partners",
-      heading: "Offer your products and services through a premium network",
-      lede: "Real estate firms, dealerships, charter operators, security companies and specialised providers can use DCM ACCESS as a channel to qualified clients.",
-      cta: "Apply as a partner",
-    },
+
   },
 
   verticals: {
@@ -228,8 +205,8 @@ export const en: Dictionary = {
       compliance:
         "DCM ACCESS does not operate aircraft and does not provide air services. All flight operations are carried out by duly certified operators under the applicable aviation regulations.",
     },
-    "private-services": {
-      eyebrow: "Private Services",
+    servicios: {
+      eyebrow: "Services",
       title: "Private services and executive logistics",
       lede: "We connect clients with professional providers of transport, concierge, logistics and protection services.",
       teaser: "Transport, concierge, logistics and protection.",
@@ -245,8 +222,8 @@ export const en: Dictionary = {
       compliance:
         "Security and protection services are provided exclusively by legally licensed companies holding current authorisation in their jurisdiction. DCM ACCESS acts as an intermediary, not as the service provider.",
     },
-    business: {
-      eyebrow: "Business Opportunities",
+    negocios: {
+      eyebrow: "Business",
       title: "Business assets and commercial opportunities",
       lede: "The open category: machinery, equipment, holdings, suppliers and partnerships that do not fit the others.",
       teaser: "Machinery, assets, businesses and partnerships.",
@@ -271,6 +248,8 @@ export const en: Dictionary = {
     offeringsHeading: "What you can ask us for",
     filters: {
       legend: "Filter vehicles",
+      queryLabel: "Search",
+      queryPlaceholder: "Classic Porsche in Madrid, armoured SUV…",
       make: "Make",
       year: "Year",
       yearFrom: "Year from",
@@ -402,101 +381,7 @@ export const en: Dictionary = {
       "Details of this opportunity are shared strictly on request. Send an enquiry and the information will be released under the appropriate level of confidentiality.",
   },
 
-  privateAccess: {
-    eyebrow: "DCM ACCESS PRIVATE",
-    heading: "Not every opportunity needs to be public",
-    statement: "Not everything needs to be public.",
-    lede: "Private Access is the reserved channel of DCM ACCESS: off-market opportunities, search mandates and transactions handled without exposure.",
-    includes: [
-      "Off-market property",
-      "Premium vehicles and specific units",
-      "Aircraft and private flights",
-      "Private and protection services",
-      "Confidential business opportunities",
-      "Concierge and dedicated attention",
-    ],
-    cta: "Start a private search",
-    offMarketHeading: "Reserved opportunities",
-    offMarketLede:
-      "These opportunities exist and are active. Their detail is released on request, not in the open.",
-    discretionHeading: "Discretion by design",
-    discretionBody:
-      "Every request carries a confidentiality level that defines what is shared, with whom and when. You choose it when you submit.",
-  },
-
-  privateRequest: {
-    eyebrow: "Private Search",
-    heading: "Request an opportunity",
-    lede: "Describe what you need. We search the network, verify what we find and present only what is worth your time.",
-    examplesHeading: "Requests like these",
-    examples: [
-      "I'm looking for a jet for 8 passengers.",
-      "I'm looking for a high-value estate.",
-      "I'm looking for an armoured SUV.",
-      "I'm looking for a premium apartment as an investment.",
-    ],
-    fields: {
-      what: {
-        label: "What are you looking for?",
-        placeholder: "Describe the asset, service or opportunity in as much detail as you like.",
-        hint: "The more specific you are, the shorter and more useful the search.",
-      },
-      vertical: { label: "Category" },
-      location: { label: "Location", placeholder: "City, country or region" },
-      budget: { label: "Budget", placeholder: "Approximate figure" },
-      currency: { label: "Currency" },
-      timeline: { label: "Timeline" },
-      requirements: {
-        label: "Specific requirements",
-        placeholder: "Conditions, must-have features, constraints.",
-      },
-      name: { label: "Name" },
-      email: { label: "Email" },
-      phone: { label: "Phone" },
-      contactMethod: { label: "Preferred contact method" },
-      confidentiality: { label: "Confidentiality level" },
-    },
-    timelineOptions: [
-      { value: "immediate", label: "Immediate" },
-      { value: "30-days", label: "Within 30 days" },
-      { value: "90-days", label: "Within 90 days" },
-      { value: "exploring", label: "Exploring options" },
-    ],
-    contactOptions: [
-      { value: "email", label: "Email" },
-      { value: "phone", label: "Phone call" },
-      { value: "whatsapp", label: "WhatsApp" },
-    ],
-    confidentialityOptions: [
-      {
-        value: "standard",
-        label: "Standard",
-        description: "We may mention your requirement to providers in the network.",
-      },
-      {
-        value: "discreet",
-        label: "Discreet",
-        description: "We share the requirement without identifying you.",
-      },
-      {
-        value: "strictly_private",
-        label: "Strictly private",
-        description: "Only an assigned broker handles the request.",
-      },
-    ],
-    submit: "Submit request",
-    successHeading: "Request received",
-    successBody:
-      "Your request has been logged with an internal reference. A broker will review it and contact you through the channel you selected.",
-    consent:
-      "I authorise the processing of my data to handle this request, in accordance with the privacy policy.",
-  },
-
   brokerage: {
-    eyebrow: "DCM Brokerage",
-    heading: "Tell us what you need",
-    statement: "We search. We connect. We facilitate.",
-    lede: "Our work is intermediation. We source the opportunity, review the available information, connect the parties and support the process as far as the agreed mandate reaches.",
     steps: [
       {
         number: "01",
@@ -535,154 +420,6 @@ export const en: Dictionary = {
         body: "We support the closing within the scope of the engaged service.",
       },
     ],
-    scopeHeading: "What this means, and what it does not",
-    scopeBody:
-      "DCM ACCESS acts as an intermediary. It does not replace the legal, accounting, tax or technical advice each transaction requires, and it does not directly provide regulated services — those are carried out by licensed providers. The exact scope is set out in writing in each mandate.",
-    cta: "Start a request",
-  },
-
-  partners: {
-    eyebrow: "Partners",
-    heading: "Become a DCM ACCESS Partner",
-    lede: "Offer your products and services through a premium network of qualified clients.",
-    benefitsHeading: "What you get",
-    benefits: [
-      {
-        key: "qualified-demand",
-        title: "Qualified demand",
-        body: "You receive pre-filtered requests with a defined requirement, budget and timeframe.",
-      },
-      {
-        key: "positioning",
-        title: "Positioning",
-        body: "Your company appears inside a premium environment, not on a classifieds board.",
-      },
-      {
-        key: "single-channel",
-        title: "One channel, several categories",
-        body: "If you operate across more than one vertical, you don't need more than one agreement.",
-      },
-      {
-        key: "commercial-terms",
-        title: "Clear terms",
-        body: "Commission, referral, lead fee or revenue share — agreed in writing before anything starts.",
-      },
-    ],
-    whoHeading: "Who we work with",
-    who: [
-      "Real estate firms and developers",
-      "Dealerships and vehicle traders",
-      "Charter operators and aviation companies",
-      "Security and protection companies",
-      "Transport and logistics companies",
-      "Concierge and premium service companies",
-      "Specialised and B2B providers",
-    ],
-    curationHeading: "Curation is not a formality",
-    curationBody:
-      "No application is published automatically. We review the information, the documentation and the suitability before approving a profile, because the exclusivity of the network depends on exactly that.",
-    cta: "Submit application",
-    directoryHeading: "Approved providers",
-    directoryLede: "Companies that are part of the network and publish through DCM ACCESS.",
-    directoryEmpty: "No approved providers have been published yet.",
-  },
-
-  partnerApply: {
-    heading: "Partner application",
-    lede: "Tell us who you are, what you offer and where you operate. Review is manual.",
-    steps: ["Company", "Operation", "Documentation"],
-    fields: {
-      company: { label: "Company name" },
-      country: { label: "Country" },
-      city: { label: "City" },
-      verticals: { label: "Categories you operate in", hint: "You may select more than one." },
-      services: { label: "Services or products", placeholder: "Separate them with commas." },
-      website: { label: "Website" },
-      email: { label: "Email" },
-      phone: { label: "Phone" },
-      description: {
-        label: "Company description",
-        placeholder: "What you do, since when, and what sets you apart.",
-      },
-      operatingAreas: {
-        label: "Operating areas",
-        placeholder: "Cities, regions or countries you serve.",
-      },
-      commercialInfo: {
-        label: "Commercial information",
-        placeholder: "Terms, usual commissions, capacity to take on work.",
-      },
-      certifications: {
-        label: "Certifications",
-        placeholder: "Separate them with commas.",
-        hint: "These are verified before being shown as accredited.",
-      },
-      licences: {
-        label: "Licences and authorisations",
-        hint: "Required for regulated services: aviation, security and protection.",
-      },
-      documentation: {
-        label: "Documentation",
-        hint: "Indicate what documentation you can provide. Do not attach it yet.",
-      },
-    },
-    reviewNotice:
-      "Your application enters a review queue. No profile is published automatically.",
-    submit: "Submit application",
-    successHeading: "Application received",
-    successBody:
-      "It has been logged with an internal reference. We will review the information and contact you to continue the process.",
-  },
-
-  provider: {
-    about: "About the company",
-    services: "Services",
-    coverage: "Coverage",
-    certifications: "Certifications",
-    openOpportunities: "Published opportunities",
-    contact: "Contact",
-    verificationHeading: "About verification",
-    verificationBody:
-      "The verification status indicates what information has been reviewed by DCM ACCESS. Accreditations without a verification mark are declared by the provider and have not been checked.",
-  },
-
-  about: {
-    eyebrow: "About",
-    heading: "DCM ACCESS is a way in",
-    lede: "We don't try to sell everything. We find the right opportunities, connect the right people and facilitate high-value transactions.",
-    originHeading: "The origin",
-    originBody: [
-      "DCM ACCESS takes its initials from its founder, David Cardona Martínez. ACCESS is what names the business: giving access to opportunities, assets, services and connections that are normally hard to find, negotiate or secure.",
-      "The company operates from Colombia and is building its network towards international markets, without being tied to a single industry.",
-    ],
-    modelHeading: "The model",
-    modelBody: [
-      "We work through intermediation. We do not depend on our own inventory: our function is to connect clients with assets, services, providers and opportunities, and to facilitate the transaction between the parties.",
-      "That makes it possible to serve, at the same time, someone looking for property, someone who needs a charter and someone acquiring machinery — through one point of contact and one standard of work.",
-    ],
-    principlesHeading: "How we work",
-    principles: [
-      {
-        key: "selectivity",
-        title: "Selection over volume",
-        body: "We would rather present little and good. Publishing too much is the fastest way to look like a classifieds site.",
-      },
-      {
-        key: "verification",
-        title: "Verify before presenting",
-        body: "We review the information and the suitability of the provider as each transaction requires.",
-      },
-      {
-        key: "discretion",
-        title: "Discretion as standard",
-        body: "High-value transactions are handled without public exposure, and the client sets the level of reserve.",
-      },
-      {
-        key: "clarity",
-        title: "Commercial clarity",
-        body: "Scope and terms are agreed in writing before anything starts, not afterwards.",
-      },
-    ],
   },
 
   contact: {
@@ -715,25 +452,6 @@ export const en: Dictionary = {
     submit: "Send enquiry",
     successHeading: "Enquiry sent",
     successBody: "A broker will review your enquiry and reply with the available detail.",
-  },
-
-  account: {
-    heading: "Your account",
-    lede: "Your saved opportunities, your requests and your conversation with the brokerage desk.",
-    nav: {
-      overview: "Overview",
-      favorites: "Favourites",
-      requests: "Requests",
-      messages: "Messages",
-      profile: "Profile",
-    },
-    empty: {
-      favorites: "You haven't saved any opportunities yet.",
-      requests: "You have no recorded requests.",
-      messages: "There are no messages in this conversation.",
-    },
-    demoSession:
-      "Demonstration session. Real authentication is not connected yet; the data shown is sample data.",
   },
 
   legal: {
@@ -856,7 +574,6 @@ export const en: Dictionary = {
   footer: {
     tagline: "Access to exclusive opportunities.",
     exploreHeading: "Explore",
-    companyHeading: "Company",
     legalHeading: "Legal",
     contactHeading: "Contact",
     rights: "All rights reserved.",
