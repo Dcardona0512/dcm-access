@@ -85,7 +85,6 @@ export async function MotorsMarketplace({
 
   const state: MotorsFilterState = {
     q: one(searchParams.q),
-    categoryId: one(searchParams.categoryId),
     make: one(searchParams.make),
     city: one(searchParams.city),
     yearMin: one(searchParams.yearMin),
@@ -105,7 +104,6 @@ export async function MotorsMarketplace({
   const query: OpportunityQuery = {
     q: state.q,
     vertical: VERTICAL,
-    categoryId: state.categoryId,
     city: state.city,
     minPrice: toNumber(state.minPrice),
     maxPrice: toNumber(state.maxPrice),
@@ -122,11 +120,10 @@ export async function MotorsMarketplace({
     offset: (page - 1) * PAGE_SIZE,
   };
 
-  const { opportunities, categories } = getRepositories();
-  const [results, allCategories] = await Promise.all([
-    opportunities.search(query),
-    categories.list(),
-  ]);
+  // Ya no hace falta el catálogo de categorías: con una por sección, el filtro
+  // de tipo desapareció y la tarjeta de vehículo no lo muestra.
+  const { opportunities } = getRepositories();
+  const results = await opportunities.search(query);
 
   const totalPages = Math.max(1, Math.ceil(results.total / PAGE_SIZE));
 
@@ -258,7 +255,6 @@ export async function MotorsMarketplace({
               locale={locale}
               dict={dict}
               facets={results.facets}
-              categories={allCategories}
               state={state}
               total={results.total}
             />

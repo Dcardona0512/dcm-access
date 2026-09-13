@@ -93,13 +93,7 @@ export function contactSchema(dict: Dictionary) {
  * transmisión, estado— NO se repiten en el diccionario: salen del
  * `attributeSchema` de la categoría, que es su única fuente de verdad.
  */
-export const motorsCategoryIds = [
-  "cat-mo-premium",
-  "cat-mo-classic",
-  "cat-mo-security",
-  "cat-mo-commercial",
-  "cat-mo-motorcycle",
-] as const;
+export const motorsCategoryIds = ["cat-motors"] as const;
 
 export const motorsFuels = ["petrol", "diesel", "hybrid", "electric"] as const;
 export const motorsTransmissions = ["automatic", "manual"] as const;

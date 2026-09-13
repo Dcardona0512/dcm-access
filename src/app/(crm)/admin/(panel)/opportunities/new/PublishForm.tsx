@@ -67,17 +67,16 @@ export function PublishForm({
   const [state, action] = useActionState(publishListing, initial);
 
   const [vertical, setVertical] = useState(verticals[0]?.value ?? "");
-  const [categoryId, setCategoryId] = useState("");
   const [priceMode, setPriceMode] = useState<"fixed" | "on_request">("fixed");
   const [files, setFiles] = useState<FileState[]>([]);
   const [uploading, setUploading] = useState(false);
 
-  const visibleCategories = useMemo(
-    () => categories.filter((c) => c.vertical === vertical),
+  // Una categoría por sección: elegir la sección YA elige la categoría, así que
+  // preguntarlo dos veces era pedir al usuario que repitiera la misma decisión.
+  const category = useMemo(
+    () => categories.find((c) => c.vertical === vertical),
     [categories, vertical],
   );
-
-  const category = categories.find((c) => c.id === categoryId);
   const ready = files.filter((f) => f.status === "listo");
   const pending = files.some((f) => f.status === "pendiente" || f.status === "subiendo");
 
@@ -179,39 +178,19 @@ export function PublishForm({
       ) : null}
 
       {/* --- Sección y categoría --------------------------------------------- */}
+      <input type="hidden" name="categoryId" value={category?.id ?? ""} />
+
       <Group title="Dónde va">
-        <Field label="Sección">
+        <Field label="Sección" full>
           <select
             name="vertical"
             value={vertical}
-            onChange={(e) => {
-              setVertical(e.target.value);
-              setCategoryId("");
-            }}
+            onChange={(e) => setVertical(e.target.value)}
             className={control}
           >
             {verticals.map((v) => (
               <option key={v.value} value={v.value} className="bg-surface-raised">
                 {v.label}
-              </option>
-            ))}
-          </select>
-        </Field>
-
-        <Field label="Categoría">
-          <select
-            name="categoryId"
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-            required
-            className={control}
-          >
-            <option value="" className="bg-surface-raised">
-              Elija una categoría
-            </option>
-            {visibleCategories.map((c) => (
-              <option key={c.id} value={c.id} className="bg-surface-raised">
-                {c.name}
               </option>
             ))}
           </select>
@@ -233,7 +212,7 @@ export function PublishForm({
 
       {/* --- Atributos de la categoría elegida -------------------------------- */}
       {category && category.attributes.length > 0 ? (
-        <Group title={`Datos de ${category.name.toLowerCase()}`}>
+        <Group title="Datos de la ficha">
           {category.attributes.map((attr) => (
             <Field key={attr.key} label={attr.unit ? `${attr.label} (${attr.unit})` : attr.label}>
               {attr.options && attr.options.length > 0 ? (

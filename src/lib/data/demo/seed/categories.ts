@@ -322,177 +322,65 @@ const businessBase: readonly AttributeDef[] = [
 
 /* --- Catálogo de categorías ------------------------------------------------------ */
 
+/**
+ * Una categoría por sección, y nada más.
+ *
+ * Hubo veintitrés subcategorías —premium, clásicos, comerciales, motos— y se
+ * quitaron: subdividir un catálogo de decenas de fichas produce filtros que
+ * devuelven una sola cosa o ninguna, y obliga a quien publica a clasificar
+ * antes de poder escribir el título.
+ *
+ * Lo que la categoría sigue aportando es su `attributeSchema`: es lo que
+ * decide que un vehículo tenga marca y kilometraje y un inmueble habitaciones
+ * y área. Esa parte se conserva intacta; lo que desaparece es la subdivisión.
+ *
+ * El blindaje entra en el esquema general de vehículos y queda como campo
+ * opcional: antes obligaba a elegir "vehículos de seguridad" para poder
+ * declararlo, y ahora simplemente se rellena cuando aplica.
+ */
 export const categories: readonly Category[] = [
-  // Real Estate
   {
-    id: "cat-re-apartment",
+    id: "cat-real-estate",
     vertical: "real-estate",
-    slug: "apartamentos",
-    name: { es: "Apartamentos", en: "Apartments" },
+    slug: "inmobiliario",
+    name: { es: "Inmobiliario", en: "Real Estate" },
     attributeSchema: realEstateBase,
   },
   {
-    id: "cat-re-house",
-    vertical: "real-estate",
-    slug: "casas",
-    name: { es: "Casas", en: "Houses" },
-    attributeSchema: realEstateBase,
-  },
-  {
-    id: "cat-re-estate",
-    vertical: "real-estate",
-    slug: "fincas",
-    name: { es: "Fincas y haciendas", en: "Estates and farmland" },
-    attributeSchema: realEstateBase,
-  },
-  {
-    id: "cat-re-land",
-    vertical: "real-estate",
-    slug: "lotes",
-    name: { es: "Lotes y terrenos", en: "Plots and land" },
-    attributeSchema: [realEstateBase[1], realEstateBase[7]] as AttributeDef[],
-  },
-  {
-    id: "cat-re-commercial",
-    vertical: "real-estate",
-    slug: "comercial",
-    name: { es: "Propiedades comerciales", en: "Commercial property" },
-    attributeSchema: realEstateBase,
-  },
-  {
-    id: "cat-re-investment",
-    vertical: "real-estate",
-    slug: "inversion",
-    name: { es: "Inmuebles de inversión", en: "Investment property" },
-    attributeSchema: realEstateBase,
-  },
-
-  // Motors
-  {
-    id: "cat-mo-premium",
+    id: "cat-motors",
     vertical: "motors",
-    slug: "premium",
-    name: { es: "Vehículos premium", en: "Premium vehicles" },
-    attributeSchema: motorsBase,
-  },
-  {
-    id: "cat-mo-classic",
-    vertical: "motors",
-    slug: "clasicos",
-    name: { es: "Vehículos clásicos", en: "Classic vehicles" },
-    attributeSchema: motorsBase,
-  },
-  {
-    id: "cat-mo-security",
-    vertical: "motors",
-    slug: "seguridad",
-    name: { es: "Vehículos de seguridad", en: "Security vehicles" },
+    slug: "vehiculos",
+    name: { es: "Vehículos", en: "Motors" },
     attributeSchema: [...motorsBase, armourLevel],
   },
   {
-    id: "cat-mo-commercial",
-    vertical: "motors",
-    slug: "comerciales",
-    name: { es: "Vehículos comerciales", en: "Commercial vehicles" },
-    attributeSchema: motorsBase,
-  },
-  {
-    id: "cat-mo-motorcycle",
-    vertical: "motors",
-    slug: "motos",
-    name: { es: "Motocicletas", en: "Motorcycles" },
-    attributeSchema: motorsBase,
-  },
-
-  // Aviation
-  {
-    id: "cat-av-jet",
+    id: "cat-aviation",
     vertical: "aviation",
-    slug: "jets",
-    name: { es: "Jets privados", en: "Private jets" },
+    slug: "aviacion",
+    name: { es: "Aviación", en: "Aviation" },
     attributeSchema: aviationBase,
   },
   {
-    id: "cat-av-helicopter",
-    vertical: "aviation",
-    slug: "helicopteros",
-    name: { es: "Helicópteros", en: "Helicopters" },
-    attributeSchema: aviationBase,
-  },
-  {
-    id: "cat-av-charter",
-    vertical: "aviation",
-    slug: "charter",
-    name: { es: "Vuelos charter", en: "Charter flights" },
-    attributeSchema: aviationBase,
-  },
-  {
-    id: "cat-av-services",
-    vertical: "aviation",
-    slug: "servicios-aviacion",
-    name: { es: "Servicios de aviación", en: "Aviation services" },
-    attributeSchema: aviationBase,
-  },
-
-  // Private Services
-  {
-    id: "cat-ps-transport",
+    id: "cat-servicios",
     vertical: "servicios",
-    slug: "transporte-ejecutivo",
-    name: { es: "Transporte ejecutivo", en: "Executive transport" },
+    slug: "servicios",
+    name: { es: "Servicios", en: "Services" },
     attributeSchema: servicesBase,
   },
   {
-    id: "cat-ps-protection",
-    vertical: "servicios",
-    slug: "proteccion",
-    name: { es: "Seguridad y protección", en: "Security and protection" },
-    attributeSchema: servicesBase,
-  },
-  {
-    id: "cat-ps-concierge",
-    vertical: "servicios",
-    slug: "concierge",
-    name: { es: "Concierge", en: "Concierge" },
-    attributeSchema: servicesBase,
-  },
-  {
-    id: "cat-ps-logistics",
-    vertical: "servicios",
-    slug: "logistica",
-    name: { es: "Logística privada", en: "Private logistics" },
-    attributeSchema: servicesBase,
-  },
-
-  // Business Opportunities
-  {
-    id: "cat-bu-machinery",
-    vertical: "negocios",
-    slug: "maquinaria",
-    name: { es: "Maquinaria y equipos", en: "Machinery and equipment" },
-    attributeSchema: businessBase,
-  },
-  {
-    id: "cat-bu-company",
+    id: "cat-negocios",
     vertical: "negocios",
     slug: "negocios",
-    name: { es: "Negocios en venta", en: "Businesses for sale" },
-    attributeSchema: businessBase,
-  },
-  {
-    id: "cat-bu-partnership",
-    vertical: "negocios",
-    slug: "alianzas",
-    name: { es: "Alianzas comerciales", en: "Commercial partnerships" },
-    attributeSchema: businessBase,
-  },
-  {
-    id: "cat-bu-assets",
-    vertical: "negocios",
-    slug: "activos",
-    name: { es: "Activos especiales", en: "Special assets" },
+    name: { es: "Negocios", en: "Business" },
     attributeSchema: businessBase,
   },
 ];
+
+/** La categoría de una sección. Con una sola por vertical, es una búsqueda directa. */
+export function categoryForVertical(vertical: Category["vertical"]): Category {
+  const found = categories.find((category) => category.vertical === vertical);
+  if (!found) throw new Error(`Sin categoría para la vertical ${vertical}`);
+  return found;
+}
 
 export const categoriesById = new Map(categories.map((category) => [category.id, category]));

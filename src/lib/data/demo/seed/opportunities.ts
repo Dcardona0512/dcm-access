@@ -39,7 +39,7 @@ export const opportunities: readonly Opportunity[] = [
     slug: "penthouse-el-poblado-medellin",
     reference: "DCM-RE-1042",
     vertical: "real-estate",
-    categoryId: "cat-re-apartment",
+    categoryId: "cat-real-estate",
     title: {
       es: "Penthouse con terraza panorámica en El Poblado",
       en: "Penthouse with panoramic terrace in El Poblado",
@@ -80,7 +80,7 @@ export const opportunities: readonly Opportunity[] = [
     slug: "hacienda-cafetera-oriente-antioqueno",
     reference: "DCM-RE-1078",
     vertical: "real-estate",
-    categoryId: "cat-re-estate",
+    categoryId: "cat-real-estate",
     title: {
       es: "Hacienda cafetera en el oriente antioqueño",
       en: "Coffee estate in eastern Antioquia",
@@ -122,7 +122,7 @@ export const opportunities: readonly Opportunity[] = [
     slug: "apartamento-zona-t-bogota",
     reference: "DCM-RE-1091",
     vertical: "real-estate",
-    categoryId: "cat-re-apartment",
+    categoryId: "cat-real-estate",
     title: {
       es: "Apartamento amoblado en Zona T, Bogotá",
       en: "Furnished apartment in Zona T, Bogotá",
@@ -159,7 +159,7 @@ export const opportunities: readonly Opportunity[] = [
     slug: "edificio-oficinas-cartagena",
     reference: "DCM-RE-1103",
     vertical: "real-estate",
-    categoryId: "cat-re-investment",
+    categoryId: "cat-real-estate",
     title: {
       es: "Edificio de oficinas con renta en operación, Cartagena",
       en: "Income-producing office building, Cartagena",
@@ -193,7 +193,7 @@ export const opportunities: readonly Opportunity[] = [
     slug: "villa-frente-al-mar-off-market",
     reference: "DCM-RE-1120",
     vertical: "real-estate",
-    categoryId: "cat-re-house",
+    categoryId: "cat-real-estate",
     title: {
       es: "Villa frente al mar — off-market",
       en: "Beachfront villa — off-market",
@@ -222,7 +222,7 @@ export const opportunities: readonly Opportunity[] = [
     slug: "mercedes-amg-g63-miami",
     reference: "DCM-MO-2041",
     vertical: "motors",
-    categoryId: "cat-mo-premium",
+    categoryId: "cat-motors",
     title: { es: "Mercedes-AMG G 63", en: "Mercedes-AMG G 63" },
     summary: {
       es: "Unidad con especificación completa y kilometraje bajo, disponible en Miami para entrega inmediata.",
@@ -262,7 +262,7 @@ export const opportunities: readonly Opportunity[] = [
     slug: "suv-blindada-nivel-b6-bogota",
     reference: "DCM-MO-2058",
     vertical: "motors",
-    categoryId: "cat-mo-security",
+    categoryId: "cat-motors",
     title: {
       es: "SUV blindada nivel B6",
       en: "B6 armoured SUV",
@@ -304,7 +304,7 @@ export const opportunities: readonly Opportunity[] = [
     slug: "porsche-911-clasico-madrid",
     reference: "DCM-MO-2066",
     vertical: "motors",
-    categoryId: "cat-mo-classic",
+    categoryId: "cat-motors",
     title: { es: "Porsche 911 Carrera 3.2", en: "Porsche 911 Carrera 3.2" },
     summary: {
       es: "Clásico con restauración documentada y matrícula histórica, localizado en Madrid.",
@@ -339,7 +339,7 @@ export const opportunities: readonly Opportunity[] = [
     slug: "flota-camionetas-ejecutivas-leasing",
     reference: "DCM-MO-2074",
     vertical: "motors",
-    categoryId: "cat-mo-commercial",
+    categoryId: "cat-motors",
     title: {
       es: "Flota de camionetas ejecutivas en leasing",
       en: "Executive SUV fleet on lease",
@@ -376,7 +376,7 @@ export const opportunities: readonly Opportunity[] = [
     slug: "charter-medellin-miami-jet-ligero",
     reference: "DCM-AV-3012",
     vertical: "aviation",
-    categoryId: "cat-av-charter",
+    categoryId: "cat-aviation",
     title: {
       es: "Charter Medellín — Miami en jet ligero",
       en: "Medellín — Miami charter, light jet",
@@ -415,7 +415,7 @@ export const opportunities: readonly Opportunity[] = [
     slug: "helicoptero-biturbina-seis-pasajeros",
     reference: "DCM-AV-3027",
     vertical: "aviation",
-    categoryId: "cat-av-helicopter",
+    categoryId: "cat-aviation",
     title: {
       es: "Helicóptero biturbina para seis pasajeros",
       en: "Twin-engine helicopter, six passengers",
@@ -443,7 +443,7 @@ export const opportunities: readonly Opportunity[] = [
     slug: "jet-mediano-ocho-pasajeros-leasing",
     reference: "DCM-AV-3035",
     vertical: "aviation",
-    categoryId: "cat-av-jet",
+    categoryId: "cat-aviation",
     title: {
       es: "Jet mediano de ocho pasajeros — leasing y gestión",
       en: "Mid-size eight-passenger jet — lease and management",
@@ -480,7 +480,7 @@ export const opportunities: readonly Opportunity[] = [
     slug: "transporte-ejecutivo-con-conductor-bogota",
     reference: "DCM-PS-4008",
     vertical: "servicios",
-    categoryId: "cat-ps-transport",
+    categoryId: "cat-servicios",
     title: {
       es: "Transporte ejecutivo con conductor en Bogotá",
       en: "Executive transport with driver in Bogotá",
@@ -514,7 +514,7 @@ export const opportunities: readonly Opportunity[] = [
     slug: "proteccion-ejecutiva-bajo-contrato",
     reference: "DCM-PS-4015",
     vertical: "servicios",
-    categoryId: "cat-ps-protection",
+    categoryId: "cat-servicios",
     title: {
       es: "Protección ejecutiva bajo contrato",
       en: "Executive protection under contract",
@@ -553,7 +553,7 @@ export const opportunities: readonly Opportunity[] = [
     slug: "linea-maquinaria-construccion",
     reference: "DCM-BU-5004",
     vertical: "negocios",
-    categoryId: "cat-bu-machinery",
+    categoryId: "cat-negocios",
     title: {
       es: "Línea de maquinaria de construcción",
       en: "Construction machinery line",
@@ -586,7 +586,7 @@ export const opportunities: readonly Opportunity[] = [
     slug: "participacion-operacion-logistica",
     reference: "DCM-BU-5011",
     vertical: "negocios",
-    categoryId: "cat-bu-company",
+    categoryId: "cat-negocios",
     title: {
       es: "Participación en operación logística — confidencial",
       en: "Stake in a logistics operation — confidential",

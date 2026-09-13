@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Eyebrow } from "@/components/ui/Section";
 import type { Dictionary } from "@/content/types";
 import type { Facets } from "@/lib/data";
-import { localized, type Category } from "@/lib/domain/types";
 import { localizePath, type Locale } from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
 
@@ -24,7 +23,6 @@ import { cn } from "@/lib/utils";
 export type MotorsFilterState = {
   /** Texto libre. Lo interpreta `parseQuery`, que entiende marca y ciudad. */
   readonly q?: string;
-  readonly categoryId?: string;
   readonly make?: string;
   readonly city?: string;
   readonly yearMin?: string;
@@ -38,14 +36,12 @@ export function MotorsFilters({
   locale,
   dict,
   facets,
-  categories,
   state,
   total,
 }: {
   readonly locale: Locale;
   readonly dict: Dictionary;
   readonly facets: Facets;
-  readonly categories: readonly Category[];
   readonly state: MotorsFilterState;
   readonly total: number;
 }) {
@@ -54,9 +50,6 @@ export function MotorsFilters({
 
   const hasFilters = Object.values(state).some(Boolean);
   const makes = facets.attributes?.make ?? [];
-
-  const categoryName = (id: string) =>
-    localized(categories.find((category) => category.id === id)?.name, locale) || id;
 
   return (
     <details
@@ -108,18 +101,6 @@ export function MotorsFilters({
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <Select
-            name="categoryId"
-            label={copy.category}
-            value={state.categoryId}
-            anyLabel={dict.catalog.facets.any}
-            options={facets.categories.map((bucket) => ({
-              value: bucket.value,
-              label: categoryName(bucket.value),
-              count: bucket.count,
-            }))}
-          />
-
           <Select
             name="make"
             label={copy.make}
