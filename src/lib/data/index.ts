@@ -22,9 +22,23 @@ export function isDemoData(): boolean {
 
 let cached: Repositories | undefined;
 
+/**
+ * Fuente compuesta.
+ *
+ * Supabase implementa hoy el catálogo y nada más. En lugar de exigirle las
+ * seis interfaces de golpe, se superpone sobre el adaptador de memoria: lo que
+ * sabe hacer lo hace él, y el resto —proveedores, leads, operaciones,
+ * comisiones— sigue funcionando mientras se migra.
+ *
+ * Sin credenciales, `createSupabaseRepositories()` devuelve un objeto vacío y
+ * todo cae a memoria. El sitio nunca se queda sin datos por una variable de
+ * entorno mal puesta; simplemente sirve la semilla.
+ */
 export function getRepositories(): Repositories {
   if (!cached) {
-    cached = getDataSource() === "supabase" ? createSupabaseRepositories() : createDemoRepositories();
+    const demo = createDemoRepositories();
+    cached =
+      getDataSource() === "supabase" ? { ...demo, ...createSupabaseRepositories() } : demo;
   }
   return cached;
 }

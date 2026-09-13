@@ -39,6 +39,30 @@ export function isSupabaseWritable(): boolean {
 }
 
 /**
+ * Cliente anónimo, sin cookies y sin sesión.
+ *
+ * Es el que sirve el catálogo público, y usa la clave PUBLICABLE a propósito:
+ * la política de RLS ya restringe lo que se puede leer a lo publicado y
+ * público, así que no hace falta una credencial privilegiada para mostrar lo
+ * que de todas formas es público. Un error aquí no puede filtrar una ficha
+ * reservada, porque la base no la devuelve.
+ *
+ * Al no tocar cookies, las páginas que lo usan siguen pudiendo renderizarse
+ * estáticamente.
+ */
+export function createPublicClient() {
+  if (!SUPABASE_URL || !PUBLISHABLE_KEY) {
+    throw new Error(
+      "Faltan NEXT_PUBLIC_SUPABASE_URL o NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.",
+    );
+  }
+
+  return createClient(SUPABASE_URL, PUBLISHABLE_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
+
+/**
  * Cliente ligado a la sesión del visitante. Lee y escribe las cookies de
  * autenticación, así que es el único que sabe quién ha iniciado sesión.
  */

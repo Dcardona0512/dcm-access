@@ -46,6 +46,15 @@ export default async function AdminOpportunitiesPage() {
         lede={`${results.total} publicadas, incluidas las reservadas que no aparecen en el catálogo público.`}
       />
 
+      <div className="mb-8">
+        <Link
+          href="/admin/opportunities/new"
+          className="eyebrow border-accent/50 text-accent hover:bg-accent/10 inline-flex rounded-(--radius-card) border px-4 py-2.5 text-[0.5rem] transition-colors"
+        >
+          Publicar una ficha
+        </Link>
+      </div>
+
       <DataTable
         headers={[
           "Título",
