@@ -19,6 +19,7 @@ const ENTRIES: readonly { href: string; label: string; resource: Resource }[] = 
   { href: "/admin/leads", label: "Leads", resource: "leads" },
   { href: "/admin/deals", label: "Operaciones", resource: "deals" },
   { href: "/admin/opportunities", label: "Oportunidades", resource: "opportunities" },
+  { href: "/admin/submissions", label: "Solicitudes", resource: "opportunities" },
   { href: "/admin/providers", label: "Proveedores", resource: "providers" },
   { href: "/admin/commissions", label: "Comisiones", resource: "commissions" },
 ];

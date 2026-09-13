@@ -189,6 +189,96 @@ export type Dictionary = {
     readonly business: VerticalCopy;
   };
 
+  /**
+   * Marketplace de vehículos.
+   *
+   * Bloque propio y no dentro de `verticals.motors`, porque `VerticalCopy` lo
+   * comparten las cinco verticales: meter aquí las claves del marketplace
+   * obligaría a inmobiliaria, aviación, servicios privados y negocios a
+   * inventarse un formulario de venta que nunca van a renderizar.
+   */
+  readonly motorsMarket: {
+    readonly eyebrow: string;
+    readonly heading: string;
+    /** Invitación a bajar: el vídeo es la primera impresión, la parrilla la segunda. */
+    readonly scrollCue: string;
+    readonly sellCta: string;
+    readonly searchCta: string;
+    /** Encabezado de la prosa reubicada bajo la parrilla. */
+    readonly offeringsHeading: string;
+    readonly filters: {
+      readonly legend: string;
+      readonly make: string;
+      readonly year: string;
+      readonly yearFrom: string;
+      readonly yearTo: string;
+      readonly priceFrom: string;
+      readonly priceTo: string;
+      readonly kmMax: string;
+      readonly city: string;
+      readonly category: string;
+    };
+    readonly card: {
+      readonly video: string;
+      readonly km: string;
+    };
+    readonly sell: {
+      readonly eyebrow: string;
+      readonly title: string;
+      readonly lede: string;
+      /** Qué pasa tras enviar. Se dice ANTES de enviar, no solo en el éxito. */
+      readonly reviewNote: string;
+      readonly sections: {
+        readonly vehicle: string;
+        readonly price: string;
+        readonly place: string;
+        readonly media: string;
+        readonly seller: string;
+      };
+      readonly fields: {
+        readonly category: FieldCopy;
+        readonly make: FieldCopy;
+        readonly model: FieldCopy;
+        readonly year: FieldCopy;
+        readonly mileage: FieldCopy;
+        readonly fuel: FieldCopy;
+        readonly transmission: FieldCopy;
+        readonly condition: FieldCopy;
+        readonly priceMode: FieldCopy;
+        readonly priceAmount: FieldCopy;
+        readonly currency: FieldCopy;
+        readonly country: FieldCopy;
+        readonly city: FieldCopy;
+        readonly description: FieldCopy;
+        readonly name: FieldCopy;
+        readonly email: FieldCopy;
+        readonly phone: FieldCopy;
+      };
+      readonly priceModes: {
+        readonly fixed: string;
+        readonly onRequest: string;
+      };
+      readonly media: {
+        readonly label: string;
+        readonly hint: string;
+        readonly add: string;
+        readonly remove: string;
+        readonly uploading: string;
+        readonly uploaded: string;
+        readonly failed: string;
+        readonly retry: string;
+        readonly tooMany: string;
+        readonly tooLarge: string;
+        readonly badType: string;
+        readonly pending: string;
+      };
+      readonly consent: string;
+      readonly submit: string;
+      readonly successHeading: string;
+      readonly successBody: string;
+    };
+  };
+
   readonly catalog: {
     readonly title: string;
     readonly lede: string;

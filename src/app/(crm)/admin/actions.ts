@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getRepositories } from "@/lib/data";
 import { can, getDemoUser } from "@/lib/auth/roles";
 import { dealStages, leadStatuses, type DealStage, type LeadStatus } from "@/lib/domain/types";
+import { locales } from "@/lib/i18n/config";
 
 /* ============================================================================
    ACCIONES DEL CRM (§22, §23)
@@ -47,6 +48,45 @@ export async function moveDeal(formData: FormData) {
   revalidatePath("/admin/deals");
   revalidatePath("/admin/commissions");
   revalidatePath("/admin");
+}
+
+/**
+ * Aprobar una solicitud es el ÚNICO camino que publica una oportunidad.
+ *
+ * Por eso pide permiso de `create` sobre oportunidades y no de `update`: lo
+ * que ocurre aquí no es cambiar un estado, es crear una ficha de catálogo a
+ * partir de lo que mandó un tercero.
+ */
+export async function approveSubmission(formData: FormData) {
+  const user = getDemoUser();
+  assert(can(user.role, "create", "opportunities"), "Sin permiso para publicar oportunidades.");
+
+  const id = String(formData.get("id") ?? "");
+  assert(id.length > 0, "Solicitud no válida.");
+
+  const { submissions } = getRepositories();
+  await submissions.approve(id);
+
+  revalidatePath("/admin/submissions");
+  revalidatePath("/admin/opportunities");
+  // El vehículo aparece en el mercado y en el catálogo en los dos idiomas.
+  for (const locale of locales) {
+    revalidatePath(`/${locale}/motors`);
+    revalidatePath(`/${locale}/opportunities`);
+  }
+}
+
+export async function rejectSubmission(formData: FormData) {
+  const user = getDemoUser();
+  assert(can(user.role, "create", "opportunities"), "Sin permiso para gestionar solicitudes.");
+
+  const id = String(formData.get("id") ?? "");
+  assert(id.length > 0, "Solicitud no válida.");
+
+  const { submissions } = getRepositories();
+  await submissions.reject(id);
+
+  revalidatePath("/admin/submissions");
 }
 
 export async function decideProvider(formData: FormData) {

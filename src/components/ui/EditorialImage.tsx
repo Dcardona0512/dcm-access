@@ -55,6 +55,14 @@ export function EditorialImage({
 }: EditorialImageProps) {
   const angle = toneAngles[media?.tone ?? "architecture"];
 
+  /**
+   * Un vídeo no se sirve por `next/image`: su `src` es un `.mp4` y el
+   * optimizador no sabe qué hacer con él. Lo que sí es una imagen es su
+   * fotograma de portada, así que un vídeo se representa por su póster y, si
+   * no lo tiene, por la placa editorial. Reproducirlo es cosa de la galería.
+   */
+  const imageSrc = media?.kind === "video" ? media.poster : media?.src;
+
   return (
     <div
       className={cn(
@@ -64,9 +72,9 @@ export function EditorialImage({
         className,
       )}
     >
-      {media?.src ? (
+      {imageSrc && media ? (
         <Image
-          src={media.src}
+          src={imageSrc}
           alt={media.alt}
           fill
           sizes={sizes}

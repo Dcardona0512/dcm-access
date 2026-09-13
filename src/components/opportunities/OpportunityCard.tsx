@@ -44,7 +44,7 @@ export function OpportunityCard({
     opportunity,
     category,
     locale,
-    { yes: "Sí", no: "No" },
+    { yes: locale === "es" ? "Sí" : "Yes", no: "No" },
     { onlyHighlights: true, limit: isFeature ? 4 : 3 },
   );
 

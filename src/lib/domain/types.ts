@@ -125,13 +125,23 @@ export type MediaTone = "architecture" | "motors" | "aviation" | "services" | "b
 export type MediaItem = {
   readonly id: string;
   readonly kind: "image" | "video";
-  /** Ruta bajo `/public/media`. Si falta, se renderiza el placeholder editorial. */
+  /**
+   * Ruta del archivo: absoluta bajo `/public/media`, o URL pública del bucket
+   * de almacenamiento. Si falta, se renderiza el placeholder editorial.
+   */
   readonly src?: string;
   /** Obligatorio, nunca opcional: sin alt no hay accesibilidad ni SEO (§27, §39). */
   readonly alt: string;
   readonly width?: number;
   readonly height?: number;
   readonly tone?: MediaTone;
+  /**
+   * Fotograma de portada de un vídeo. Es una IMAGEN, así que viaja por la ruta
+   * normal de `next/image`: `src` de un vídeo apunta a un `.mp4` y no puede
+   * optimizarse. Sin póster, un vídeo cae al placeholder editorial.
+   */
+  readonly poster?: string;
+  readonly durationS?: number;
 };
 
 /* --- Oportunidad ----------------------------------------------------------- */

@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 
-import { VerticalPage, verticalMetadata } from "@/components/pages/VerticalPage";
-
-const VERTICAL = "motors" as const;
+import { MotorsMarketplace, motorsMetadata } from "@/components/pages/MotorsMarketplace";
 
 export async function generateMetadata({
   params,
@@ -10,11 +8,22 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  return verticalMetadata(VERTICAL, locale);
+  return motorsMetadata(locale);
 }
 
-export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  /**
+   * Leer los filtros de la URL vuelve la página dinámica y le quita el
+   * prerenderizado estático. Es el precio de filtrar sin JavaScript, y es el
+   * mismo que ya paga `/opportunities`.
+   */
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const [{ locale }, sp] = await Promise.all([params, searchParams]);
 
   /**
    * `bright` va por el PICO, no por la media. Este metraje promedia 0,27
@@ -23,9 +32,9 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
    * más claro que pase, no en el promedio del vídeo.
    */
   return (
-    <VerticalPage
-      vertical={VERTICAL}
+    <MotorsMarketplace
       localeRaw={locale}
+      searchParams={sp}
       backgroundVideo={{ src: "/media/motors.mp4", tone: "bright" }}
     />
   );

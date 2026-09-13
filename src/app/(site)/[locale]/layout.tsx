@@ -8,7 +8,7 @@ import { AccessIntro } from "@/components/intro/AccessIntro";
 import { AccessIntroGate } from "@/components/intro/AccessIntroGate";
 import { getDictionary } from "@/content";
 import { brand } from "@/content/shared";
-import { isDemoData } from "@/lib/data";
+import { getRepositories, isDemoData } from "@/lib/data";
 import { fontVariables } from "@/lib/fonts";
 import { isLocale, localeMeta, locales, type Locale } from "@/lib/i18n/config";
 import { alternatesFor, jsonLd, organizationSchema, siteUrl, websiteSchema } from "@/lib/seo";
@@ -67,6 +67,20 @@ export default async function LocaleLayout({
   const locale = raw as Locale;
   const dict = getDictionary(locale);
 
+  /**
+   * El aviso de demostración no puede seguir siendo pura configuración.
+   *
+   * En cuanto un vehículo real conviva con la semilla, `isDemoData()` se
+   * equivoca en los dos sentidos: con Supabase escondería el aviso mientras
+   * siguen a la vista fichas de ejemplo, y en memoria lo mostraría aunque ya
+   * no quedara ninguna. La pregunta correcta se la hace a los datos, y el
+   * adaptador que aún no sepa responderla cae al comportamiento de antes.
+   */
+  const { opportunities } = getRepositories();
+  const showDemoNotice = opportunities.hasDemoPublished
+    ? await opportunities.hasDemoPublished()
+    : isDemoData();
+
   return (
     <html
       lang={localeMeta[locale].hreflang}
@@ -105,7 +119,7 @@ export default async function LocaleLayout({
 
         <SiteFooter locale={locale} dict={dict} />
 
-        {isDemoData() ? <DemoNotice dict={dict} /> : null}
+        {showDemoNotice ? <DemoNotice dict={dict} /> : null}
 
         {/* Cortina de entrada. Va al final del body para que el contenido de la
             página ya esté en el documento cuando aparezca (§27, §28). */}

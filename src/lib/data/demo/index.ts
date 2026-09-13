@@ -1,6 +1,5 @@
 import type { CommissionPlan } from "@/lib/commerce/commissions";
 import type {
-  Category,
   Deal,
   DealStage,
   Lead,
@@ -8,19 +7,17 @@ import type {
   LeadStatus,
   Opportunity,
   Provider,
-  Visibility,
 } from "@/lib/domain/types";
-import { parseQuery, type SearchIntent } from "@/lib/search/parse";
-import { normalize, slugify } from "@/lib/utils";
+import { slugify } from "@/lib/utils";
 
+import { searchIn } from "../query";
 import type {
-  Facets,
   LeadInput,
-  OpportunityQuery,
   Page,
   ProviderApplicationInput,
   Repositories,
 } from "../repositories";
+import { createInMemorySubmissions } from "./submissions";
 import { categories, categoriesById } from "./seed/categories";
 import { opportunities } from "./seed/opportunities";
 import { commissionPlans, commissionPlansById, deals, leads } from "./seed/pipeline";
@@ -35,250 +32,49 @@ import { providers } from "./seed/providers";
    prueba, y es también el recordatorio de que aquí falta conectar Supabase.
    ========================================================================== */
 
-const runtimeLeads: Lead[] = [...leads];
-const runtimeProviders: Provider[] = [...providers];
-const runtimeDeals: Deal[] = [...deals];
+/* --- Estado de ejecución ------------------------------------------------------
+   El sitio público y el CRM son layouts RAÍZ distintos, y Next los compila en
+   grafos de módulos separados. Una variable de módulo, por tanto, no es una:
+   son dos, y un vehículo aprobado desde `/admin` no aparecía en `/motors`.
 
-let leadCounter = leads.length;
-let providerCounter = providers.length;
+   Anclar los arrays a `globalThis` les da una sola identidad en el proceso.
+   Es el mismo truco que se usa con un cliente de base de datos en desarrollo,
+   y sigue siendo memoria: se pierde al reiniciar, que es lo que debe pasar con
+   datos de prueba. Con Supabase esto sobra, porque el estado deja de vivir en
+   el proceso.
+   ---------------------------------------------------------------------------- */
 
-/* --- Coincidencia textual ---------------------------------------------------- */
-
-/** Aplana todos los idiomas de un texto multilingüe para poder buscar en él. */
-function flatten(value: Record<string, string | undefined> | undefined): string {
-  if (!value) return "";
-  return Object.values(value).filter(Boolean).join(" ");
-}
-
-type Haystack = {
-  /** Texto completo, para coincidencias por subcadena (ciudades de dos palabras). */
-  readonly text: string;
-  /**
-   * Palabras exactas. Los términos se comparan contra este conjunto y no con
-   * `includes`, para que "privado" no case dentro de "privados" ni "auto"
-   * dentro de "automático".
-   */
-  readonly words: ReadonlySet<string>;
+type RuntimeStore = {
+  opportunities: Opportunity[];
+  leads: Lead[];
+  providers: Provider[];
+  deals: Deal[];
+  leadCounter: number;
+  providerCounter: number;
 };
 
-/**
- * Despluralización mínima para español e inglés.
- *
- * No es un lematizador y no pretende serlo: solo cubre el caso que aparece
- * constantemente en este catálogo, donde las categorías van en plural
- * ("Fincas y haciendas") y la gente busca en singular ("finca"). Sin esto,
- * buscar "finca" no encontraba ninguna finca.
- */
-function stem(word: string): string {
-  if (word.length > 4 && word.endsWith("es")) return word.slice(0, -2);
-  if (word.length > 3 && word.endsWith("s")) return word.slice(0, -1);
-  return word;
-}
+const STORE = Symbol.for("dcm.demo.runtime");
 
-function haystackFor(opportunity: Opportunity, category: Category | undefined): Haystack {
-  const attributeText = Object.values(opportunity.attributes)
-    .map((value) => (Array.isArray(value) ? value.join(" ") : String(value ?? "")))
-    .join(" ");
+function getStore(): RuntimeStore {
+  const host = globalThis as typeof globalThis & { [STORE]?: RuntimeStore };
 
-  const text = normalize(
-    [
-      flatten(opportunity.title),
-      flatten(opportunity.summary),
-      flatten(opportunity.description),
-      flatten(category?.name),
-      opportunity.reference,
-      opportunity.location.city ?? "",
-      opportunity.location.region ?? "",
-      opportunity.location.country,
-      attributeText,
-    ].join(" "),
-  );
-
-  const words = new Set<string>();
-  for (const word of text.split(/[^a-z0-9]+/)) {
-    if (!word) continue;
-    words.add(word);
-    words.add(stem(word));
-  }
-
-  return { text, words };
-}
-
-type Relevance = {
-  /** Puntuación total, para ordenar. */
-  readonly points: number;
-  /**
-   * Si la oportunidad merece aparecer siquiera.
-   *
-   * La distinción importa: coincidir en país o estar destacada sube en la
-   * lista, pero no justifica salir en ella. Sin esta separación, "Vuelo
-   * privado Medellín Miami" devolvería toda la oferta colombiana —maquinaria
-   * incluida— porque todo comparte país, y §15 pide exactamente lo contrario:
-   * una selección corta que transmita exclusividad.
-   */
-  readonly relevant: boolean;
-};
-
-function score(opportunity: Opportunity, intent: SearchIntent, haystack: Haystack): Relevance {
-  let points = 0;
-
-  const verticalHit = Boolean(intent.vertical) && opportunity.vertical === intent.vertical;
-  if (verticalHit) points += 40;
-
-  if (intent.listingType && opportunity.listingType === intent.listingType) points += 15;
-
-  let cityHit = false;
-  if (intent.city) {
-    const city = normalize(intent.city);
-    if (normalize(opportunity.location.city ?? "") === city) {
-      points += 25;
-      cityHit = true;
-    } else if (haystack.text.includes(city)) {
-      points += 10;
-      cityHit = true;
-    }
-  }
-
-  let destinationHit = false;
-  if (intent.destination && haystack.text.includes(normalize(intent.destination))) {
-    points += 8;
-    destinationHit = true;
-  }
-
-  // Señales de refuerzo: ordenan, no seleccionan.
-  if (intent.country && opportunity.location.country === intent.country) points += 6;
-  if (opportunity.featured) points += 3;
-
-  let termHit = false;
-  for (const term of intent.terms) {
-    if (!haystack.words.has(term) && !haystack.words.has(stem(term))) continue;
-    points += 6;
-    termHit = true;
-  }
-
-  /**
-   * Cuando el texto identifica una vertical, esa vertical manda: pedir "vuelo
-   * privado" y recibir un apartamento porque está en la misma ciudad no es un
-   * resultado, es ruido. Sin vertical reconocida, basta con la ubicación o con
-   * cualquier término.
-   */
-  const relevant = intent.vertical
-    ? verticalHit || termHit
-    : cityHit || destinationHit || termHit;
-
-  return { points, relevant };
-}
-
-/* --- Filtrado ----------------------------------------------------------------- */
-
-const DEFAULT_VISIBILITY: readonly Visibility[] = ["public"];
-
-function matchesFilters(opportunity: Opportunity, query: OpportunityQuery): boolean {
-  const visibility = query.visibility ?? DEFAULT_VISIBILITY;
-
-  if (opportunity.status !== "published") return false;
-  if (!visibility.includes(opportunity.visibility)) return false;
-  if (query.vertical && opportunity.vertical !== query.vertical) return false;
-  if (query.categoryId && opportunity.categoryId !== query.categoryId) return false;
-  if (query.providerId && opportunity.providerId !== query.providerId) return false;
-  if (query.listingType && opportunity.listingType !== query.listingType) return false;
-  if (query.featured !== undefined && opportunity.featured !== query.featured) return false;
-  if (query.country && opportunity.location.country !== query.country) return false;
-
-  if (query.city && normalize(opportunity.location.city ?? "") !== normalize(query.city)) {
-    return false;
-  }
-
-  if (query.currency && opportunity.price.currency !== query.currency) return false;
-
-  // Un precio "a consultar" nunca se descarta por rango: descartarlo escondería
-  // justo las oportunidades de mayor valor, que son las que no publican cifra.
-  if (opportunity.price.amount !== undefined) {
-    if (query.minPrice !== undefined && opportunity.price.amount < query.minPrice) return false;
-    if (query.maxPrice !== undefined && opportunity.price.amount > query.maxPrice) return false;
-  }
-
-  if (query.attributes) {
-    for (const [key, expected] of Object.entries(query.attributes)) {
-      if (!expected) continue;
-      const actual = opportunity.attributes[key];
-      const matches = Array.isArray(actual)
-        ? actual.map(String).includes(expected)
-        : String(actual ?? "") === expected;
-      if (!matches) return false;
-    }
-  }
-
-  return true;
-}
-
-/* --- Facetas ------------------------------------------------------------------- */
-
-function countBy<T>(items: readonly T[], pick: (item: T) => string | undefined) {
-  const counts = new Map<string, number>();
-
-  for (const item of items) {
-    const key = pick(item);
-    if (!key) continue;
-    counts.set(key, (counts.get(key) ?? 0) + 1);
-  }
-
-  return [...counts.entries()]
-    .map(([value, count]) => ({ value, count }))
-    .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
-}
-
-function buildFacets(items: readonly Opportunity[]): Facets {
-  return {
-    verticals: countBy(items, (item) => item.vertical),
-    categories: countBy(items, (item) => item.categoryId),
-    countries: countBy(items, (item) => item.location.country),
-    cities: countBy(items, (item) => item.location.city),
-    listingTypes: countBy(items, (item) => item.listingType),
+  host[STORE] ??= {
+    opportunities: [...opportunities],
+    leads: [...leads],
+    providers: [...providers],
+    deals: [...deals],
+    leadCounter: leads.length,
+    providerCounter: providers.length,
   };
+
+  return host[STORE];
 }
 
-/* --- Ordenación ------------------------------------------------------------------ */
-
-/** Sin precio no hay orden por precio: esos registros van al final, no arriba. */
-function priceOf(opportunity: Opportunity): number | null {
-  return opportunity.price.amount ?? null;
-}
-
-function sortItems(
-  items: Opportunity[],
-  sort: OpportunityQuery["sort"],
-  scores: Map<string, number>,
-): Opportunity[] {
-  const byDate = (a: Opportunity, b: Opportunity) =>
-    new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
-
-  switch (sort) {
-    case "newest":
-      return items.sort(byDate);
-
-    case "price-asc":
-    case "price-desc": {
-      const direction = sort === "price-asc" ? 1 : -1;
-      return items.sort((a, b) => {
-        const pa = priceOf(a);
-        const pb = priceOf(b);
-        if (pa === null && pb === null) return byDate(a, b);
-        if (pa === null) return 1;
-        if (pb === null) return -1;
-        return (pa - pb) * direction;
-      });
-    }
-
-    default:
-      return items.sort((a, b) => {
-        const diff = (scores.get(b.id) ?? 0) - (scores.get(a.id) ?? 0);
-        if (diff !== 0) return diff;
-        if (a.featured !== b.featured) return a.featured ? -1 : 1;
-        return byDate(a, b);
-      });
-  }
-}
+const store = getStore();
+const runtimeOpportunities = store.opportunities;
+const runtimeLeads = store.leads;
+const runtimeProviders = store.providers;
+const runtimeDeals = store.deals;
 
 /* --- Utilidades ------------------------------------------------------------------- */
 
@@ -311,69 +107,22 @@ export function createDemoRepositories(): Repositories {
 
     opportunities: {
       async search(query): Promise<Page<Opportunity>> {
-        const intent = query.q ? parseQuery(query.q) : null;
-
-        /**
-         * La intención completa los filtros que el usuario no marcó a mano,
-         * pero nunca pisa una elección explícita suya.
-         *
-         * La vertical inferida se deja FUERA a propósito: es una conjetura y
-         * debe influir en el orden, no excluir resultados. "Vehículo de
-         * seguridad" contiene léxico de dos verticales a la vez —"vehículo" es
-         * de Motors y "seguridad" de Private Services— y filtrar por la que
-         * gane el desempate escondería justo la camioneta blindada que se está
-         * buscando. La vertical solo filtra cuando llega del selector.
-         *
-         * La ubicación sí filtra: "en Miami" es una restricción explícita del
-         * usuario, no una deducción del léxico.
-         */
-        const effective: OpportunityQuery = {
-          ...query,
-          country: query.country ?? intent?.country,
-          maxPrice: query.maxPrice ?? intent?.maxPrice,
-        };
-
-        const filtered = opportunities.filter((item) => matchesFilters(item, effective));
-
-        const scores = new Map<string, number>();
-        let matched = filtered;
-
-        if (intent && intent.raw.length > 0) {
-          const scored = filtered.map((item) => {
-            const category = categoriesById.get(item.categoryId);
-            const relevance = score(item, intent, haystackFor(item, category));
-            scores.set(item.id, relevance.points);
-            return { item, ...relevance };
-          });
-
-          // Si nada resulta relevante se devuelve todo lo filtrado en lugar de
-          // una lista vacía: el catálogo completo es más útil que un callejón
-          // sin salida, y el estado vacío ya empuja a la búsqueda privada.
-          const relevant = scored.filter((entry) => entry.relevant);
-          matched = relevant.length > 0 ? relevant.map((entry) => entry.item) : filtered;
-        }
-
-        const sorted = sortItems([...matched], effective.sort, scores);
-        const offset = effective.offset ?? 0;
-        const limit = effective.limit ?? sorted.length;
-
-        return {
-          items: sorted.slice(offset, offset + limit),
-          total: sorted.length,
-          facets: buildFacets(matched),
-        };
+        // Toda la semilla cabe en memoria, así que el núcleo compartido recibe
+        // el conjunto entero. El adaptador de Supabase llamará a este mismo
+        // `searchIn` con lo que la base de datos ya haya recortado.
+        return searchIn(runtimeOpportunities, query, categoriesById);
       },
 
       async bySlug(slug) {
-        return opportunities.find((item) => item.slug === slug) ?? null;
+        return runtimeOpportunities.find((item) => item.slug === slug) ?? null;
       },
 
       async byId(id) {
-        return opportunities.find((item) => item.id === id) ?? null;
+        return runtimeOpportunities.find((item) => item.id === id) ?? null;
       },
 
       async related(opportunity, limit = 3) {
-        return opportunities
+        return runtimeOpportunities
           .filter(
             (item) =>
               item.id !== opportunity.id &&
@@ -385,8 +134,14 @@ export function createDemoRepositories(): Repositories {
       },
 
       async allPublished() {
-        return opportunities.filter(
+        return runtimeOpportunities.filter(
           (item) => item.status === "published" && item.visibility === "public",
+        );
+      },
+
+      async hasDemoPublished() {
+        return runtimeOpportunities.some(
+          (item) => item.isDemo && item.status === "published" && item.visibility === "public",
         );
       },
     },
@@ -406,7 +161,8 @@ export function createDemoRepositories(): Repositories {
       },
 
       async createApplication(input: ProviderApplicationInput) {
-        providerCounter += 1;
+        store.providerCounter += 1;
+        const providerCounter = store.providerCounter;
 
         const provider: Provider = {
           id: `prv-app-${providerCounter}`,
@@ -450,7 +206,8 @@ export function createDemoRepositories(): Repositories {
 
     leads: {
       async create(input: LeadInput) {
-        leadCounter += 1;
+        store.leadCounter += 1;
+        const leadCounter = store.leadCounter;
         const at = nowIso();
 
         const lead: Lead = {
@@ -535,5 +292,12 @@ export function createDemoRepositories(): Repositories {
         return commissionPlansById.get(id) ?? null;
       },
     },
+
+    submissions: createInMemorySubmissions({
+      // Publicar es insertar al principio: lo recién aprobado es lo más nuevo,
+      // y el orden por defecto del catálogo es `newest`.
+      publish: (opportunity) => runtimeOpportunities.unshift(opportunity),
+      publishedSlugs: () => new Set(runtimeOpportunities.map((item) => item.slug)),
+    }),
   };
 }

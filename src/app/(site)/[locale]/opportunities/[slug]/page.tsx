@@ -3,10 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { InquiryForm } from "@/components/forms/InquiryForm";
+import { MediaGallery } from "@/components/opportunities/MediaGallery";
 import { OpportunityCard } from "@/components/opportunities/OpportunityCard";
 import { ArrowEast, Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
-import { EditorialImage } from "@/components/ui/EditorialImage";
 import { PriceTag } from "@/components/ui/PriceTag";
 import { Eyebrow } from "@/components/ui/Section";
 import { DemoTag, Tag, VerificationBadge } from "@/components/ui/Tag";
@@ -137,12 +137,7 @@ export default async function OpportunityPage({
               </p>
             </header>
 
-            <EditorialImage
-              media={opportunity.media[0]}
-              ratio="16/9"
-              priority
-              sizes="(max-width: 1024px) 100vw, 62vw"
-            />
+            <MediaGallery media={opportunity.media} label={dict.opportunity.overview} />
 
             {restricted ? (
               <section className="border-accent/25 bg-accent/[0.03] flex flex-col gap-4 rounded-(--radius-card) border px-6 py-8">

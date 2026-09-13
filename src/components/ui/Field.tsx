@@ -142,10 +142,17 @@ export function TextAreaField({ rows = 5, ...props }: BaseProps & { readonly row
 export function SelectField({
   options,
   emptyLabel,
+  onChange,
   ...props
 }: BaseProps & {
   readonly options: readonly { readonly value: string; readonly label: string }[];
   readonly emptyLabel?: string;
+  /**
+   * Aviso de cambio para los pocos casos en que otro campo depende de este.
+   * Opcional a propósito: el campo sigue siendo no controlado —el valor vive
+   * en el DOM y lo lee el FormData—, así que sin `onChange` no cambia nada.
+   */
+  readonly onChange?: (value: string) => void;
 }) {
   const id = useId();
 
@@ -164,6 +171,7 @@ export function SelectField({
         name={props.name}
         defaultValue={props.defaultValue ?? ""}
         required={props.required}
+        onChange={onChange ? (event) => onChange(event.target.value) : undefined}
         aria-invalid={props.error ? true : undefined}
         className={cn(controlBase, "h-12 cursor-pointer appearance-none")}
       >
