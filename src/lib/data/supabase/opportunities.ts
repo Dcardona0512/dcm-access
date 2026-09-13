@@ -55,12 +55,41 @@ async function withRetry<T>(label: string, run: () => Promise<T>): Promise<T> {
     } catch (error) {
       last = error;
       if (attempt < 2) {
-        await new Promise((resolve) => setTimeout(resolve, 300 * 2 ** attempt));
+        await new Promise((resolve) => setTimeout(resolve, 800 * 2 ** attempt));
       }
     }
   }
 
   throw new Error(`Supabase (${label}): ${last instanceof Error ? last.message : String(last)}`);
+}
+
+/**
+ * Memoización por PROCESO, con caducidad.
+ *
+ * `cache()` de React agrupa dentro de un render; esto agrupa entre renders. La
+ * diferencia importa en el build: hay consultas que viven en el layout y se
+ * ejecutan una vez por página, así que `cache()` las dejaba en cincuenta y
+ * ocho peticiones idénticas lanzadas por siete procesos a la vez —suficiente
+ * para que la base devolviera un tiempo de espera agotado.
+ *
+ * Solo se usa en consultas donde un dato de hace unos segundos da igual: el
+ * aviso de contenido de demostración y la lista de lo publicado. Lo que se
+ * muestra de una ficha concreta NUNCA pasa por aquí.
+ */
+function memo<T>(ttlMs: number, run: () => Promise<T>): () => Promise<T> {
+  let value: { at: number; promise: Promise<T> } | undefined;
+
+  return () => {
+    const now = Date.now();
+    if (!value || now - value.at > ttlMs) {
+      value = { at: now, promise: run() };
+      // Un fallo no se cachea: reintentar debe poder volver a preguntar.
+      value.promise.catch(() => {
+        value = undefined;
+      });
+    }
+    return value.promise;
+  };
 }
 
 /** Fila con sus medios embebidos: PostgREST los trae en la misma petición. */
@@ -96,7 +125,7 @@ export function createSupabaseOpportunities(
    * `related`, cada una de las cincuenta fichas. Con `cache()` es UNA consulta
    * reutilizada, en vez de cincuenta y cinco.
    */
-  const allPublished = cache(async (): Promise<Opportunity[]> => {
+  const allPublished = memo(20_000, async (): Promise<Opportunity[]> => {
     const rows = await withRetry("allPublished", async () => {
       const { data, error } = await table()
         .eq("status", "published")
@@ -190,7 +219,7 @@ export function createSupabaseOpportunities(
 
     allPublished,
 
-    hasDemoPublished: cache(async () => {
+    hasDemoPublished: memo(5 * 60_000, async () => {
       const data = await withRetry("hasDemoPublished", async () => {
         const result = await client
           .from("opportunities")
