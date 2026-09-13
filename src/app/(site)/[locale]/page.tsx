@@ -5,7 +5,6 @@ import { GlobalNetwork } from "@/components/sections/GlobalNetwork";
 import { Hero } from "@/components/sections/Hero";
 import { HeroVideo } from "@/components/sections/HeroVideo";
 import { ProcessSteps } from "@/components/sections/ProcessSteps";
-import { SelectedOpportunities } from "@/components/sections/SelectedOpportunities";
 import { VerticalsGrid } from "@/components/sections/VerticalsGrid";
 import { WhyPillars } from "@/components/sections/WhyPillars";
 import { getDictionary } from "@/content";
@@ -63,7 +62,6 @@ export default async function HomePage({
       <div className="dcm-over-video relative">
         <Hero locale={locale} dict={dict} />
         <VerticalsGrid locale={locale} dict={dict} />
-        <SelectedOpportunities locale={locale} dict={dict} />
         <WhyPillars dict={dict} />
         <ProcessSteps locale={locale} dict={dict} />
         <GlobalNetwork dict={dict} />

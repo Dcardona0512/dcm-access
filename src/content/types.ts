@@ -66,8 +66,6 @@ export type Dictionary = {
   readonly brand: {
     /** Eslogan principal, en versalitas. */
     readonly tagline: string;
-    /** Los tres ejes, separados por bullets. Acompaña al logo. */
-    readonly descriptor: string;
     /** Variante para el pie y las imágenes sociales. */
     readonly signature: string;
   };
@@ -119,10 +117,7 @@ export type Dictionary = {
 
   readonly home: {
     readonly hero: {
-      readonly eyebrow: string;
       readonly lede: string;
-      readonly primaryCta: string;
-      readonly secondaryCta: string;
       readonly scrollHint: string;
     };
 
@@ -131,12 +126,7 @@ export type Dictionary = {
       readonly heading: string;
       readonly lede: string;
     };
-    readonly selected: {
-      readonly eyebrow: string;
-      readonly heading: string;
-      readonly lede: string;
-      readonly cta: string;
-    };
+
     readonly why: {
       readonly eyebrow: string;
       readonly heading: string;

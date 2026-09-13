@@ -26,7 +26,7 @@ export function SiteFooter({
         <div className="grid gap-14 py-20 lg:grid-cols-[1.6fr_1fr_1fr] lg:gap-12">
           <div className="flex flex-col gap-6">
             <Link href={to("/")} className="text-fg hover:text-accent w-fit transition-colors">
-              <Logo descriptor={dict.brand.descriptor} />
+              <Logo />
             </Link>
             <p className="text-fg-muted max-w-[34ch] text-sm text-pretty">{dict.footer.tagline}</p>
 

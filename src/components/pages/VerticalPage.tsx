@@ -215,7 +215,7 @@ export async function VerticalPage({
 
         {/* --- Oportunidades publicadas ------------------------------------- */}
         <Section id="publicadas" width="wide" divider>
-          <SectionHeading eyebrow={dict.home.selected.eyebrow} heading={dict.catalog.title} />
+          <SectionHeading heading={dict.catalog.title} />
 
           {results.items.length === 0 ? (
             <EmptyState

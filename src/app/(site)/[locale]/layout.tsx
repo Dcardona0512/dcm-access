@@ -123,7 +123,7 @@ export default async function LocaleLayout({
 
         {/* Cortina de entrada. Va al final del body para que el contenido de la
             página ya esté en el documento cuando aparezca (§27, §28). */}
-        <AccessIntro descriptor={dict.brand.descriptor} />
+        <AccessIntro />
 
         <script
           type="application/ld+json"

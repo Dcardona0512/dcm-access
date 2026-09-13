@@ -13,7 +13,6 @@ export const en: Dictionary = {
 
   brand: {
     tagline: "ACCESS TO EXCLUSIVE OPPORTUNITIES",
-    descriptor: "Global Assets • Premium Services • Exclusive Opportunities",
     signature: "Global Assets • Premium Services • Private Brokerage",
   },
 
@@ -75,10 +74,7 @@ export const en: Dictionary = {
 
   home: {
     hero: {
-      eyebrow: "Global Assets • Premium Services • Exclusive Opportunities",
       lede: "Global assets, premium services and carefully selected opportunities, connected through a brokerage network.",
-      primaryCta: "Explore opportunities",
-      secondaryCta: "Request a private search",
       scrollHint: "Scroll",
     },
 
@@ -87,12 +83,7 @@ export const en: Dictionary = {
       heading: "Five fronts, one way in",
       lede: "We work through intermediation. You describe what you need and we source it across the network, whichever of these categories it belongs to.",
     },
-    selected: {
-      eyebrow: "Selected Opportunities",
-      heading: "A selection, not a catalogue",
-      lede: "We publish sparingly, on purpose. Every opportunity is reviewed before it appears here, and most of what we move is never published at all.",
-      cta: "View all opportunities",
-    },
+
     why: {
       eyebrow: "Why DCM ACCESS",
       heading: "Six reasons to work through a single point of access",

@@ -1,4 +1,3 @@
-import { ArrowEast, Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { brand } from "@/content/shared";
 import type { Dictionary } from "@/content/types";
@@ -41,7 +40,6 @@ export function Hero({ locale, dict }: { readonly locale: Locale; readonly dict:
       <Container width="wide" className="relative">
         <div className="flex flex-col gap-10 md:gap-12">
           <div className="flex max-w-4xl flex-col gap-8">
-            <p className="eyebrow text-accent">{dict.home.hero.eyebrow}</p>
 
             <div className="flex flex-col gap-5">
               {/* El nombre de la marca es el h1; el eslogan lo acompaña como
@@ -63,17 +61,6 @@ export function Hero({ locale, dict }: { readonly locale: Locale; readonly dict:
               </p>
             </div>
 
-            {/*
-              Un solo CTA, y ancla en vez de ruta: las cinco categorías están
-              justo debajo, en `VerticalsGrid`. Bajar a ellas es la acción
-              honesta desde una portada que ya no tiene catálogo general.
-            */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-              <Button href="#categories" size="lg">
-                {dict.home.hero.primaryCta}
-                <ArrowEast />
-              </Button>
-            </div>
           </div>
         </div>
       </Container>

@@ -98,7 +98,7 @@ function revealSchedule(scale: number): readonly number[] {
 
 type Phase = "armed" | "running" | "resolved" | "out" | "done";
 
-export function AccessIntro({ descriptor }: { readonly descriptor: string }) {
+export function AccessIntro() {
   // El servidor y el primer render del cliente coinciden: la palabra final,
   // oculta por CSS mientras la fase es "armed". Sin parpadeo y sin desajuste
   // de hidratación, porque no hay nada aleatorio en el render inicial.
@@ -311,7 +311,6 @@ export function AccessIntro({ descriptor }: { readonly descriptor: string }) {
         </p>
 
         <span className="dcm-intro__rule" />
-        <span className="dcm-intro__descriptor">{descriptor}</span>
       </div>
     </div>
   );

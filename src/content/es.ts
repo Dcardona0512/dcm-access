@@ -14,7 +14,6 @@ export const es: Dictionary = {
 
   brand: {
     tagline: "ACCESO A OPORTUNIDADES EXCLUSIVAS",
-    descriptor: "Activos globales • Servicios premium • Oportunidades exclusivas",
     signature: "Activos globales • Servicios premium • Intermediación privada",
   },
 
@@ -76,10 +75,7 @@ export const es: Dictionary = {
 
   home: {
     hero: {
-      eyebrow: "Activos globales • Servicios premium • Oportunidades exclusivas",
       lede: "Activos globales, servicios premium y oportunidades cuidadosamente seleccionadas, conectadas a través de una red de intermediación.",
-      primaryCta: "Explorar oportunidades",
-      secondaryCta: "Solicitar una búsqueda privada",
       scrollHint: "Desplácese",
     },
 
@@ -88,12 +84,7 @@ export const es: Dictionary = {
       heading: "Cinco frentes, una sola puerta de entrada",
       lede: "Operamos por intermediación. Usted describe lo que necesita y nosotros lo buscamos dentro de la red, sin importar en cuál de estas categorías esté.",
     },
-    selected: {
-      eyebrow: "Selección",
-      heading: "Una selección, no un catálogo",
-      lede: "Publicamos poco a propósito. Cada oportunidad pasa por revisión antes de aparecer aquí, y la mayoría de lo que movemos nunca llega a publicarse.",
-      cta: "Ver todas las oportunidades",
-    },
+
     why: {
       eyebrow: "Por qué DCM ACCESS",
       heading: "Seis razones para trabajar con una puerta de acceso",
