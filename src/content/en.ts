@@ -560,6 +560,64 @@ export const en: Dictionary = {
           },
         ],
       },
+      {
+        slug: "trade-policy",
+        title: "Trade policy",
+        summary: "What may be published on DCM ACCESS, and what may not.",
+        sections: [
+          {
+            heading: "What may be published",
+            body: "Only assets, vehicles, property and services that the publisher owns, represents, or holds a current mandate for. A listing must describe the item as it is, with its real condition, its real location and a price that can be honoured.",
+          },
+          {
+            heading: "What is not accepted",
+            body: "No goods of doubtful provenance, with undisclosed retention of title, hidden encumbrances, stolen, or subject to litigation. Nor weapons, wildlife, medicines, identity documents, or anything whose trade is restricted or prohibited by the regulations applicable in the relevant jurisdiction.",
+          },
+          {
+            heading: "Vehicles and regulated goods",
+            body: "Armoured vehicles, aircraft and security services are subject to the regulations and permits of each jurisdiction. DCM ACCESS brokers through licensed providers and does not itself handle procedures requiring specific licensing.",
+          },
+          {
+            heading: "Accuracy of information",
+            body: "Photographs and video must correspond to the item advertised. Stock imagery presented as your own, bait pricing, and the omission of material defects a reasonable buyer would want to know before deciding are not accepted.",
+          },
+          {
+            heading: "The role of DCM ACCESS",
+            body: "DCM ACCESS acts as an intermediary and point of access. It does not own the items published, does not guarantee their condition, and does not take part in payment between the parties unless expressly agreed in writing for a specific transaction.",
+          },
+          {
+            heading: "Removal of listings",
+            body: "Any listing that breaches these conditions may be removed without prior notice. Repeated inaccurate information may lead to publishing access being withdrawn.",
+          },
+        ],
+      },
+      {
+        slug: "non-discrimination",
+        title: "Non-discrimination policy",
+        summary: "Nobody is excluded for who they are.",
+        sections: [
+          {
+            heading: "Commitment",
+            body: "DCM ACCESS does not accept listings or conduct that discriminate against a person on the basis of national or ethnic origin, skin colour, sex, sexual orientation, gender identity, age, disability, marital status, family situation, religion, political opinion or socioeconomic condition.",
+          },
+          {
+            heading: "In listings",
+            body: "No listing may exclude, discourage or give preference to people on those grounds — not in its text, not in its imagery, and not in the terms of the transaction. This applies with particular force to residential lettings, where tenant selection may not rest on any of those criteria.",
+          },
+          {
+            heading: "In conduct",
+            body: "The same requirement applies to how the parties treat each other during a brokered transaction, and to network providers in delivering their services.",
+          },
+          {
+            heading: "How to report",
+            body: "Anyone may flag a listing or conduct they consider discriminatory by writing to the contact address. Every report is reviewed, and the listing is taken down for the duration of that review where the case warrants it.",
+          },
+          {
+            heading: "Consequences",
+            body: "A breach means removal of the listing and may mean withdrawal of publishing access, without prejudice to any legal action that may apply.",
+          },
+        ],
+      },
     ],
   },
 

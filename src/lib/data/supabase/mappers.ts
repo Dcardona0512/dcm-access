@@ -46,6 +46,9 @@ export type OpportunityRow = {
   region: string | null;
   city: string | null;
   area: string | null;
+  lat: string | number | null;
+  lng: string | number | null;
+  sku: string | null;
   attributes: Record<string, AttributeValue>;
   provider_id: string | null;
   verification: string;
@@ -125,6 +128,8 @@ export function rowToOpportunity(
       country: row.country,
       region: clean(row.region),
       city: clean(row.city),
+      lat: num(row.lat),
+      lng: num(row.lng),
     },
     // Una ficha sin fotografía conserva un medio sin `src`, que es lo que hace
     // que `EditorialImage` dibuje la placa editorial en vez de un hueco roto.
@@ -168,6 +173,9 @@ export function opportunityToRow(opportunity: Opportunity): Record<string, unkno
     city: opportunity.location.city ?? null,
     city_slug: opportunity.location.city ? normalize(opportunity.location.city) : null,
     area: opportunity.location.area ?? null,
+    lat: opportunity.location.lat ?? null,
+    lng: opportunity.location.lng ?? null,
+    sku: opportunity.sku ?? null,
     attributes: opportunity.attributes,
     provider_id: opportunity.providerId ?? null,
     verification: opportunity.verification,

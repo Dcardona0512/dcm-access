@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useActionState, useMemo, useState } from "react";
 import { useFormStatus } from "react-dom";
 
+import { LocationPicker } from "@/components/admin/LocationPicker";
+import { TagsInput } from "@/components/admin/TagsInput";
 import { createBrowserClient } from "@/lib/supabase/browser";
 
 import { publishListing, requestUploadSlots, type PublishState } from "./actions";
@@ -67,16 +69,26 @@ export function PublishForm({
   const [state, action] = useActionState(publishListing, initial);
 
   const [vertical, setVertical] = useState(verticals[0]?.value ?? "");
+  const [categoryId, setCategoryId] = useState("");
+  const [point, setPoint] = useState<{ lat: number; lng: number } | null>(null);
+  const [city, setCity] = useState("");
+  const [tags, setTags] = useState<readonly string[]>([]);
   const [priceMode, setPriceMode] = useState<"fixed" | "on_request">("fixed");
   const [files, setFiles] = useState<FileState[]>([]);
   const [uploading, setUploading] = useState(false);
 
-  // Una categoría por sección: elegir la sección YA elige la categoría, así que
-  // preguntarlo dos veces era pedir al usuario que repitiera la misma decisión.
-  const category = useMemo(
-    () => categories.find((c) => c.vertical === vertical),
+  const options = useMemo(
+    () => categories.filter((c) => c.vertical === vertical),
     [categories, vertical],
   );
+
+  /**
+   * Cuatro secciones tienen una sola categoría y no hace falta preguntar.
+   * Vehículos tiene ocho, así que ahí sí: una moto y un remolque no son lo
+   * mismo. La pregunta aparece solo cuando hay algo que decidir.
+   */
+  const mustChoose = options.length > 1;
+  const category = mustChoose ? options.find((c) => c.id === categoryId) : options[0];
   const ready = files.filter((f) => f.status === "listo");
   const pending = files.some((f) => f.status === "pendiente" || f.status === "subiendo");
 
@@ -179,13 +191,23 @@ export function PublishForm({
 
       {/* --- Sección y categoría --------------------------------------------- */}
       <input type="hidden" name="categoryId" value={category?.id ?? ""} />
+      <input type="hidden" name="tags" value={tags.join(",")} />
+      {point ? (
+        <>
+          <input type="hidden" name="lat" value={point.lat} />
+          <input type="hidden" name="lng" value={point.lng} />
+        </>
+      ) : null}
 
       <Group title="Dónde va">
-        <Field label="Sección" full>
+        <Field label="Sección" full={!mustChoose}>
           <select
             name="vertical"
             value={vertical}
-            onChange={(e) => setVertical(e.target.value)}
+            onChange={(e) => {
+              setVertical(e.target.value);
+              setCategoryId("");
+            }}
             className={control}
           >
             {verticals.map((v) => (
@@ -195,6 +217,26 @@ export function PublishForm({
             ))}
           </select>
         </Field>
+
+        {mustChoose ? (
+          <Field label="Categoría">
+            <select
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
+              required
+              className={control}
+            >
+              <option value="" className="bg-surface-raised">
+                Elija una categoría
+              </option>
+              {options.map((c) => (
+                <option key={c.id} value={c.id} className="bg-surface-raised">
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </Field>
+        ) : null}
       </Group>
 
       {/* --- Texto ------------------------------------------------------------ */}
@@ -263,7 +305,9 @@ export function PublishForm({
         ) : null}
 
         <Field label="Moneda">
-          <select name="currency" defaultValue="USD" className={control}>
+          {/* COP por defecto: la mayoría del inventario está en Colombia. Las
+              demás siguen ahí para lo que se publica fuera. */}
+          <select name="currency" defaultValue="COP" className={control}>
             {currencies.map((c) => (
               <option key={c} value={c} className="bg-surface-raised">
                 {c}
@@ -294,7 +338,37 @@ export function PublishForm({
         </Field>
 
         <Field label="Ciudad">
-          <input name="city" className={control} />
+          <input
+            name="city"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            className={control}
+          />
+        </Field>
+
+        <div className="sm:col-span-2">
+          <LocationPicker
+            onChange={(picked) => {
+              setPoint({ lat: picked.lat, lng: picked.lng });
+              // El mapa RELLENA la ciudad, no la sustituye: si Nominatim no
+              // acierta, se corrige a mano en el campo de arriba.
+              if (picked.label) setCity(picked.label);
+            }}
+          />
+        </div>
+      </Group>
+
+      {/* --- Etiquetas y referencia interna --------------------------------- */}
+      <Group title="Extras">
+        <Field label="Etiquetas" full>
+          <TagsInput onChange={setTags} />
+        </Field>
+
+        <Field label="SKU" full>
+          <input name="sku" className={control} />
+          <span className="text-fg-muted/60 text-xs">
+            Su referencia interna. Opcional, y no se muestra en ninguna página pública.
+          </span>
         </Field>
       </Group>
 
@@ -347,6 +421,22 @@ export function PublishForm({
           ) : null}
         </div>
       </Group>
+
+      <p className="border-accent/25 bg-accent/[0.03] text-fg-muted rounded-(--radius-card) border px-5 py-4 text-sm text-pretty">
+        Al publicar acepta las{" "}
+        <Link href="/es/legal/trade-policy" target="_blank" className="text-accent underline">
+          políticas de comercio
+        </Link>{" "}
+        y la{" "}
+        <Link
+          href="/es/legal/non-discrimination"
+          target="_blank"
+          className="text-accent underline"
+        >
+          política de no discriminación
+        </Link>
+        .
+      </p>
 
       <Submit disabled={uploading || pending} pendingUploads={pending} />
     </form>

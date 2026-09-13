@@ -83,6 +83,14 @@ export const regionKeys: readonly RegionKey[] = [
   "other",
 ];
 
-export const legalSlugs = ["terms", "privacy", "cookies", "disclaimer", "partner-policy"] as const;
+export const legalSlugs = [
+  "terms",
+  "privacy",
+  "cookies",
+  "disclaimer",
+  "partner-policy",
+  "trade-policy",
+  "non-discrimination",
+] as const;
 
 export type LegalSlug = (typeof legalSlugs)[number];

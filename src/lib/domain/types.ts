@@ -111,6 +111,14 @@ export type Location = {
   readonly region?: string;
   readonly city?: string;
   readonly area?: string;
+  /**
+   * Punto marcado en el mapa. Se guarda para uso interno —saber dónde está de
+   * verdad un activo— pero NO se publica: al visitante se le muestra la ciudad
+   * y nada más. Publicar la coordenada exacta de un vehículo o una vivienda
+   * expone a quien lo vende.
+   */
+  readonly lat?: number;
+  readonly lng?: number;
 };
 
 /** Familia visual del placeholder cuando todavía no hay fotografía real. */
@@ -172,6 +180,13 @@ export type Opportunity = {
   readonly verification: Verification;
   readonly featured: boolean;
   readonly availability?: Localized;
+  /**
+   * Referencia interna de quien publica. PRIVADA: no se renderiza en ninguna
+   * página pública, solo en el panel. Vive fuera de `attributes` justamente
+   * para que no pueda colarse en la tabla de especificaciones, que se pinta
+   * sola a partir del esquema.
+   */
+  readonly sku?: string;
   /** Marca de dato de demostración. Nunca se muestra sin su etiqueta (§48). */
   readonly isDemo: boolean;
   readonly publishedAt: string;

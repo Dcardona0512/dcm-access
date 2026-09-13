@@ -562,6 +562,64 @@ export const es: Dictionary = {
           },
         ],
       },
+      {
+        slug: "trade-policy",
+        title: "Políticas de comercio",
+        summary: "Qué se puede publicar en DCM ACCESS y qué no.",
+        sections: [
+          {
+            heading: "Qué se puede publicar",
+            body: "Únicamente activos, vehículos, inmuebles y servicios sobre los que quien publica tenga la propiedad, la representación o un mandato vigente. La publicación debe describir el bien tal como es, con su estado real, su ubicación real y un precio que se pueda sostener.",
+          },
+          {
+            heading: "Qué no se admite",
+            body: "No se publican bienes de procedencia dudosa, con reserva de dominio no declarada, con gravámenes ocultos, robados o sujetos a litigio. Tampoco armas, fauna, medicamentos, documentos de identidad, ni nada cuyo comercio esté restringido o prohibido por la normativa aplicable en la jurisdicción correspondiente.",
+          },
+          {
+            heading: "Vehículos y bienes regulados",
+            body: "Los vehículos blindados, las aeronaves y los servicios de seguridad están sujetos a la normativa y a los permisos de cada jurisdicción. DCM ACCESS intermedia con proveedores habilitados y no gestiona por sí misma trámites que exijan licencia específica.",
+          },
+          {
+            heading: "Veracidad de la información",
+            body: "Las fotografías y los vídeos deben corresponder al bien anunciado. No se admiten imágenes de archivo presentadas como propias, precios señuelo, ni omitir defectos relevantes que un comprador razonable querría conocer antes de decidir.",
+          },
+          {
+            heading: "Papel de DCM ACCESS",
+            body: "DCM ACCESS actúa como intermediario y punto de acceso. No es propietaria de los bienes publicados, no garantiza su estado ni interviene en el pago entre las partes, salvo que se pacte expresamente por escrito para una operación concreta.",
+          },
+          {
+            heading: "Retirada de publicaciones",
+            body: "Cualquier publicación que incumpla estas condiciones puede retirarse sin aviso previo. Ante información inexacta reiterada, se puede cancelar el acceso a publicar.",
+          },
+        ],
+      },
+      {
+        slug: "non-discrimination",
+        title: "Política de no discriminación",
+        summary: "Nadie queda fuera por quién es.",
+        sections: [
+          {
+            heading: "Compromiso",
+            body: "DCM ACCESS no admite publicaciones ni conductas que discriminen a una persona por su origen nacional o étnico, color de piel, sexo, orientación sexual, identidad de género, edad, discapacidad, estado civil, situación familiar, religión, opinión política o condición socioeconómica.",
+          },
+          {
+            heading: "En las publicaciones",
+            body: "Ninguna publicación puede excluir, desalentar ni dar preferencia a personas por esas características, ni en su texto, ni en sus imágenes, ni en las condiciones de la operación. Esto alcanza especialmente al arrendamiento de vivienda, donde la selección del inquilino no puede apoyarse en ninguno de esos criterios.",
+          },
+          {
+            heading: "En el trato",
+            body: "La misma exigencia se aplica al trato entre las partes durante una operación intermediada, y a los proveedores de la red en la prestación de sus servicios.",
+          },
+          {
+            heading: "Cómo reportar",
+            body: "Cualquier persona puede señalar una publicación o una conducta que considere discriminatoria escribiendo al correo de contacto. Cada reporte se revisa, y la publicación se retira mientras dure la revisión cuando el caso lo amerite.",
+          },
+          {
+            heading: "Consecuencias",
+            body: "El incumplimiento supone la retirada de la publicación y puede suponer la cancelación del acceso a publicar, sin perjuicio de las acciones legales que correspondan.",
+          },
+        ],
+      },
     ],
   },
 

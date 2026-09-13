@@ -134,7 +134,7 @@ export function sellListingSchema(dict: Dictionary) {
 
       priceMode: z.enum(["fixed", "on_request"]).default("fixed"),
       priceAmount: amount(),
-      currency: z.enum(currencies).default("USD"),
+      currency: z.enum(currencies).default("COP"),
 
       country: requiredText(dict, { min: 2, max: 2 }),
       city: requiredText(dict, { min: 2, max: 80 }),

@@ -9,7 +9,6 @@ import { createAdminOpportunities } from "@/lib/data/supabase";
 import { createUploadSlots, verifyUploads, type UploadSlot } from "@/lib/media/storage";
 import { createAdminClient } from "@/lib/supabase/server";
 import {
-  currencies,
   isCurrency,
   isVertical,
   type AttributeValue,
@@ -133,7 +132,7 @@ export async function publishListing(
   }
 
   const currencyRaw = text(formData, "currency");
-  const currency: Currency = isCurrency(currencyRaw) ? currencyRaw : currencies[1];
+  const currency: Currency = isCurrency(currencyRaw) ? currencyRaw : "COP";
 
   const listingTypeRaw = text(formData, "listingType");
   const listingType = (
@@ -148,6 +147,10 @@ export async function publishListing(
    */
   const attributes: Record<string, AttributeValue> = {};
   for (const def of category.attributeSchema) {
+    // Las etiquetas no vienen del esquema: tienen su propio control y su
+    // propio campo, así que se saltan aquí y se añaden abajo.
+    if (def.key === "tags") continue;
+
     const raw = text(formData, `attr_${def.key}`);
     if (!raw) continue;
 
@@ -160,6 +163,33 @@ export async function publishListing(
       attributes[def.key] = raw;
     }
   }
+
+  /**
+   * Etiquetas: hasta veinte, normalizadas y sin repetir. El tope se comprueba
+   * también aquí y no solo en el formulario, porque el formulario es una
+   * comodidad y esto es la frontera de confianza.
+   */
+  const tags = [
+    ...new Set(
+      text(formData, "tags")
+        .split(",")
+        .map((tag) => tag.trim().toLowerCase())
+        .filter(Boolean),
+    ),
+  ].slice(0, 20);
+
+  if (tags.length > 0) attributes.tags = tags;
+
+  const coordinate = (key: string): number | null => {
+    const raw = text(formData, key);
+    if (!raw) return null;
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) ? parsed : null;
+  };
+
+  const lat = coordinate("lat");
+  const lng = coordinate("lng");
+  const sku = text(formData, "sku");
 
   // Manifiesto de medios: qué dice el navegador que subió. Se comprueba contra
   // el almacenamiento antes de creer nada.
@@ -206,6 +236,10 @@ export async function publishListing(
       country,
       region: null,
       city: city || null,
+      // El punto exacto se guarda; la ficha pública solo muestra la ciudad.
+      lat,
+      lng,
+      sku: sku || null,
       city_slug: city ? slugify(city).replace(/-/g, " ").trim() : null,
       area: null,
       attributes,

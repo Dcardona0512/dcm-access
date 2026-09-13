@@ -174,7 +174,7 @@ export function SellListingForm({
           <SelectField
             name="currency"
             label={copy.fields.currency.label}
-            defaultValue="USD"
+            defaultValue="COP"
             options={currencies.map((code) => ({ value: code, label: code }))}
             error={state.errors?.currency}
           />

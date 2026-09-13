@@ -103,6 +103,37 @@ const realEstateBase: readonly AttributeDef[] = [
 
 /* --- Motors ------------------------------------------------------------------ */
 
+/**
+ * Estado de un vehículo, con el vocabulario que usa quien compra: o está nuevo,
+ * o está usado, y entre medias existe el usado que parece nuevo. La escala
+ * general del catálogo —excelente, bueno, para reformar— es de inmuebles y en
+ * un carro no dice nada.
+ */
+const motorsCondition: AttributeDef = {
+  key: "condition",
+  type: "enum",
+  label: { es: "Estado", en: "Condition" },
+  facet: true,
+  highlight: true,
+  group: groups.general,
+  options: [
+    { value: "new", label: { es: "Nuevo", en: "New" } },
+    { value: "used-like-new", label: { es: "Usado — como nuevo", en: "Used — like new" } },
+    { value: "used", label: { es: "Usado", en: "Used" } },
+  ],
+};
+
+/**
+ * Etiquetas libres. Sin `options` a propósito: las escribe quien publica, y
+ * `formatValue` ya sabe pintar un multi-enum sin catálogo cerrado.
+ */
+const tags: AttributeDef = {
+  key: "tags",
+  type: "multi-enum",
+  label: { es: "Etiquetas", en: "Tags" },
+  group: groups.general,
+};
+
 const motorsBase: readonly AttributeDef[] = [
   {
     key: "make",
@@ -159,7 +190,8 @@ const motorsBase: readonly AttributeDef[] = [
     group: groups.performance,
   },
   { key: "seats", type: "number", label: { es: "Plazas", en: "Seats" }, group: groups.technical },
-  condition,
+  motorsCondition,
+  tags,
 ];
 
 const armourLevel: AttributeDef = {
@@ -346,12 +378,68 @@ export const categories: readonly Category[] = [
     name: { es: "Inmobiliario", en: "Real Estate" },
     attributeSchema: realEstateBase,
   },
+  /*
+    Vehículos sí se subdivide, y por TIPO, no por gama. La diferencia importa:
+    "premium" o "clásico" son juicios de valor que el comprador no usa para
+    buscar, mientras que una moto, una embarcación y un remolque son cosas
+    distintas que nadie confunde. Es la taxonomía de un mercado, no la de un
+    catálogo curado.
+  */
   {
-    id: "cat-motors",
+    id: "cat-mo-cars",
     vertical: "motors",
-    slug: "vehiculos",
-    name: { es: "Vehículos", en: "Motors" },
+    slug: "autos-y-camionetas",
+    name: { es: "Autos y camionetas", en: "Cars & trucks" },
     attributeSchema: [...motorsBase, armourLevel],
+  },
+  {
+    id: "cat-mo-motorcycles",
+    vertical: "motors",
+    slug: "motocicletas",
+    name: { es: "Motocicletas", en: "Motorcycles" },
+    attributeSchema: motorsBase,
+  },
+  {
+    id: "cat-mo-offroad",
+    vertical: "motors",
+    slug: "todoterreno",
+    name: { es: "Todoterreno", en: "Off-road" },
+    attributeSchema: [...motorsBase, armourLevel],
+  },
+  {
+    id: "cat-mo-rv",
+    vertical: "motors",
+    slug: "casas-rodantes-y-caravanas",
+    name: { es: "Casas rodantes y caravanas", en: "Motorhomes & caravans" },
+    attributeSchema: motorsBase,
+  },
+  {
+    id: "cat-mo-boats",
+    vertical: "motors",
+    slug: "embarcaciones",
+    name: { es: "Embarcaciones", en: "Boats" },
+    attributeSchema: motorsBase,
+  },
+  {
+    id: "cat-mo-commercial",
+    vertical: "motors",
+    slug: "comercial-e-industrial",
+    name: { es: "Comercial e industrial", en: "Commercial & industrial" },
+    attributeSchema: motorsBase,
+  },
+  {
+    id: "cat-mo-trailers",
+    vertical: "motors",
+    slug: "remolques",
+    name: { es: "Remolques", en: "Trailers" },
+    attributeSchema: motorsBase,
+  },
+  {
+    id: "cat-mo-other",
+    vertical: "motors",
+    slug: "otro",
+    name: { es: "Otro", en: "Other" },
+    attributeSchema: motorsBase,
   },
   {
     id: "cat-aviation",
@@ -376,11 +464,15 @@ export const categories: readonly Category[] = [
   },
 ];
 
-/** La categoría de una sección. Con una sola por vertical, es una búsqueda directa. */
-export function categoryForVertical(vertical: Category["vertical"]): Category {
-  const found = categories.find((category) => category.vertical === vertical);
-  if (!found) throw new Error(`Sin categoría para la vertical ${vertical}`);
-  return found;
+/**
+ * Categorías de una sección.
+ *
+ * Cuatro de las cinco tienen una sola y el formulario no pregunta. Vehículos
+ * tiene ocho, y ahí sí hay que elegir, porque una moto y un remolque no son la
+ * misma cosa.
+ */
+export function categoriesForVertical(vertical: Category["vertical"]): readonly Category[] {
+  return categories.filter((category) => category.vertical === vertical);
 }
 
 export const categoriesById = new Map(categories.map((category) => [category.id, category]));
