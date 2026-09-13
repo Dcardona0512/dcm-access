@@ -32,6 +32,8 @@ export const brand = {
 export const contact = {
   email: process.env.NEXT_PUBLIC_DCM_EMAIL ?? "dcmxaccess@gmail.com",
   phone: process.env.NEXT_PUBLIC_DCM_PHONE ?? "",
+  /** Solo dígitos con indicativo de país: es el formato que exige wa.me. */
+  whatsapp: process.env.NEXT_PUBLIC_DCM_WHATSAPP ?? "573205088849",
   baseCity: "Medellín",
   baseCountry: "CO",
 } as const;
@@ -56,13 +58,21 @@ export const verticalNav: readonly { readonly key: NavKey; readonly vertical: Ve
 ];
 
 /**
- * Destino del CTA destacado único (§30, §42). Su texto es `dict.common.sell`.
+ * Enlace de WhatsApp con mensaje redactado.
  *
- * La barra son las cinco categorías y nada más, así que ya no hay una lista de
- * "otros destinos": el único botón empuja la captación de inventario, que es
- * lo que hace falta para que el mercado tenga qué mostrar.
+ * Vender no es un formulario: es una conversación. Quien quiere vender escribe,
+ * y la ficha la publica el administrador desde el CRM con sus fotos y su vídeo.
+ * Eso evita tener que moderar lo que suban terceros y garantiza que todo lo
+ * publicado pasó por una revisión.
+ *
+ * Sin número configurado devuelve `null`, y quien llama cae al contacto: un
+ * `wa.me/` sin destinatario lleva a una pantalla de error de WhatsApp.
  */
-export const primaryCtaHref = "/motors/sell";
+export function whatsappHref(message: string): string | null {
+  const number = contact.whatsapp.replace(/\D/g, "");
+  if (!number) return null;
+  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+}
 
 /** Regiones de la red (§35). Su nombre lo pone `dict.regions[key]`. */
 export const regionKeys: readonly RegionKey[] = [

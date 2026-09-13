@@ -90,6 +90,8 @@ export type Dictionary = {
     readonly contactBroker: string;
     readonly privateRequest: string;
     readonly sell: string;
+    /** Mensaje que se abre redactado en WhatsApp. */
+    readonly sellMessage: string;
     readonly learnMore: string;
     readonly back: string;
     readonly submit: string;

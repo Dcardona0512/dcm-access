@@ -25,7 +25,14 @@ export function Hero({ locale, dict }: { readonly locale: Locale; readonly dict:
   return (
     // Sin fondo propio: aquí el vídeo se ve a plena intensidad. La capa fija
     // que lo sostiene la monta la página, no esta sección.
-    <section className="relative flex min-h-[100svh] flex-col justify-end pt-32 pb-16 md:pb-20">
+    //
+    // Centrado vertical, no apoyado abajo. Era `justify-end` cuando debajo del
+    // texto vivían los dos botones y el buscador: el bloque se sostenía sobre
+    // ellos. Sin ese peso, alinear al fondo dejaba el título pegado al borde
+    // inferior. La asimetría del relleno —más arriba que abajo— conserva la
+    // caída ligeramente por debajo del centro óptico, y es el mismo tratamiento
+    // que ya usan las cabeceras de las cinco categorías.
+    <section className="relative flex min-h-[100svh] flex-col justify-center pt-36 pb-16 md:pt-44">
       {/*
         Sombra local del hero. Va ANTES del contenido en el DOM, así que este
         pinta encima sin necesidad de índices z. Concentra la densidad donde

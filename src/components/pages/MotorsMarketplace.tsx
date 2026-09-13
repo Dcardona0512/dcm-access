@@ -14,6 +14,7 @@ import { getRepositories } from "@/lib/data";
 import type { OpportunityQuery } from "@/lib/data/repositories";
 import { localized } from "@/lib/domain/types";
 import { isLocale, localizePath, type Locale } from "@/lib/i18n/config";
+import { navHrefs, whatsappHref } from "@/content/shared";
 import { breadcrumbSchema, buildMetadata, jsonLd, siteUrl } from "@/lib/seo";
 
 /* ============================================================================
@@ -129,6 +130,9 @@ export async function MotorsMarketplace({
 
   const totalPages = Math.max(1, Math.ceil(results.total / PAGE_SIZE));
 
+  const sellHref = whatsappHref(dict.common.sellMessage) ?? localizePath(navHrefs.contact, locale);
+  const sellExternal = sellHref.startsWith("http") ? "_blank" : undefined;
+
   /** Conserva los filtros al paginar: cambiar de página no es reiniciar. */
   const pageHref = (target: number) => {
     const params = new URLSearchParams();
@@ -211,7 +215,7 @@ export async function MotorsMarketplace({
                 marfil sobre tinta, que además tiene más contraste.
               */}
               <div className="flex flex-col gap-3 pt-2 sm:flex-row">
-                <Button href={localizePath("/motors/sell", locale)} size="lg">
+                <Button href={sellHref} target={sellExternal} size="lg">
                   {market.sellCta}
                   <ArrowEast />
                 </Button>
@@ -242,7 +246,7 @@ export async function MotorsMarketplace({
             eyebrow={market.eyebrow}
             heading={market.heading}
             action={
-              <Button href={localizePath("/motors/sell", locale)} variant="outline" size="sm">
+              <Button href={sellHref} target={sellExternal} variant="outline" size="sm">
                 {market.sellCta}
                 <ArrowEast />
               </Button>
@@ -266,7 +270,7 @@ export async function MotorsMarketplace({
               heading={dict.catalog.empty.heading}
               body={dict.catalog.empty.body}
               action={
-                <Button href={localizePath("/motors/sell", locale)} variant="outline">
+                <Button href={sellHref} target={sellExternal} variant="outline">
                   {market.sellCta}
                   <ArrowEast />
                 </Button>

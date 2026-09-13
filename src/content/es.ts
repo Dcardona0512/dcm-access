@@ -47,6 +47,8 @@ export const es: Dictionary = {
     contactBroker: "Contactar con un asesor",
     privateRequest: "Solicitud privada",
     sell: "Vender",
+    sellMessage:
+      "Hola, quiero vender a través de DCM ACCESS. Les cuento qué tengo:",
     learnMore: "Conocer más",
     back: "Volver",
     submit: "Enviar",

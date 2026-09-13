@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Logo } from "@/components/brand/Logo";
-import { navHrefs, primaryCtaHref, verticalNav } from "@/content/shared";
+import { navHrefs, verticalNav, whatsappHref } from "@/content/shared";
 import { ArrowEast, Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import type { Dictionary } from "@/content/types";
@@ -43,6 +43,13 @@ export function SiteHeader({
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const to = useCallback((href: string) => localizePath(href, locale), [locale]);
+
+  /**
+   * Vender abre una conversación, no un formulario. Si algún día falta el
+   * número, el botón cae al contacto en vez de llevar a un error de WhatsApp.
+   */
+  const sellHref = whatsappHref(dict.common.sellMessage) ?? to(navHrefs.contact);
+  const sellIsExternal = sellHref.startsWith("http");
 
   /**
    * La portada es la raíz del idioma y nada más: `/es`, `/en`. Se compara con
@@ -120,7 +127,8 @@ export function SiteHeader({
             <LocaleSwitcher locale={locale} dict={dict} className="hidden md:flex" />
 
             <Button
-              href={to(primaryCtaHref)}
+              href={sellHref}
+              target={sellIsExternal ? "_blank" : undefined}
               variant="accent"
               size="sm"
               className="hidden sm:inline-flex"
@@ -149,6 +157,8 @@ export function SiteHeader({
         locale={locale}
         dict={dict}
         pathname={pathname}
+        sellHref={sellHref}
+        sellIsExternal={sellIsExternal}
       />
     </header>
   );
@@ -190,12 +200,17 @@ function MobileDrawer({
   locale,
   dict,
   pathname,
+  sellHref,
+  sellIsExternal,
 }: {
   readonly open: boolean;
   readonly onClose: () => void;
   readonly locale: Locale;
   readonly dict: Dictionary;
   readonly pathname: string;
+  /** Resuelto arriba para que la barra y el cajón no puedan divergir. */
+  readonly sellHref: string;
+  readonly sellIsExternal: boolean;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
   const to = (href: string) => localizePath(href, locale);
@@ -278,7 +293,13 @@ function MobileDrawer({
                 </ul>
 
                 <div className="flex flex-col gap-6">
-                  <Button href={to(primaryCtaHref)} variant="accent" fullWidth onClick={onClose}>
+                  <Button
+                    href={sellHref}
+                    target={sellIsExternal ? "_blank" : undefined}
+                    variant="accent"
+                    fullWidth
+                    onClick={onClose}
+                  >
                     {dict.common.sell}
                     <ArrowEast />
                   </Button>
