@@ -199,6 +199,82 @@ export function PublishForm({
         </>
       ) : null}
 
+      {/*
+        Los medios van PRIMERO y en grande. Es lo que de verdad hay que
+        revisar antes de publicar —si una foto salió movida o el vídeo no es el
+        que era, se ve aquí— y enterrarlo al final del formulario obligaba a
+        recorrerlo entero para comprobarlo.
+      */}
+      <Group title="Fotos y vídeo" wide>
+        <div className="flex flex-col gap-5">
+          <div className="flex flex-wrap items-center gap-4">
+            <label className="eyebrow border-accent/50 text-accent hover:bg-accent/10 w-fit cursor-pointer rounded-(--radius-card) border px-5 py-3 text-[0.5625rem] transition-colors">
+              Elegir archivos
+              {/* Sin `name`: si lo tuviera, los archivos entrarían en el FormData
+                  y la petición reventaría el límite de 1 MB. */}
+              <input
+                type="file"
+                multiple
+                accept="image/jpeg,image/png,image/webp,image/avif,video/mp4,video/quicktime"
+                onChange={(e) => void onPick(e.target.files)}
+                className="sr-only"
+              />
+            </label>
+
+            <p className="text-fg-muted/60 text-xs">
+              Hasta 10 MB por foto y 100 MB por vídeo. La primera es la portada.
+            </p>
+          </div>
+
+          {files.length > 0 ? (
+            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {files.map((f, index) => (
+                <li key={f.id} className="flex flex-col gap-2">
+                  <div className="border-line bg-surface-sunken relative aspect-[4/3] overflow-hidden rounded-(--radius-card) border">
+                    {f.file.type.startsWith("video/") ? (
+                      // `controls` a propósito: un vídeo que no se puede
+                      // reproducir no se puede revisar, y revisarlo es el punto.
+                      <video
+                        src={f.preview}
+                        controls
+                        playsInline
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={f.preview} alt="" className="h-full w-full object-cover" />
+                    )}
+
+                    {index === 0 ? (
+                      <span className="eyebrow bg-surface/85 text-accent absolute top-2 left-2 rounded-(--radius-card) px-2 py-1 text-[0.5rem] backdrop-blur-sm">
+                        Portada
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div className="flex items-center justify-between gap-3">
+                    <span
+                      className={`eyebrow text-[0.5rem] ${
+                        f.status === "listo"
+                          ? "text-verified"
+                          : f.status === "falló"
+                            ? "text-danger"
+                            : "text-fg-muted"
+                      }`}
+                    >
+                      {f.status}
+                    </span>
+                    <span className="text-fg-muted/50 max-w-[60%] truncate text-xs">
+                      {f.file.name}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+      </Group>
+
       <Group title="Dónde va">
         <Field label="Sección" full={!mustChoose}>
           <select
@@ -373,55 +449,6 @@ export function PublishForm({
       </Group>
 
       {/* --- Medios ----------------------------------------------------------- */}
-      <Group title="Fotos y vídeo">
-        <div className="sm:col-span-2 flex flex-col gap-4">
-          <label className="eyebrow border-line text-fg-muted hover:border-fg-muted/60 hover:text-fg w-fit cursor-pointer rounded-(--radius-card) border px-4 py-2.5 text-[0.5rem] transition-colors">
-            Elegir archivos
-            {/* Sin `name`: si lo tuviera, los archivos entrarían en el FormData
-                y la petición reventaría el límite de 1 MB. */}
-            <input
-              type="file"
-              multiple
-              accept="image/jpeg,image/png,image/webp,image/avif,video/mp4,video/quicktime"
-              onChange={(e) => void onPick(e.target.files)}
-              className="sr-only"
-            />
-          </label>
-
-          <p className="text-fg-muted/60 text-xs">
-            Hasta 10 MB por foto y 100 MB por vídeo. La primera imagen es la portada.
-          </p>
-
-          {files.length > 0 ? (
-            <ul className="grid grid-cols-3 gap-3 sm:grid-cols-5">
-              {files.map((f) => (
-                <li key={f.id} className="flex flex-col gap-1.5">
-                  <div className="border-line bg-surface-sunken relative aspect-square overflow-hidden rounded-(--radius-card) border">
-                    {f.file.type.startsWith("video/") ? (
-                      <video src={f.preview} className="h-full w-full object-cover" muted />
-                    ) : (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={f.preview} alt="" className="h-full w-full object-cover" />
-                    )}
-                  </div>
-                  <span
-                    className={`eyebrow text-[0.5rem] ${
-                      f.status === "listo"
-                        ? "text-verified"
-                        : f.status === "falló"
-                          ? "text-danger"
-                          : "text-fg-muted"
-                    }`}
-                  >
-                    {f.status}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-        </div>
-      </Group>
-
       <p className="border-accent/25 bg-accent/[0.03] text-fg-muted rounded-(--radius-card) border px-5 py-4 text-sm text-pretty">
         Al publicar acepta las{" "}
         <Link href="/es/legal/trade-policy" target="_blank" className="text-accent underline">
@@ -446,11 +473,20 @@ export function PublishForm({
 const control =
   "border-line text-fg placeholder:text-fg-muted/40 focus-visible:border-accent h-11 w-full rounded-(--radius-card) border bg-transparent px-3 text-sm outline-none transition-colors";
 
-function Group({ title, children }: { readonly title: string; readonly children: React.ReactNode }) {
+function Group({
+  title,
+  children,
+  wide = false,
+}: {
+  readonly title: string;
+  readonly children: React.ReactNode;
+  /** Sin rejilla de dos columnas: para lo que ocupa la fila entera. */
+  readonly wide?: boolean;
+}) {
   return (
     <fieldset className="flex flex-col gap-5">
       <legend className="eyebrow text-accent mb-3 text-[0.5625rem]">{title}</legend>
-      <div className="grid gap-5 sm:grid-cols-2">{children}</div>
+      {wide ? children : <div className="grid gap-5 sm:grid-cols-2">{children}</div>}
     </fieldset>
   );
 }
