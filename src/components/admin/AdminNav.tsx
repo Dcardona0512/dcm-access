@@ -12,16 +12,18 @@ import { cn } from "@/lib/utils";
  *
  * Cada entrada declara el recurso que representa y se filtra con `can()`: la
  * política de autorización no es decorativa, decide de verdad lo que se ve.
- * Cuando llegue Supabase, la misma matriz pasa a ser RLS y esto no cambia.
+ */
+/**
+ * Una sola entrada, por ahora.
+ *
+ * El panel tenía siete —resumen, leads, operaciones, oportunidades,
+ * solicitudes, proveedores, comisiones— y ninguna resolvía el trabajo real de
+ * este momento, que es llenar el catálogo. Las pantallas siguen existiendo y
+ * se alcanzan por URL; lo que se quita es el menú que invitaba a perderse
+ * entre ellas.
  */
 const ENTRIES: readonly { href: string; label: string; resource: Resource }[] = [
-  { href: "/admin", label: "Resumen", resource: "leads" },
-  { href: "/admin/leads", label: "Leads", resource: "leads" },
-  { href: "/admin/deals", label: "Operaciones", resource: "deals" },
-  { href: "/admin/opportunities", label: "Oportunidades", resource: "opportunities" },
-  { href: "/admin/submissions", label: "Solicitudes", resource: "opportunities" },
-  { href: "/admin/providers", label: "Proveedores", resource: "providers" },
-  { href: "/admin/commissions", label: "Comisiones", resource: "commissions" },
+  { href: "/admin", label: "Crear publicación", resource: "opportunities" },
 ];
 
 export function AdminNav({ role }: { readonly role: Role }) {

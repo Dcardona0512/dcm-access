@@ -7,7 +7,7 @@ import Link from "next/link";
 import { AdminHeading } from "@/components/admin/AdminUI";
 import { categories } from "@/lib/data/demo/seed/categories";
 import { verticalLabels } from "@/lib/domain/labels";
-import { currencies, localized, verticals } from "@/lib/domain/types";
+import { currencies, isVertical, localized, verticals } from "@/lib/domain/types";
 import { formatCountry } from "@/lib/format";
 import { isSupabaseWritable } from "@/lib/supabase/server";
 
@@ -22,7 +22,18 @@ export const dynamic = "force-dynamic";
  * traducidos. El cliente no conoce el dominio: solo pinta lo que le llega, de
  * modo que añadir un campo a una categoría cambia el formulario sin tocarlo.
  */
-export default function NewOpportunityPage() {
+export default async function NewOpportunityPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const sp = await searchParams;
+  const raw = Array.isArray(sp.vertical) ? sp.vertical[0] : sp.vertical;
+
+  // La sección se elige en la pantalla anterior. Si llega una que no existe,
+  // se cae a vehículos en lugar de romper.
+  const initialVertical = isVertical(raw ?? "") ? (raw as string) : "motors";
+
   const categoryOptions: CategoryOption[] = categories.map((category) => ({
     id: category.id,
     vertical: category.vertical,
@@ -57,12 +68,13 @@ export default function NewOpportunityPage() {
       <AdminHeading
         eyebrow="Catálogo"
         title="Publicar una ficha"
-        lede="Lo que publiques aquí aparece de inmediato en la sección que elijas. Las fotos y el vídeo suben directo al almacenamiento."
+        lede="Lo que publique aquí aparece de inmediato en el sitio. Las fotos y el vídeo suben directo al almacenamiento."
       />
 
       {isSupabaseWritable() ? (
         <PublishForm
           listingId={`opp-${randomUUID().slice(0, 12)}`}
+          initialVertical={initialVertical}
           verticals={verticals.map((vertical) => ({
             value: vertical,
             label: localized(verticalLabels[vertical], "es"),

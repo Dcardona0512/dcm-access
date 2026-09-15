@@ -18,7 +18,9 @@ import { createAdminClient } from "@/lib/supabase/server";
 export const BUCKET = "listing-media";
 
 export const MEDIA_LIMITS = {
-  maxFiles: 14,
+  /** Mismo tope que muestra el formulario. Se comprueba también aquí porque el
+   *  formulario es una comodidad y esto es la frontera de confianza. */
+  maxFiles: 20,
   maxImageBytes: 10 * 1024 * 1024,
   maxVideoBytes: 100 * 1024 * 1024,
 } as const;
@@ -65,6 +67,10 @@ export async function createUploadSlots(
   listingId: string,
   files: readonly { readonly mimeType: string; readonly bytes: number }[],
 ): Promise<readonly UploadSlot[]> {
+  if (files.length > MEDIA_LIMITS.maxFiles) {
+    throw new Error(`No se pueden subir más de ${MEDIA_LIMITS.maxFiles} archivos.`);
+  }
+
   const storage = createAdminClient().storage.from(BUCKET);
   const slots: UploadSlot[] = [];
 

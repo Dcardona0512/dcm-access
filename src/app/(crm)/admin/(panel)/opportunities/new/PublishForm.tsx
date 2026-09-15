@@ -46,10 +46,13 @@ type FileState = {
   path?: string;
 };
 
+const MAX_FILES = 20;
+
 const initial: PublishState = { status: "idle" };
 
 export function PublishForm({
   listingId,
+  initialVertical,
   verticals,
   categories,
   currencies,
@@ -62,6 +65,8 @@ export function PublishForm({
    * identificador distinto en el render del servidor y en el del navegador.
    */
   readonly listingId: string;
+  /** Viene de la pantalla anterior: aquí ya no se vuelve a preguntar. */
+  readonly initialVertical: string;
   readonly verticals: readonly VerticalOption[];
   readonly categories: readonly CategoryOption[];
   readonly currencies: readonly string[];
@@ -69,7 +74,7 @@ export function PublishForm({
 }) {
   const [state, action] = useActionState(publishListing, initial);
 
-  const [vertical, setVertical] = useState(verticals[0]?.value ?? "");
+  const [vertical] = useState(initialVertical);
   const [categoryId, setCategoryId] = useState("");
   const [place, setPlace] = useState<Place>({ country: "CO" });
   const [point, setPoint] = useState<{ lat: number; lng: number } | null>(null);
@@ -77,6 +82,8 @@ export function PublishForm({
   const [priceMode, setPriceMode] = useState<"fixed" | "on_request">("fixed");
   const [files, setFiles] = useState<FileState[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [touched, setTouched] = useState(false);
 
   const options = useMemo(
     () => categories.filter((c) => c.vertical === vertical),
@@ -91,6 +98,7 @@ export function PublishForm({
   const mustChoose = options.length > 1;
   const category = mustChoose ? options.find((c) => c.id === categoryId) : options[0];
   const ready = files.filter((f) => f.status === "listo");
+  const missingMedia = touched && ready.length === 0;
   const pending = files.some((f) => f.status === "pendiente" || f.status === "subiendo");
 
   if (state.status === "success") {
@@ -120,10 +128,19 @@ export function PublishForm({
     );
   }
 
+  function remove(id: string) {
+    setFiles((current) => current.filter((entry) => entry.id !== id));
+  }
+
   async function onPick(picked: FileList | null) {
     if (!picked || picked.length === 0) return;
 
-    const next: FileState[] = [...picked].map((file) => ({
+    // El tope se aplica al elegir, no al enviar: enterarse de que sobran
+    // archivos DESPUÉS de haberlos subido es la peor versión de un límite.
+    const room = MAX_FILES - files.length;
+    if (room <= 0) return;
+
+    const next: FileState[] = [...picked].slice(0, room).map((file) => ({
       id: `${file.name}-${file.size}-${Math.random()}`,
       file,
       preview: URL.createObjectURL(file),
@@ -203,26 +220,61 @@ export function PublishForm({
         que era, se ve aquí— y enterrarlo al final del formulario obligaba a
         recorrerlo entero para comprobarlo.
       */}
-      <Group title="Fotos y vídeo" wide>
-        <div className="flex flex-col gap-5">
-          <div className="flex flex-wrap items-center gap-4">
-            <label className="eyebrow border-accent/50 text-accent hover:bg-accent/10 w-fit cursor-pointer rounded-(--radius-card) border px-5 py-3 text-[0.5625rem] transition-colors">
-              Elegir archivos
-              {/* Sin `name`: si lo tuviera, los archivos entrarían en el FormData
-                  y la petición reventaría el límite de 1 MB. */}
-              <input
-                type="file"
-                multiple
-                accept="image/jpeg,image/png,image/webp,image/avif,video/mp4,video/quicktime"
-                onChange={(e) => void onPick(e.target.files)}
-                className="sr-only"
-              />
-            </label>
+      {/*
+        Zona de arrastre, y no un botón discreto. Subir el contenido es la
+        parte que más tiempo lleva y la que decide si un anuncio se ve bien o
+        no, así que ocupa el sitio que le corresponde: arriba y grande.
+      */}
+      <Group title="Subir contenido" wide>
+        <div className="flex flex-col gap-4">
+          <p className="text-fg-muted/70 text-sm">
+            Fotos y vídeos · {files.length}/{MAX_FILES} — Puede agregar un máximo de {MAX_FILES}
+            archivos.
+          </p>
 
-            <p className="text-fg-muted/60 text-xs">
-              Hasta 10 MB por foto y 100 MB por vídeo. La primera es la portada.
+          <label
+            onDragOver={(event) => {
+              event.preventDefault();
+              setDragging(true);
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={(event) => {
+              event.preventDefault();
+              setDragging(false);
+              void onPick(event.dataTransfer.files);
+            }}
+            className={`flex cursor-pointer flex-col items-center justify-center gap-3 rounded-(--radius-card) border border-dashed px-6 py-16 transition-colors ${
+              dragging
+                ? "border-accent bg-accent/[0.06]"
+                : missingMedia
+                  ? "border-danger/60 bg-danger/[0.03]"
+                  : "border-line hover:border-fg-muted/60 bg-surface-raised/40"
+            }`}
+          >
+            <PlusGlyph />
+            <span className="font-display text-lg">Agregar fotos y vídeos</span>
+            <span className="text-fg-muted/60 text-sm">o arrástrelos aquí</span>
+
+            {/* Sin `name`: si lo tuviera, los archivos entrarían en el FormData
+                y la petición reventaría el límite de 1 MB de las acciones. */}
+            <input
+              type="file"
+              multiple
+              accept="image/jpeg,image/png,image/webp,image/avif,video/mp4,video/quicktime"
+              onChange={(event) => void onPick(event.target.files)}
+              className="sr-only"
+            />
+          </label>
+
+          {missingMedia ? (
+            <p role="alert" className="text-danger text-sm">
+              Suba al menos una foto.
             </p>
-          </div>
+          ) : (
+            <p className="text-fg-muted/50 text-xs">
+              Hasta 10 MB por foto y 100 MB por vídeo. La primera imagen es la portada.
+            </p>
+          )}
 
           {files.length > 0 ? (
             <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -230,8 +282,6 @@ export function PublishForm({
                 <li key={f.id} className="flex flex-col gap-2">
                   <div className="border-line bg-surface-sunken relative aspect-[4/3] overflow-hidden rounded-(--radius-card) border">
                     {f.file.type.startsWith("video/") ? (
-                      // `controls` a propósito: un vídeo que no se puede
-                      // reproducir no se puede revisar, y revisarlo es el punto.
                       <video
                         src={f.preview}
                         controls
@@ -248,6 +298,15 @@ export function PublishForm({
                         Portada
                       </span>
                     ) : null}
+
+                    <button
+                      type="button"
+                      onClick={() => remove(f.id)}
+                      aria-label={`Quitar ${f.file.name}`}
+                      className="bg-surface/85 text-fg-muted hover:text-danger absolute top-2 right-2 grid h-7 w-7 place-items-center rounded-full backdrop-blur-sm transition-colors"
+                    >
+                      ×
+                    </button>
                   </div>
 
                   <div className="flex items-center justify-between gap-3">
@@ -273,23 +332,13 @@ export function PublishForm({
         </div>
       </Group>
 
+      <input type="hidden" name="vertical" value={vertical} />
+
       <Group title="Dónde va">
-        <Field label="Sección" full={!mustChoose}>
-          <select
-            name="vertical"
-            value={vertical}
-            onChange={(e) => {
-              setVertical(e.target.value);
-              setCategoryId("");
-            }}
-            className={control}
-          >
-            {verticals.map((v) => (
-              <option key={v.value} value={v.value} className="bg-surface-raised">
-                {v.label}
-              </option>
-            ))}
-          </select>
+        <Field label="Sección">
+          <p className="border-line-soft text-fg-muted flex h-11 items-center rounded-(--radius-card) border border-dashed px-3 text-sm">
+            {verticals.find((v) => v.value === vertical)?.label ?? vertical}
+          </p>
         </Field>
 
         {mustChoose ? (
@@ -448,7 +497,11 @@ export function PublishForm({
         .
       </p>
 
-      <Submit disabled={uploading || pending} pendingUploads={pending} />
+      <Submit
+        disabled={uploading || pending || ready.length === 0}
+        pendingUploads={pending}
+        onAttempt={() => setTouched(true)}
+      />
     </form>
   );
 }
@@ -494,9 +547,11 @@ function Field({
 function Submit({
   disabled,
   pendingUploads,
+  onAttempt,
 }: {
   readonly disabled: boolean;
   readonly pendingUploads: boolean;
+  readonly onAttempt: () => void;
 }) {
   const { pending } = useFormStatus();
   const blocked = disabled || pending;
@@ -505,6 +560,7 @@ function Submit({
     <div className="border-line-soft flex items-center gap-4 border-t pt-6">
       <button
         type="submit"
+        onClick={onAttempt}
         disabled={blocked}
         className="eyebrow bg-fg text-surface h-12 rounded-(--radius-card) px-8 transition-opacity hover:opacity-90 disabled:pointer-events-none disabled:opacity-40"
       >
@@ -514,5 +570,19 @@ function Submit({
         <span className="text-fg-muted/70 text-xs">Espere a que terminen de subir los archivos.</span>
       ) : null}
     </div>
+  );
+}
+
+function PlusGlyph() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+      className="text-fg-muted/60 h-9 w-9"
+    >
+      <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M12 9v6M9 12h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
   );
 }
