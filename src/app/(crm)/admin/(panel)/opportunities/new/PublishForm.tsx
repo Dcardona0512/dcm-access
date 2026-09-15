@@ -5,6 +5,7 @@ import { useActionState, useMemo, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 import { LocationPicker } from "@/components/admin/LocationPicker";
+import { PlacePicker, type Place } from "@/components/admin/PlacePicker";
 import { TagsInput } from "@/components/admin/TagsInput";
 import { createBrowserClient } from "@/lib/supabase/browser";
 
@@ -64,14 +65,14 @@ export function PublishForm({
   readonly verticals: readonly VerticalOption[];
   readonly categories: readonly CategoryOption[];
   readonly currencies: readonly string[];
-  readonly countries: readonly { readonly value: string; readonly label: string }[];
+  readonly countries: readonly { readonly code: string; readonly name: string }[];
 }) {
   const [state, action] = useActionState(publishListing, initial);
 
   const [vertical, setVertical] = useState(verticals[0]?.value ?? "");
   const [categoryId, setCategoryId] = useState("");
+  const [place, setPlace] = useState<Place>({ country: "CO" });
   const [point, setPoint] = useState<{ lat: number; lng: number } | null>(null);
-  const [city, setCity] = useState("");
   const [tags, setTags] = useState<readonly string[]>([]);
   const [priceMode, setPriceMode] = useState<"fixed" | "on_request">("fixed");
   const [files, setFiles] = useState<FileState[]>([]);
@@ -192,12 +193,9 @@ export function PublishForm({
       {/* --- Sección y categoría --------------------------------------------- */}
       <input type="hidden" name="categoryId" value={category?.id ?? ""} />
       <input type="hidden" name="tags" value={tags.join(",")} />
-      {point ? (
-        <>
-          <input type="hidden" name="lat" value={point.lat} />
-          <input type="hidden" name="lng" value={point.lng} />
-        </>
-      ) : null}
+      {/* Si no se marcó el mapa, valen las coordenadas de la ciudad elegida. */}
+      <input type="hidden" name="lat" value={point?.lat ?? place.lat ?? ""} />
+      <input type="hidden" name="lng" value={point?.lng ?? place.lng ?? ""} />
 
       {/*
         Los medios van PRIMERO y en grande. Es lo que de verdad hay que
@@ -403,35 +401,7 @@ export function PublishForm({
           </select>
         </Field>
 
-        <Field label="País">
-          <select name="country" defaultValue="CO" className={control}>
-            {countries.map((c) => (
-              <option key={c.value} value={c.value} className="bg-surface-raised">
-                {c.label}
-              </option>
-            ))}
-          </select>
-        </Field>
-
-        <Field label="Ciudad">
-          <input
-            name="city"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            className={control}
-          />
-        </Field>
-
-        <div className="sm:col-span-2">
-          <LocationPicker
-            onChange={(picked) => {
-              setPoint({ lat: picked.lat, lng: picked.lng });
-              // El mapa RELLENA la ciudad, no la sustituye: si Nominatim no
-              // acierta, se corrige a mano en el campo de arriba.
-              if (picked.label) setCity(picked.label);
-            }}
-          />
-        </div>
+        <PlacePicker countries={countries} onChange={setPlace} />
       </Group>
 
       {/* --- Etiquetas y referencia interna --------------------------------- */}
@@ -449,6 +419,19 @@ export function PublishForm({
       </Group>
 
       {/* --- Medios ----------------------------------------------------------- */}
+      {/*
+        El mapa va al FINAL y es opcional: el país, el departamento y la ciudad
+        ya quedaron fijados arriba con los desplegables, que es lo que de verdad
+        se publica. Esto solo afina el punto exacto, que se guarda para uso
+        interno y nunca se muestra.
+      */}
+      <Group title="Punto en el mapa" wide>
+        <LocationPicker
+          center={place.lat && place.lng ? { lat: place.lat, lng: place.lng } : null}
+          onChange={(picked) => setPoint({ lat: picked.lat, lng: picked.lng })}
+        />
+      </Group>
+
       <p className="border-accent/25 bg-accent/[0.03] text-fg-muted rounded-(--radius-card) border px-5 py-4 text-sm text-pretty">
         Al publicar acepta las{" "}
         <Link href="/es/legal/trade-policy" target="_blank" className="text-accent underline">

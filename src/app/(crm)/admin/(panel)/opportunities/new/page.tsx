@@ -1,10 +1,11 @@
 import { randomUUID } from "node:crypto";
 
+import { Country } from "country-state-city";
+
 import Link from "next/link";
 
 import { AdminHeading } from "@/components/admin/AdminUI";
 import { categories } from "@/lib/data/demo/seed/categories";
-import { knownCountries } from "@/lib/data/locations";
 import { verticalLabels } from "@/lib/domain/labels";
 import { currencies, localized, verticals } from "@/lib/domain/types";
 import { formatCountry } from "@/lib/format";
@@ -38,6 +39,19 @@ export default function NewOpportunityPage() {
     })),
   }));
 
+  /**
+   * Los 250 países del catálogo mundial, con el nombre en español cuando el
+   * navegador sabe traducirlo. Son unos pocos kilobytes de HTML: la lista
+   * completa cabe en la página, y lo que NO cabe —cinco mil divisiones y
+   * ciento cuarenta y ocho mil ciudades— se pide al servidor bajo demanda.
+   */
+  const countryOptions = Country.getAllCountries()
+    .map((country) => ({
+      code: country.isoCode,
+      name: formatCountry(country.isoCode, "es") || country.name,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name, "es"));
+
   return (
     <>
       <AdminHeading
@@ -55,10 +69,7 @@ export default function NewOpportunityPage() {
           }))}
           categories={categoryOptions}
           currencies={[...currencies]}
-          countries={knownCountries.map((country) => ({
-            value: country.code,
-            label: formatCountry(country.code, "es"),
-          }))}
+          countries={countryOptions}
         />
       ) : (
         <p

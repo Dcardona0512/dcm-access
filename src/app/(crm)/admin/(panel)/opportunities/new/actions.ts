@@ -123,6 +123,7 @@ export async function publishListing(
   const summary = text(formData, "summary");
   const description = text(formData, "description");
   const city = text(formData, "city");
+  const region = text(formData, "region");
   const country = text(formData, "country").toUpperCase() || "CO";
 
   const priceMode = text(formData, "priceMode") === "on_request" ? "on_request" : "fixed";
@@ -234,7 +235,7 @@ export async function publishListing(
       price_currency: currency,
       price_period: null,
       country,
-      region: null,
+      region: region || null,
       city: city || null,
       // El punto exacto se guarda; la ficha pública solo muestra la ciudad.
       lat,

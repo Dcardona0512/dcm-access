@@ -49,8 +49,11 @@ async function lookupCity(lat: number, lng: number): Promise<string | undefined>
 }
 
 export function LocationPicker({
+  center,
   onChange,
 }: {
+  /** Ciudad elegida arriba. El mapa la sigue en vez de obligar a buscarla. */
+  readonly center?: { readonly lat: number; readonly lng: number } | null;
   readonly onChange: (point: PickedPoint) => void;
 }) {
   const container = useRef<HTMLDivElement>(null);
@@ -122,6 +125,13 @@ export function LocationPicker({
     };
   }, []);
 
+  // Al elegir ciudad arriba, el mapa vuela hasta ella. Sin esto habría que
+  // arrastrar el mundo entero desde Medellín cada vez.
+  useEffect(() => {
+    if (!center || !map.current) return;
+    map.current.setView([center.lat, center.lng], 12);
+  }, [center]);
+
   return (
     <div className="flex flex-col gap-2">
       <div
@@ -135,7 +145,7 @@ export function LocationPicker({
           ? looking
             ? "Buscando la ciudad…"
             : `Marcado en ${point.lat.toFixed(4)}, ${point.lng.toFixed(4)}. Al público solo se le muestra la ciudad.`
-          : "Haga clic en el mapa para marcar dónde está."}
+          : "Opcional: haga clic para marcar el punto exacto. La ciudad ya se tomó del desplegable."}
       </p>
     </div>
   );

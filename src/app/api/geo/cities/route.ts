@@ -1,0 +1,37 @@
+import { NextResponse } from "next/server";
+import { City } from "country-state-city";
+
+import { getAdminSession } from "@/lib/auth/admin";
+
+/**
+ * Ciudades de una división administrativa.
+ *
+ * Se devuelven con sus coordenadas para poder centrar el mapa en la ciudad
+ * elegida, en vez de obligar a buscarla a mano desde Medellín.
+ */
+export async function GET(request: Request) {
+  if (!(await getAdminSession())) {
+    return NextResponse.json({ error: "Sin sesión." }, { status: 401 });
+  }
+
+  const params = new URL(request.url).searchParams;
+  const country = params.get("country")?.trim().toUpperCase();
+  const state = params.get("state")?.trim();
+
+  if (!country) return NextResponse.json([]);
+
+  const cities = state
+    ? City.getCitiesOfState(country, state)
+    : // Hay países sin divisiones administrativas en el catálogo; ahí se
+      // devuelven todas las del país en lugar de una lista vacía.
+      City.getCitiesOfCountry(country) ?? [];
+
+  return NextResponse.json(
+    cities.map((city) => ({
+      name: city.name,
+      lat: Number(city.latitude),
+      lng: Number(city.longitude),
+    })),
+    { headers: { "cache-control": "public, max-age=86400" } },
+  );
+}
