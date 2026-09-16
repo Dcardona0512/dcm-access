@@ -113,29 +113,36 @@
 
 @theme {
   /* --- Escala tipográfica ---------------------------------------------- */
-  /* La escala de Facebook, medida en su propio Marketplace: 28/32 en negrita
-     lo más grande que tienen, luego 24/28, 20/24, 17/20 semi para el precio
-     de una tarjeta, 15/20 el cuerpo y 13/16 la línea de la ciudad.
+  /* Dos escalas, y la diferencia importa.
 
-     Sin `clamp()`, y es la diferencia de fondo: Facebook no estira el texto
-     con el ancho de la ventana. Un precio mide 17px en un teléfono y 17px en
-     un monitor; lo que cambia es cuántas tarjetas caben, no el tamaño de la
-     letra. Es lo que hace que una rejilla de anuncios se lea igual en todas
-     partes. */
-  --text-display-1: 1.8667rem; /* 28px */
-  --text-display-1--line-height: 2.1333rem; /* 32px */
-  --text-display-1--letter-spacing: 0;
+     LA INTERFAZ sigue la de Facebook al pie: 15/20 el cuerpo, 13/16 la línea
+     de la ciudad, 12px el suelo de los rótulos. Fija, sin estirarse con la
+     ventana: un precio mide lo mismo en un teléfono que en un monitor, y por
+     eso una rejilla de anuncios se lee igual en todas partes.
 
-  --text-display-2: 1.6rem; /* 24px */
-  --text-display-2--line-height: 1.8667rem; /* 28px */
-  --text-display-2--letter-spacing: 0;
+     LOS TITULARES no, porque Facebook no tiene nada parecido a una portada
+     con vídeo a pantalla completa. Ahí un titular compite con la imagen, y a
+     28px pierde. Vuelven los tamaños del principio —de 44 a 104 píxeles según
+     el ancho— con el tracking cerrado que pide un cuerpo grande.
 
-  --text-display-3: 1.3333rem; /* 20px */
-  --text-display-3--line-height: 1.6rem; /* 24px */
-  --text-display-3--letter-spacing: 0;
+     Van en píxeles y no en `rem` a propósito: la base es de 15px y estos
+     valores no deben moverse con ella. */
+  --text-display-1: clamp(44px, 7.5vw, 104px);
+  --text-display-1--line-height: 0.98;
+  --text-display-1--letter-spacing: -0.02em;
 
-  --text-lede: 1rem; /* 15px */
-  --text-lede--line-height: 1.3333rem; /* 20px */
+  --text-display-2: clamp(36px, 5vw, 64px);
+  --text-display-2--line-height: 1.03;
+  --text-display-2--letter-spacing: -0.015em;
+
+  --text-display-3: clamp(28px, 3.2vw, 44px);
+  --text-display-3--line-height: 1.1;
+  --text-display-3--letter-spacing: -0.01em;
+
+  /* La entradilla sube con ellos: a 15px, junto a un titular de 104px, no
+     parecía el párrafo de una portada sino un pie de foto. */
+  --text-lede: clamp(17px, 1.4vw, 21px);
+  --text-lede--line-height: 1.6;
 
   /* --- Ritmo y forma ---------------------------------------------------- */
   --spacing-section: clamp(5rem, 11vw, 9.5rem);
