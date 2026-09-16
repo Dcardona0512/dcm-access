@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 
 import { EditorialImage } from "@/components/ui/EditorialImage";
 import type { MediaItem } from "@/lib/domain/types";
@@ -17,6 +20,13 @@ import { cn } from "@/lib/utils";
 
    Con un solo medio no hay galería: se cae a la placa de siempre, así que las
    fichas que aún no tienen fotografía se ven exactamente igual que antes.
+
+   EL COMPONENTE ES DE CLIENTE, y solo por la lupa. Cambiar de foto sigue sin
+   ejecutar JavaScript: los radios y el CSS se sirven ya renderizados y
+   funcionan desde el primer byte, antes de que React hidrate. Lo único que
+   espera a la hidratación es abrir la foto a pantalla completa, que es una
+   mejora y no la función principal. Si el JavaScript no llega, la galería
+   sigue entera.
    ========================================================================== */
 
 /**
@@ -81,6 +91,9 @@ export function MediaGallery({
 }) {
   const items = media.slice(0, PEERS.length);
 
+  /** Índice abierto a pantalla completa, o `null` si la lupa está cerrada. */
+  const [ampliada, setAmpliada] = useState<number | null>(null);
+
   if (items.length <= 1) {
     return (
       <EditorialImage
@@ -131,12 +144,24 @@ export function MediaGallery({
               <source src={item.src} type="video/mp4" />
             </video>
           ) : (
-            <EditorialImage
-              media={item}
-              ratio="16/9"
-              priority={index === 0}
-              sizes="(max-width: 1024px) 100vw, 62vw"
-            />
+            /*
+              La escena entera es el botón que abre la lupa. Un icono en una
+              esquina obligaría a apuntar; aquí se pulsa donde uno ya está
+              mirando, que es lo que se hace por instinto con una foto.
+            */
+            <button
+              type="button"
+              onClick={() => setAmpliada(index)}
+              aria-label={`Ampliar: ${item.alt}`}
+              className="focus-visible:outline-accent block w-full cursor-zoom-in focus-visible:outline-2 focus-visible:outline-offset-2"
+            >
+              <EditorialImage
+                media={item}
+                ratio="16/9"
+                priority={index === 0}
+                sizes="(max-width: 1024px) 100vw, 62vw"
+              />
+            </button>
           )}
         </div>
       ))}
@@ -182,6 +207,142 @@ export function MediaGallery({
           );
         })}
       </ul>
+
+      <Lupa items={items} indice={ampliada} onCerrar={() => setAmpliada(null)} onIr={setAmpliada} />
     </fieldset>
+  );
+}
+
+/* ============================================================================
+   LUPA
+   ----------------------------------------------------------------------------
+   La foto a pantalla completa, que es donde se ve el detalle: un rayón en la
+   puerta o el estado de una llanta no se aprecian en un recuadro de 700px.
+
+   `<dialog>` con `showModal()`, no un div flotante: la tecla Escape, el foco
+   atrapado dentro y el resto de la página inerte para los lectores de pantalla
+   vienen dados. Lo que sí hay que añadir son las flechas, para recorrer el
+   carrete sin cerrar y volver a abrir.
+
+   La imagen va con `object-contain` y sin recorte: a diferencia de la escena
+   —que reencuadra a 16/9 para que la ficha tenga un ritmo— aquí manda la foto,
+   sea vertical, cuadrada o apaisada.
+   ========================================================================== */
+
+function Lupa({
+  items,
+  indice,
+  onCerrar,
+  onIr,
+}: {
+  readonly items: readonly MediaItem[];
+  readonly indice: number | null;
+  readonly onCerrar: () => void;
+  readonly onIr: (indice: number) => void;
+}) {
+  const dialogo = useRef<HTMLDialogElement>(null);
+  const abierta = indice !== null;
+
+  // `showModal()` no es un atributo: hay que llamarlo. El efecto sincroniza el
+  // estado de React con el del elemento en los dos sentidos, incluido el cierre
+  // por Escape, que ocurre sin pasar por aquí.
+  useEffect(() => {
+    const dialog = dialogo.current;
+    if (!dialog) return;
+
+    if (abierta && !dialog.open) dialog.showModal();
+    if (!abierta && dialog.open) dialog.close();
+  }, [abierta]);
+
+  useEffect(() => {
+    if (!abierta) return;
+
+    function alPulsar(event: KeyboardEvent) {
+      if (event.key === "ArrowRight") onIr(((indice ?? 0) + 1) % items.length);
+      if (event.key === "ArrowLeft") onIr(((indice ?? 0) - 1 + items.length) % items.length);
+    }
+
+    window.addEventListener("keydown", alPulsar);
+    return () => window.removeEventListener("keydown", alPulsar);
+  }, [abierta, indice, items.length, onIr]);
+
+  const item = indice === null ? null : items[indice];
+
+  return (
+    <dialog
+      ref={dialogo}
+      onClose={onCerrar}
+      // Pulsar el fondo cierra. El diálogo modal ocupa la pantalla entera, así
+      // que un clic fuera de la imagen llega aquí con `target` siendo él mismo.
+      onClick={(event) => {
+        if (event.target === dialogo.current) onCerrar();
+      }}
+      className="bg-surface/95 text-fg h-dvh max-h-none w-screen max-w-none border-0 p-0 backdrop:bg-black/80"
+    >
+      {item ? (
+        <div className="relative grid h-full w-full place-items-center p-4 sm:p-10">
+          {item.src ? (
+            <Image
+              src={item.src}
+              alt={item.alt}
+              width={2400}
+              height={1600}
+              sizes="100vw"
+              className="max-h-[88dvh] w-auto max-w-full object-contain"
+            />
+          ) : null}
+
+          <button
+            type="button"
+            onClick={onCerrar}
+            aria-label="Cerrar"
+            className="bg-surface/80 text-fg-muted hover:text-fg absolute top-4 right-4 grid h-10 w-10 place-items-center rounded-full text-xl backdrop-blur-sm transition-colors"
+          >
+            ×
+          </button>
+
+          {items.length > 1 ? (
+            <>
+              <Flecha
+                hacia="anterior"
+                onClick={() => onIr((indice! - 1 + items.length) % items.length)}
+              />
+              <Flecha hacia="siguiente" onClick={() => onIr((indice! + 1) % items.length)} />
+
+              <span
+                className="eyebrow bg-surface/80 text-fg-muted absolute bottom-4 left-1/2 -translate-x-1/2 rounded-(--radius-pill) px-3 py-1.5 text-[0.75rem] backdrop-blur-sm"
+                data-numeric
+              >
+                {indice! + 1} / {items.length}
+              </span>
+            </>
+          ) : null}
+        </div>
+      ) : null}
+    </dialog>
+  );
+}
+
+function Flecha({
+  hacia,
+  onClick,
+}: {
+  readonly hacia: "anterior" | "siguiente";
+  readonly onClick: () => void;
+}) {
+  const anterior = hacia === "anterior";
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={anterior ? "Foto anterior" : "Foto siguiente"}
+      className={cn(
+        "bg-surface/80 text-fg-muted hover:text-fg absolute top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full text-2xl backdrop-blur-sm transition-colors",
+        anterior ? "left-3 sm:left-6" : "right-3 sm:right-6",
+      )}
+    >
+      {anterior ? "‹" : "›"}
+    </button>
   );
 }

@@ -166,12 +166,16 @@ export async function OpportunityDetail({
                 {localized(opportunity.title, locale)}
               </h1>
 
-              {/* Sin resumen no se deja el hueco: el título ya carga solo. */}
-              {localized(opportunity.summary, locale) ? (
-                <p className="text-lede text-fg-muted max-w-[62ch] text-pretty">
-                  {localized(opportunity.summary, locale)}
-                </p>
-              ) : null}
+              {/*
+                Aquí iba el resumen, y sobraba: se deriva de la descripción, así
+                que decía lo mismo que el bloque de más abajo pero aplanado en un
+                párrafo corrido y cortado a la mitad. El título y el precio ya
+                sostienen la cabecera.
+
+                `summary` sigue existiendo: es la descripción que leen los
+                buscadores y la línea que acompaña al título en las tarjetas.
+                Lo que se retira es mostrarlo dos veces en la misma pantalla.
+              */}
             </header>
 
             <MediaGallery media={opportunity.media} label={dict.opportunity.overview} />

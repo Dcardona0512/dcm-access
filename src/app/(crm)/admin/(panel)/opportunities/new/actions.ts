@@ -108,6 +108,24 @@ function summarize(description: string): string {
   return `${(lastSpace > 100 ? clipped.slice(0, lastSpace) : clipped).trimEnd()}…`;
 }
 
+/**
+ * Referencia de la ficha: solo dígitos.
+ *
+ * Antes era `DCM-MO-3D-EC7`, que mezclaba marca, sección y un trozo del
+ * identificador. Se lee mal por teléfono, no se dicta sin deletrear y no dice
+ * nada que la ficha no diga ya. Un número se canta de corrido.
+ *
+ * Son los segundos transcurridos desde el 1 de enero de 2026, así que crece
+ * siempre —una referencia mayor es una ficha más reciente—, no se repite
+ * mientras no se publiquen dos en el mismo segundo, y se mantiene en ocho o
+ * nueve cifras durante décadas. Recortar los últimos dígitos de la marca de
+ * tiempo habría sido más corto y habría empezado a repetirse cada once días.
+ */
+function nuevaReferencia(): string {
+  const ORIGEN = Date.UTC(2026, 0, 1);
+  return String(Math.floor((Date.now() - ORIGEN) / 1000));
+}
+
 /** Slug libre, evitando los segmentos que ya son rutas estáticas. */
 async function uniqueSlug(base: string, taken: ReadonlySet<string>): Promise<string> {
   const free = (candidate: string) => !taken.has(candidate) && !RESERVED_SLUGS.has(candidate);
@@ -164,9 +182,17 @@ export async function publishListing(
   const currencyRaw = text(formData, "currency");
   const currency: Currency = isCurrency(currencyRaw) ? currencyRaw : "COP";
 
-  // La operación ya no se pregunta: todo lo que se publica es venta. La
-  // columna sigue existiendo por si vuelve el alquiler o el chárter.
-  const listingType: ListingType = "sale";
+  /**
+   * La operación solo llega desde inmobiliaria, y solo puede ser una de dos.
+   * Cualquier otra cosa —incluido un campo inventado a mano en la petición—
+   * cae en venta, que es lo que publica el resto de las secciones.
+   */
+  const listingType: ListingType =
+    verticalRaw === "real-estate" && text(formData, "listingType") === "rent" ? "rent" : "sale";
+
+  // Un arriendo se cobra al mes. Sin esto, un canon de 4.000.000 se leería
+  // como el precio de venta del apartamento.
+  const pricePeriod = listingType === "rent" ? "month" : null;
 
   /**
    * Los atributos salen del esquema de la categoría, y solo se guardan los que
@@ -177,6 +203,18 @@ export async function publishListing(
     // Las etiquetas no vienen del esquema: tienen su propio control y su
     // propio campo, así que se saltan aquí y se añaden abajo.
     if (def.key === "tags") continue;
+
+    // Una lista de casillas manda un valor por casilla marcada bajo el mismo
+    // nombre, así que hay que leerlas TODAS: `formData.get` devolvería solo la
+    // primera y se perderían las demás sin que nada avisara.
+    if (def.type === "multi-enum") {
+      const marcadas = formData
+        .getAll(`attr_${def.key}`)
+        .filter((valor): valor is string => typeof valor === "string" && valor.length > 0);
+
+      if (marcadas.length > 0) attributes[def.key] = marcadas;
+      continue;
+    }
 
     const raw = text(formData, `attr_${def.key}`);
     if (!raw) continue;
@@ -244,7 +282,7 @@ export async function publishListing(
     const row = {
       id: listingId,
       slug,
-      reference: `DCM-${verticalRaw.slice(0, 2).toUpperCase()}-${listingId.slice(-6).toUpperCase()}`,
+      reference: nuevaReferencia(),
       vertical: verticalRaw,
       category_id: categoryId,
       // Se guarda en los dos idiomas con el mismo texto: es lo honesto cuando
@@ -258,8 +296,8 @@ export async function publishListing(
       listing_type: listingType,
       price_mode: "fixed",
       price_amount: priceAmount,
+      price_period: pricePeriod,
       price_currency: currency,
-      price_period: null,
       country,
       region: region || null,
       city: city || null,

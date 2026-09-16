@@ -344,7 +344,27 @@ export function PublishForm({
           <input name="title" required minLength={3} className={control} />
         </Field>
 
-        <Field label="Precio">
+        {/*
+          La operación solo se pregunta en inmobiliaria, que es donde de verdad
+          hay dos: un carro se vende, pero un apartamento se vende o se
+          arrienda, y de esa respuesta depende que el precio sea un valor o un
+          canon mensual. En las demás secciones sería un desplegable con una
+          sola respuesta posible.
+        */}
+        {vertical === "real-estate" ? (
+          <Field label="Operación">
+            <select name="listingType" defaultValue="sale" className={control}>
+              <option value="sale" className="bg-surface-raised">
+                Venta
+              </option>
+              <option value="rent" className="bg-surface-raised">
+                Arriendo
+              </option>
+            </select>
+          </Field>
+        ) : null}
+
+        <Field label={vertical === "real-estate" ? "Precio o canon" : "Precio"}>
           <input name="priceAmount" inputMode="numeric" required className={control} />
         </Field>
 
@@ -386,28 +406,77 @@ export function PublishForm({
           </Field>
         ) : null}
 
-        {category?.attributes.map((attr) => (
-          <Field key={attr.key} label={attr.unit ? `${attr.label} (${attr.unit})` : attr.label}>
-            {attr.options && attr.options.length > 0 ? (
-              <select name={`attr_${attr.key}`} defaultValue="" className={control}>
-                <option value="" className="bg-surface-raised">
-                  —
-                </option>
-                {attr.options.map((o) => (
-                  <option key={o.value} value={o.value} className="bg-surface-raised">
-                    {o.label}
+        {category?.attributes.map((attr) => {
+          /*
+            Una lista de opciones múltiples —las comodidades de un inmueble son
+            treinta— no cabe en un desplegable: obligaría a abrirlo treinta
+            veces. Va como rejilla de casillas, que se recorre de un vistazo y
+            deja ver de golpe lo marcado y lo que falta.
+          */
+          if (attr.type === "multi-enum" && attr.options && attr.options.length > 0) {
+            return (
+              <Field key={attr.key} label={attr.label} full>
+                <div className="border-line-soft grid gap-x-5 gap-y-2.5 rounded-(--radius-card) border border-dashed p-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {attr.options.map((o) => (
+                    <label key={o.value} className="flex cursor-pointer items-center gap-2.5 text-sm">
+                      {/* Todas comparten nombre: así llegan al servidor como
+                          una lista y no como treinta campos sueltos. */}
+                      <input
+                        type="checkbox"
+                        name={`attr_${attr.key}`}
+                        value={o.value}
+                        className="accent-accent h-4 w-4 shrink-0"
+                      />
+                      <span className="text-fg-muted text-pretty">{o.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </Field>
+            );
+          }
+
+          return (
+            <Field key={attr.key} label={attr.unit ? `${attr.label} (${attr.unit})` : attr.label}>
+              {attr.type === "boolean" ? (
+                /*
+                  Tres estados y no una casilla: «no lo sé» es una respuesta
+                  legítima —y la más común— cuando se publica por encargo. Una
+                  casilla solo sabe decir sí o no, y su «no» se confunde con no
+                  haberla tocado.
+                */
+                <select name={`attr_${attr.key}`} defaultValue="" className={control}>
+                  <option value="" className="bg-surface-raised">
+                    —
                   </option>
-                ))}
-              </select>
-            ) : (
-              <input
-                name={`attr_${attr.key}`}
-                type={attr.type === "number" ? "number" : "text"}
-                className={control}
-              />
-            )}
-          </Field>
-        ))}
+                  <option value="true" className="bg-surface-raised">
+                    Sí
+                  </option>
+                  <option value="false" className="bg-surface-raised">
+                    No
+                  </option>
+                </select>
+              ) : attr.options && attr.options.length > 0 ? (
+                <select name={`attr_${attr.key}`} defaultValue="" className={control}>
+                  <option value="" className="bg-surface-raised">
+                    —
+                  </option>
+                  {attr.options.map((o) => (
+                    <option key={o.value} value={o.value} className="bg-surface-raised">
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  name={`attr_${attr.key}`}
+                  type={attr.type === "number" ? "number" : "text"}
+                  inputMode={attr.type === "number" ? "numeric" : undefined}
+                  className={control}
+                />
+              )}
+            </Field>
+          );
+        })}
       </Group>
 
       {/* 5. Descripción -------------------------------------------------------- */}
