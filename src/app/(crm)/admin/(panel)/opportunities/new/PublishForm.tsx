@@ -364,20 +364,37 @@ export function PublishForm({
           </Field>
         ) : null}
 
+        {/*
+          El importe y la moneda van en la misma celda porque son un solo dato
+          leído en voz alta: «ciento treinta y ocho millones de pesos». Tenerlos
+          en filas distintas obligaba a bajar la vista para confirmar en qué
+          moneda se estaba escribiendo, y dejaba dos huecos anchos para un
+          número corto y tres letras.
+        */}
         <Field label={vertical === "real-estate" ? "Precio o canon" : "Precio"}>
-          <input name="priceAmount" inputMode="numeric" required className={control} />
-        </Field>
+          <div className="flex gap-2">
+            <input
+              name="priceAmount"
+              inputMode="numeric"
+              required
+              className={`${control} flex-1`}
+            />
 
-        <Field label="Moneda">
-          {/* COP por defecto: la mayoría del inventario está en Colombia. Las
-              demás siguen ahí para lo que se publica fuera. */}
-          <select name="currency" defaultValue="COP" className={control}>
-            {currencies.map((c) => (
-              <option key={c} value={c} className="bg-surface-raised">
-                {c}
-              </option>
-            ))}
-          </select>
+            {/* COP por defecto: la mayoría del inventario está en Colombia. Las
+                demás siguen ahí para lo que se publica fuera. */}
+            <select
+              name="currency"
+              defaultValue="COP"
+              aria-label="Moneda"
+              className={`${control} w-24 shrink-0`}
+            >
+              {currencies.map((c) => (
+                <option key={c} value={c} className="bg-surface-raised">
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
         </Field>
       </Group>
 
