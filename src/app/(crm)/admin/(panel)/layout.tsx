@@ -2,10 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { AdminNav } from "@/components/admin/AdminNav";
-import { PanelSummary } from "@/components/admin/PanelSummary";
 import { Logo } from "@/components/brand/Logo";
 import { getAdminSession } from "@/lib/auth/admin";
-import { resumenPublicaciones } from "@/lib/data/supabase/panel";
 import { getDemoUser, roleLabels } from "@/lib/auth/roles";
 
 import { signOutAdmin } from "../login/actions";
@@ -28,9 +26,6 @@ export default async function PanelLayout({ children }: { children: React.ReactN
   const session = await getAdminSession();
   if (!session) redirect("/admin/login?error=required");
 
-  // Devuelve `null` si falta la clave o si la consulta falla, y entonces la
-  // barra simplemente no lo pinta: el panel sigue sirviendo sin resumen.
-  const resumen = await resumenPublicaciones();
 
   // La matriz de permisos sigue decidiendo el menú; lo que cambia es que ahora
   // hay una identidad real detrás en lugar de una sesión de demostración.
@@ -43,12 +38,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
           <Logo />
         </Link>
 
-        {/* El resumen es una entrada más del menú, no un bloque aparte: abre
-            su propia ventana y por eso vive junto a las demás opciones. */}
-        <div className="flex flex-col gap-1">
-          <AdminNav role={user.role} />
-          {resumen ? <PanelSummary resumen={resumen} /> : null}
-        </div>
+        <AdminNav role={user.role} />
 
         <div className="border-line mt-auto flex flex-col gap-2 border-t pt-5">
           <span className="eyebrow text-fg-muted text-[0.75rem]">{roleLabels[user.role].es}</span>

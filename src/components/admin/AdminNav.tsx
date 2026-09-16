@@ -14,16 +14,20 @@ import { cn } from "@/lib/utils";
  * política de autorización no es decorativa, decide de verdad lo que se ve.
  */
 /**
- * Una sola entrada, por ahora.
+ * Dos entradas, y en este orden.
  *
- * El panel tenía siete —resumen, leads, operaciones, oportunidades,
- * solicitudes, proveedores, comisiones— y ninguna resolvía el trabajo real de
- * este momento, que es llenar el catálogo. Las pantallas siguen existiendo y
- * se alcanzan por URL; lo que se quita es el menú que invitaba a perderse
- * entre ellas.
+ * El panel tenía siete —leads, operaciones, oportunidades, solicitudes,
+ * proveedores, comisiones— y ninguna resolvía el trabajo real de este
+ * momento. Las pantallas siguen existiendo y se alcanzan por URL; lo que se
+ * quitó es el menú que invitaba a perderse entre ellas.
+ *
+ * El resumen abre el panel porque responde a lo único que se pregunta al
+ * entrar: qué hay publicado y qué lleva tiempo parado. Publicar va después,
+ * porque es una decisión que ya se trae tomada de casa.
  */
 const ENTRIES: readonly { href: string; label: string; resource: Resource }[] = [
-  { href: "/admin", label: "Crear publicación", resource: "opportunities" },
+  { href: "/admin", label: "Resumen", resource: "opportunities" },
+  { href: "/admin/publicar", label: "Crear publicación", resource: "opportunities" },
 ];
 
 export function AdminNav({ role }: { readonly role: Role }) {

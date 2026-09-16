@@ -89,7 +89,7 @@ export default async function AdminOpportunitiesPage({
         })}
 
         <Link
-          href="/admin"
+          href="/admin/publicar"
           className="eyebrow border-line text-fg-muted hover:text-fg ml-auto rounded-(--radius-card) border px-3 py-2 text-[0.75rem] transition-colors"
         >
           Crear publicación
