@@ -25,7 +25,11 @@ export function AdminHeading({
     <header className="border-line mb-8 flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-end sm:justify-between">
       <div className="flex flex-col gap-2.5">
         {eyebrow ? <p className="eyebrow text-accent">{eyebrow}</p> : null}
-        <h1 className="font-display text-3xl text-balance">{title}</h1>
+        {/* Siempre en mayúscula, y desde el CSS y no desde el texto: así el
+            título sigue leyéndose «Publicar una ficha» para un lector de
+            pantalla y para el buscador, y solo se ve en versales. Escribirlo
+            en mayúsculas en el código haría que se deletreara letra a letra. */}
+        <h1 className="font-display text-3xl tracking-[0.02em] text-balance uppercase">{title}</h1>
         {lede ? <p className="text-fg-muted max-w-[68ch] text-sm text-pretty">{lede}</p> : null}
       </div>
       {action}
