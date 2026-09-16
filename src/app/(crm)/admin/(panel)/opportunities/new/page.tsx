@@ -16,6 +16,31 @@ import { PublishForm, type CategoryOption } from "./PublishForm";
 export const dynamic = "force-dynamic";
 
 /**
+ * Qué campos del esquema pregunta el FORMULARIO.
+ *
+ * Un esquema de categoría describe todo lo que una ficha puede llegar a
+ * decir: marca, modelo, año, kilometraje, combustible, transmisión, potencia,
+ * plazas, blindaje. Eso es lo correcto para la ficha publicada y para los
+ * filtros, y es exactamente lo que no se debe poner delante de alguien que
+ * está subiendo un carro: once desplegables entre el título y la descripción.
+ *
+ * En vehículos el formulario pregunta una sola cosa —el estado— y el resto
+ * del esquema sigue intacto para las fichas que ya lo traen. Las demás
+ * secciones no se tocan: nadie ha dicho todavía qué debe preguntar cada una.
+ *
+ * `tags` además venía en el esquema de vehículos, así que pintaba una segunda
+ * casilla de etiquetas junto a la de verdad. Este filtro también la quita.
+ */
+const FORM_ATTRIBUTES: Partial<Record<string, readonly string[]>> = {
+  motors: ["condition"],
+};
+
+function asksFor(vertical: string) {
+  const allowed = FORM_ATTRIBUTES[vertical];
+  return (def: { readonly key: string }) => (allowed ? allowed.includes(def.key) : true);
+}
+
+/**
  * Alta de ficha.
  *
  * Las categorías y sus atributos se serializan aquí y viajan al formulario ya
@@ -38,7 +63,7 @@ export default async function NewOpportunityPage({
     id: category.id,
     vertical: category.vertical,
     name: localized(category.name, "es"),
-    attributes: category.attributeSchema.map((def) => ({
+    attributes: category.attributeSchema.filter(asksFor(category.vertical)).map((def) => ({
       key: def.key,
       label: localized(def.label, "es"),
       type: def.type,

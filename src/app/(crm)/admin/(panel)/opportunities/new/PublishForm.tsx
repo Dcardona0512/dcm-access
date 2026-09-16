@@ -329,9 +329,43 @@ export function PublishForm({
 
       <input type="hidden" name="vertical" value={vertical} />
 
-      {/* La sección ya se anuncia en ámbar sobre el título: repetirla aquí,
-          en un campo que no se puede tocar, era decir dos veces lo mismo. */}
-      <Group title="Dónde va">
+      {/* ----------------------------------------------------------------------
+          El orden es el del anuncio, no el de la base de datos: primero lo que
+          decide si alguien sigue mirando —qué es y cuánto cuesta—, después lo
+          que lo clasifica, y al final lo que solo importa para publicarlo bien.
+
+          Los rótulos de grupo no se ven: existen para los lectores de pantalla,
+          porque un `fieldset` sin `legend` pierde su nombre.
+          -------------------------------------------------------------------- */}
+
+      {/* 1. Título · 2. Precio ------------------------------------------------ */}
+      <Group title="Qué es y cuánto cuesta">
+        <Field label="Título" full>
+          <input name="title" required minLength={3} className={control} />
+        </Field>
+
+        <Field label="Precio">
+          <input name="priceAmount" inputMode="numeric" required className={control} />
+        </Field>
+
+        <Field label="Moneda">
+          {/* COP por defecto: la mayoría del inventario está en Colombia. Las
+              demás siguen ahí para lo que se publica fuera. */}
+          <select name="currency" defaultValue="COP" className={control}>
+            {currencies.map((c) => (
+              <option key={c} value={c} className="bg-surface-raised">
+                {c}
+              </option>
+            ))}
+          </select>
+        </Field>
+      </Group>
+
+      {/* 3. Categoría · 4. Estado ---------------------------------------------
+          Van juntos y en este orden porque el estado no existe hasta que hay
+          categoría: los campos de abajo los declara la categoría elegida, no
+          este formulario. */}
+      <Group title="Categoría y estado">
         {mustChoose ? (
           <Field label="Categoría">
             <select
@@ -351,95 +385,70 @@ export function PublishForm({
             </select>
           </Field>
         ) : null}
+
+        {category?.attributes.map((attr) => (
+          <Field key={attr.key} label={attr.unit ? `${attr.label} (${attr.unit})` : attr.label}>
+            {attr.options && attr.options.length > 0 ? (
+              <select name={`attr_${attr.key}`} defaultValue="" className={control}>
+                <option value="" className="bg-surface-raised">
+                  —
+                </option>
+                {attr.options.map((o) => (
+                  <option key={o.value} value={o.value} className="bg-surface-raised">
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                name={`attr_${attr.key}`}
+                type={attr.type === "number" ? "number" : "text"}
+                className={control}
+              />
+            )}
+          </Field>
+        ))}
       </Group>
 
-      {/* --- Texto ------------------------------------------------------------ */}
-      <Group title="La ficha">
-        <Field label="Título" full>
-          <input name="title" required minLength={3} className={control} />
-        </Field>
-        <Field label="Descripción" full>
+      {/* 5. Descripción -------------------------------------------------------- */}
+      <Group title="Descripción" wide>
+        <Field label="Descripción (opcional)" full>
           <textarea name="description" rows={5} className={`${control} h-auto py-3`} />
         </Field>
       </Group>
 
-      {/* --- Atributos de la categoría elegida -------------------------------- */}
-      {category && category.attributes.length > 0 ? (
-        <Group title="Datos de la ficha">
-          {category.attributes.map((attr) => (
-            <Field key={attr.key} label={attr.unit ? `${attr.label} (${attr.unit})` : attr.label}>
-              {attr.options && attr.options.length > 0 ? (
-                <select name={`attr_${attr.key}`} defaultValue="" className={control}>
-                  <option value="" className="bg-surface-raised">
-                    —
-                  </option>
-                  {attr.options.map((o) => (
-                    <option key={o.value} value={o.value} className="bg-surface-raised">
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  name={`attr_${attr.key}`}
-                  type={attr.type === "number" ? "number" : "text"}
-                  className={control}
-                />
-              )}
-            </Field>
-          ))}
-        </Group>
-      ) : null}
-
-      {/* --- Precio y ubicación ----------------------------------------------- */}
-      <Group title="Precio y ubicación">
-        <Field label="Precio">
-          <input name="priceAmount" inputMode="numeric" required className={control} />
-        </Field>
-
-        <Field label="Moneda">
-          {/* COP por defecto: la mayoría del inventario está en Colombia. Las
-              demás siguen ahí para lo que se publica fuera. */}
-          <select name="currency" defaultValue="COP" className={control}>
-            {currencies.map((c) => (
-              <option key={c} value={c} className="bg-surface-raised">
-                {c}
-              </option>
-            ))}
-          </select>
-        </Field>
-
+      {/* 6. Ubicación ----------------------------------------------------------
+          Dos pasos, y solo el primero se publica: los desplegables fijan el país,
+          el departamento y la ciudad, que es lo que ve cualquiera. El punto del
+          mapa afina la posición exacta, se guarda para uso interno y no se
+          muestra en ninguna página pública. */}
+      <Group title="Ubicación">
         <PlacePicker countries={countries} onChange={setPlace} />
       </Group>
 
-      {/* --- Etiquetas y referencia interna --------------------------------- */}
-      <Group title="Extras">
-        <Field label="Etiquetas" full>
-          <TagsInput onChange={setTags} />
-        </Field>
-
-        <Field label="SKU" full>
-          <input name="sku" className={control} />
-          <span className="text-fg-muted/60 text-xs">
-            Su referencia interna. Opcional, y no se muestra en ninguna página pública.
-          </span>
-        </Field>
-      </Group>
-
-      {/* --- Medios ----------------------------------------------------------- */}
-      {/*
-        El mapa va al FINAL y es opcional: el país, el departamento y la ciudad
-        ya quedaron fijados arriba con los desplegables, que es lo que de verdad
-        se publica. Esto solo afina el punto exacto, que se guarda para uso
-        interno y nunca se muestra.
-      */}
-      <Group title="Punto en el mapa" wide>
+      <Group title="Punto exacto en el mapa" wide>
         <LocationPicker
           center={place.lat && place.lng ? { lat: place.lat, lng: place.lng } : null}
           onChange={(picked) => setPoint({ lat: picked.lat, lng: picked.lng })}
         />
       </Group>
 
+      {/* 7. Etiquetas · 8. SKU -------------------------------------------------- */}
+      <Group title="Etiquetas y referencia interna" wide>
+        <Field label="Etiquetas (opcional, máximo 20)" full>
+          <TagsInput onChange={setTags} />
+        </Field>
+
+        <Field label="SKU (opcional)" full>
+          <input name="sku" className={control} />
+          <span className="text-fg-muted/60 text-xs">
+            Su referencia interna. Solo visible para usted: no se muestra en ninguna página
+            pública.
+          </span>
+        </Field>
+      </Group>
+
+      {/* 9. Políticas ----------------------------------------------------------- */}
       <p className="border-accent/25 bg-accent/[0.03] text-fg-muted rounded-(--radius-card) border px-5 py-4 text-sm text-pretty">
         Al publicar acepta las{" "}
         <Link href="/es/legal/trade-policy" target="_blank" className="text-accent underline">
