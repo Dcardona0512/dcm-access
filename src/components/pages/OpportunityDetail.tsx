@@ -158,9 +158,12 @@ export async function OpportunityDetail({
                 {localized(opportunity.title, locale)}
               </h1>
 
-              <p className="text-lede text-fg-muted max-w-[62ch] text-pretty">
-                {localized(opportunity.summary, locale)}
-              </p>
+              {/* Sin resumen no se deja el hueco: el título ya carga solo. */}
+              {localized(opportunity.summary, locale) ? (
+                <p className="text-lede text-fg-muted max-w-[62ch] text-pretty">
+                  {localized(opportunity.summary, locale)}
+                </p>
+              ) : null}
             </header>
 
             <MediaGallery media={opportunity.media} label={dict.opportunity.overview} />

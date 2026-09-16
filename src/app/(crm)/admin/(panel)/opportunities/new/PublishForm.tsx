@@ -79,7 +79,6 @@ export function PublishForm({
   const [place, setPlace] = useState<Place>({ country: "CO" });
   const [point, setPoint] = useState<{ lat: number; lng: number } | null>(null);
   const [tags, setTags] = useState<readonly string[]>([]);
-  const [priceMode, setPriceMode] = useState<"fixed" | "on_request">("fixed");
   const [files, setFiles] = useState<FileState[]>([]);
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
@@ -367,9 +366,6 @@ export function PublishForm({
         <Field label="Título" full>
           <input name="title" required minLength={3} className={control} />
         </Field>
-        <Field label="Resumen" full>
-          <input name="summary" className={control} />
-        </Field>
         <Field label="Descripción" full>
           <textarea name="description" rows={5} className={`${control} h-auto py-3`} />
         </Field>
@@ -406,26 +402,8 @@ export function PublishForm({
       {/* --- Precio y ubicación ----------------------------------------------- */}
       <Group title="Precio y ubicación">
         <Field label="Precio">
-          <select
-            name="priceMode"
-            value={priceMode}
-            onChange={(e) => setPriceMode(e.target.value as "fixed" | "on_request")}
-            className={control}
-          >
-            <option value="fixed" className="bg-surface-raised">
-              Mostrar importe
-            </option>
-            <option value="on_request" className="bg-surface-raised">
-              A consultar
-            </option>
-          </select>
+          <input name="priceAmount" inputMode="numeric" required className={control} />
         </Field>
-
-        {priceMode === "fixed" ? (
-          <Field label="Importe">
-            <input name="priceAmount" inputMode="numeric" className={control} />
-          </Field>
-        ) : null}
 
         <Field label="Moneda">
           {/* COP por defecto: la mayoría del inventario está en Colombia. Las
@@ -436,17 +414,6 @@ export function PublishForm({
                 {c}
               </option>
             ))}
-          </select>
-        </Field>
-
-        <Field label="Operación">
-          <select name="listingType" defaultValue="sale" className={control}>
-            <option value="sale" className="bg-surface-raised">Venta</option>
-            <option value="rent" className="bg-surface-raised">Alquiler</option>
-            <option value="lease" className="bg-surface-raised">Leasing</option>
-            <option value="charter" className="bg-surface-raised">Chárter</option>
-            <option value="service" className="bg-surface-raised">Servicio</option>
-            <option value="opportunity" className="bg-surface-raised">Oportunidad</option>
           </select>
         </Field>
 

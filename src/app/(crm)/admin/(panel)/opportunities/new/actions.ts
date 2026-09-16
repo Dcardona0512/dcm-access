@@ -82,6 +82,32 @@ function amount(raw: string): number | undefined {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
 }
 
+/**
+ * El resumen sale de la descripción, no de un campo aparte.
+ *
+ * Pedir dos textos para lo mismo es pedir que el segundo se quede vacío o
+ * repita al primero. Aquí se toma la primera frase —que es lo que alguien
+ * escribe primero cuando describe un carro— y se recorta a la longitud que
+ * los buscadores muestran sin cortar.
+ *
+ * Si no hay descripción no se inventa nada: un resumen vacío se nota menos
+ * que uno que repite el título palabra por palabra.
+ */
+function summarize(description: string): string {
+  const flat = description.replace(/\s+/g, " ").trim();
+  if (!flat) return "";
+
+  const firstSentence = flat.match(/^[^.!?]+[.!?]?/)?.[0]?.trim() ?? flat;
+  const candidate = firstSentence.length >= 40 ? firstSentence : flat;
+
+  if (candidate.length <= 160) return candidate;
+
+  // Se corta en un espacio, nunca a mitad de palabra.
+  const clipped = candidate.slice(0, 160);
+  const lastSpace = clipped.lastIndexOf(" ");
+  return `${(lastSpace > 100 ? clipped.slice(0, lastSpace) : clipped).trimEnd()}…`;
+}
+
 /** Slug libre, evitando los segmentos que ya son rutas estáticas. */
 async function uniqueSlug(base: string, taken: ReadonlySet<string>): Promise<string> {
   const free = (candidate: string) => !taken.has(candidate) && !RESERVED_SLUGS.has(candidate);
@@ -120,27 +146,25 @@ export async function publishListing(
     return { status: "error", message: "El título es obligatorio." };
   }
 
-  const summary = text(formData, "summary");
   const description = text(formData, "description");
+  const summary = summarize(description);
   const city = text(formData, "city");
   const region = text(formData, "region");
   const country = text(formData, "country").toUpperCase() || "CO";
 
-  const priceMode = text(formData, "priceMode") === "on_request" ? "on_request" : "fixed";
+  // Siempre hay importe. El modo «a consultar» se quitó del formulario: quien
+  // publica aquí sabe lo que pide, y una ficha sin precio no es una oferta.
   const priceAmount = amount(text(formData, "priceAmount"));
-  if (priceMode === "fixed" && priceAmount === undefined) {
-    return { status: "error", message: "Indique un precio o marque «a consultar»." };
+  if (priceAmount === undefined) {
+    return { status: "error", message: "Indique el precio." };
   }
 
   const currencyRaw = text(formData, "currency");
   const currency: Currency = isCurrency(currencyRaw) ? currencyRaw : "COP";
 
-  const listingTypeRaw = text(formData, "listingType");
-  const listingType = (
-    ["sale", "rent", "charter", "lease", "service", "opportunity"] as const
-  ).includes(listingTypeRaw as ListingType)
-    ? (listingTypeRaw as ListingType)
-    : "sale";
+  // La operación ya no se pregunta: todo lo que se publica es venta. La
+  // columna sigue existiendo por si vuelve el alquiler o el chárter.
+  const listingType: ListingType = "sale";
 
   /**
    * Los atributos salen del esquema de la categoría, y solo se guardan los que
@@ -230,8 +254,8 @@ export async function publishListing(
       status: "published",
       visibility: "public",
       listing_type: listingType,
-      price_mode: priceMode,
-      price_amount: priceMode === "on_request" ? null : priceAmount,
+      price_mode: "fixed",
+      price_amount: priceAmount,
       price_currency: currency,
       price_period: null,
       country,
