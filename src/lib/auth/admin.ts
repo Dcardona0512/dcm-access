@@ -5,8 +5,22 @@ import { createSessionClient, isSupabaseConfigured } from "@/lib/supabase/server
 /* ============================================================================
    ACCESO AL PANEL (§22, §40)
    ----------------------------------------------------------------------------
-   Se entra con el correo: Supabase manda un enlace y al abrirlo hay sesión.
-   Sin contraseña que recordar, rotar ni filtrar.
+   AHORA MISMO LA PUERTA ESTÁ ABIERTA, Y ES A PROPÓSITO.
+
+   El enlace por correo dependía del servidor de correo de cortesía de
+   Supabase, que corta el envío tras un par de mensajes por hora; con el
+   catálogo todavía vacío, esa espera costaba más que el riesgo. Mientras el
+   interruptor esté abierto, cualquiera que escriba la dirección del panel
+   entra y publica: la dirección es predecible y no hay nada más que la
+   proteja.
+
+   Para volver a cerrarlo basta con poner `ADMIN_GATE=on` en Vercel. No hace
+   falta desplegar ni tocar este archivo: el enlace por correo sigue entero,
+   solo está en pausa.
+
+   Cuando la puerta está cerrada, se entra con el correo: Supabase manda un
+   enlace y al abrirlo hay sesión. Sin contraseña que recordar, rotar ni
+   filtrar.
 
    Autenticarse NO es lo mismo que estar autorizado, y aquí la distinción es
    todo el asunto: Supabase Auth deja registrarse a cualquiera con un correo
@@ -38,6 +52,32 @@ export function isAllowed(email: string | undefined | null): boolean {
 export type AdminSession = {
   readonly email: string;
   readonly userId: string;
+  /** Cierto cuando no hubo puerta que cruzar. La interfaz lo avisa. */
+  readonly open?: boolean;
+};
+
+/**
+ * ¿Hay puerta?
+ *
+ * Cerrar es la acción que puede urgir, así que es la que se hace sin
+ * desplegar: una variable en Vercel y vuelve a pedirse el enlace. Abrir, que
+ * es lo que compromete, exige tocar el código y pasar por revisión.
+ */
+export function isAdminGateOn(): boolean {
+  return process.env.ADMIN_GATE?.trim().toLowerCase() === "on";
+}
+
+/**
+ * Identidad de cortesía mientras la puerta está abierta.
+ *
+ * Se devuelve el correo del fundador, y no algo vacío, porque todo lo de
+ * dentro —la matriz de permisos, la autoría de una ficha— espera una
+ * identidad. `open` marca que nadie la demostró.
+ */
+const OPEN_SESSION: AdminSession = {
+  email: FALLBACK_ADMIN,
+  userId: "admin-sin-puerta",
+  open: true,
 };
 
 /**
@@ -47,6 +87,11 @@ export type AdminSession = {
  * el segundo se fía de la cookie, que el navegador puede haber manipulado.
  */
 export async function getAdminSession(): Promise<AdminSession | null> {
+  // Un solo sitio decide, y por eso se abren a la vez el panel, la acción de
+  // publicar y las rutas de geografía. Repartir el interruptor por seis
+  // ficheros es cómo se queda uno abierto al cerrar los otros cinco.
+  if (!isAdminGateOn()) return OPEN_SESSION;
+
   if (!isSupabaseConfigured()) return null;
 
   const supabase = await createSessionClient();
