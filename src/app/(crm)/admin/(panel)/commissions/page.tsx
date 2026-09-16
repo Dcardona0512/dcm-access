@@ -49,7 +49,6 @@ export default async function AdminCommissionsPage() {
   return (
     <>
       <AdminHeading
-        eyebrow="Monetización"
         title="Comisiones"
         lede="Comisión fija, porcentual, referido, fee por lead, revenue share, suscripción y publicación destacada conviven en el mismo plan. Añadir un modelo nuevo es una regla más, no una migración."
       />

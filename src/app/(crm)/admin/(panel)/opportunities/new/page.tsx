@@ -66,7 +66,6 @@ export default async function NewOpportunityPage({
   return (
     <>
       <AdminHeading
-        eyebrow="Catálogo"
         title="Publicar una ficha"
         lede="Lo que publique aquí aparece de inmediato en el sitio. Las fotos y el vídeo suben directo al almacenamiento."
       />

@@ -41,7 +41,6 @@ export default async function AdminOpportunitiesPage() {
   return (
     <>
       <AdminHeading
-        eyebrow="Inventario"
         title="Oportunidades"
         lede={`${results.total} publicadas, incluidas las reservadas que no aparecen en el catálogo público.`}
       />

@@ -32,7 +32,6 @@ export default function AdminHomePage() {
   return (
     <>
       <AdminHeading
-        eyebrow="Catálogo"
         title="Crear publicación"
         lede="Elija dónde va lo que quiere publicar. Cada sección pide sus propios datos."
       />

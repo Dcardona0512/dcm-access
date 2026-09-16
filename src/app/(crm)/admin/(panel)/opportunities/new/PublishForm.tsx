@@ -488,7 +488,10 @@ function Group({
 }) {
   return (
     <fieldset className="flex flex-col gap-5">
-      <legend className="eyebrow text-accent mb-3 text-[0.5625rem]">{title}</legend>
+      {/* El rótulo se queda para quien navega con lector de pantalla —un
+          `fieldset` sin `legend` pierde su nombre— y desaparece de la vista,
+          que es donde sobraba. */}
+      <legend className="sr-only">{title}</legend>
       {wide ? children : <div className="grid gap-5 sm:grid-cols-2">{children}</div>}
     </fieldset>
   );

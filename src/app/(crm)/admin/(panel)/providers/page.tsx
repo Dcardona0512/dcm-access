@@ -35,7 +35,6 @@ export default async function AdminProvidersPage() {
   return (
     <>
       <AdminHeading
-        eyebrow="Red"
         title="Proveedores"
         lede="Ninguna postulación se publica automáticamente. Los servicios regulados exigen acreditación vigente antes de aprobarse."
       />

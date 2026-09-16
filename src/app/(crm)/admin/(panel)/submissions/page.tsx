@@ -35,7 +35,6 @@ export default async function AdminSubmissionsPage() {
   return (
     <>
       <AdminHeading
-        eyebrow="Mercado"
         title="Solicitudes de venta"
         lede="Lo que llega por el formulario público no se publica solo. Aprobar crea la ficha en el catálogo; rechazar la archiva."
       />

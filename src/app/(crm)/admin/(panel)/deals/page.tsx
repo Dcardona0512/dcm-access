@@ -35,7 +35,6 @@ export default async function AdminDealsPage() {
   return (
     <>
       <AdminHeading
-        eyebrow="Operaciones"
         title="Pipeline"
         lede="Request → Source → Verify → Connect → Negotiate → Close. El mismo proceso para un apartamento que para una aeronave."
       />
@@ -51,7 +50,7 @@ export default async function AdminDealsPage() {
               className="border-line flex flex-col gap-3 rounded-(--radius-card) border p-4"
             >
               <div className="flex items-baseline justify-between gap-3">
-                <h2 className="eyebrow text-accent text-[0.5625rem]">
+                <h2 className="eyebrow text-fg-muted text-[0.5625rem]">
                   {localized(dealStageLabels[stage], "es")}
                 </h2>
                 <span className="text-fg-muted/60 text-xs" data-numeric>

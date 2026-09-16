@@ -1,15 +1,12 @@
 import type { ReactNode } from "react";
 
-import { Eyebrow } from "@/components/ui/Section";
 import { cn } from "@/lib/utils";
 
 export function AdminHeading({
-  eyebrow,
   title,
   lede,
   action,
 }: {
-  readonly eyebrow?: string;
   readonly title: string;
   readonly lede?: string;
   readonly action?: ReactNode;
@@ -17,7 +14,6 @@ export function AdminHeading({
   return (
     <header className="border-line mb-8 flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-end sm:justify-between">
       <div className="flex flex-col gap-2.5">
-        {eyebrow ? <Eyebrow tone="muted">{eyebrow}</Eyebrow> : null}
         <h1 className="font-display text-3xl text-balance">{title}</h1>
         {lede ? <p className="text-fg-muted max-w-[68ch] text-sm text-pretty">{lede}</p> : null}
       </div>
