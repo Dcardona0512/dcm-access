@@ -1,5 +1,7 @@
 "use server";
 
+import { isAuthError } from "@supabase/supabase-js";
+
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -18,6 +20,37 @@ import { checkRateLimit } from "@/lib/security/rate-limit";
    ========================================================================== */
 
 export type LoginState = { readonly status: "idle" | "sent" | "error"; readonly message?: string };
+
+/**
+ * Traduce el fallo de Supabase a algo accionable.
+ *
+ * Antes todo error —tope de correos, proveedor apagado, dirección rechazada—
+ * salía como "Inténtelo de nuevo", que es el consejo exactamente contrario al
+ * correcto cuando el problema es haber insistido demasiado. Un mensaje que no
+ * distingue causas no es prudencia: es esconder la causa.
+ */
+function describe(code: string | undefined): string {
+  switch (code) {
+    case "over_email_send_rate_limit":
+    case "over_request_rate_limit":
+      return "Se pidieron varios enlaces seguidos y el proveedor de correo cerró el envío por un rato. Espere unos minutos y pida uno solo.";
+    case "email_address_invalid":
+      return "El proveedor de correo rechazó esa dirección.";
+    case "otp_disabled":
+    case "email_provider_disabled":
+    case "signup_disabled":
+      return "El acceso por enlace está desactivado en Supabase. Revise la configuración de autenticación.";
+    default:
+      return "No se pudo enviar el enlace. Inténtelo de nuevo.";
+  }
+}
+
+/** "Espere unos minutos" no dice cuántos. Esto sí. */
+function formatWait(seconds: number): string {
+  if (seconds <= 90) return `${Math.max(seconds, 1)} segundos`;
+  const minutes = Math.ceil(seconds / 60);
+  return minutes === 1 ? "un minuto" : `${minutes} minutos`;
+}
 
 export async function requestMagicLink(
   _previous: LoginState,
@@ -38,9 +71,14 @@ export async function requestMagicLink(
   const store = await headers();
   const ip = store.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
 
+  // Este freno corre ANTES de mirar la lista, así que su mensaje lo ve
+  // cualquiera: no distingue administradores de desconocidos.
   const limit = checkRateLimit(`admin-login:${ip}`, { limit: 5, windowMs: 15 * 60 * 1000 });
   if (!limit.allowed) {
-    return { status: "error", message: "Demasiados intentos. Espere unos minutos." };
+    return {
+      status: "error",
+      message: `Demasiados intentos. Vuelva a intentarlo en ${formatWait(limit.retryAfter)}.`,
+    };
   }
 
   // Éxito aparente para cualquier correo: no se confirma quién es administrador.
@@ -62,7 +100,17 @@ export async function requestMagicLink(
   });
 
   if (error) {
-    return { status: "error", message: "No se pudo enviar el enlace. Inténtelo de nuevo." };
+    const code = isAuthError(error) ? error.code : undefined;
+
+    // Sin el correo: lo que hace falta para diagnosticar es el código, y la
+    // dirección no pinta nada en un registro que queda escrito.
+    console.error("[admin-login] signInWithOtp falló", {
+      code,
+      status: isAuthError(error) ? error.status : undefined,
+      message: error.message,
+    });
+
+    return { status: "error", message: describe(code) };
   }
 
   return { status: "sent" };
