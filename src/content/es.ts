@@ -13,7 +13,7 @@ export const es: Dictionary = {
   },
 
   brand: {
-    tagline: "ACCESO A OPORTUNIDADES EXCLUSIVAS",
+    taglineLines: ["ACCESO A OPORTUNIDADES", "EXCLUSIVAS"],
     signature: "Activos globales • Servicios premium • Intermediación privada",
   },
 

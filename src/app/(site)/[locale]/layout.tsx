@@ -128,7 +128,7 @@ export default async function LocaleLayout({
         <script
           type="application/ld+json"
           // Datos estructurados de organización y sitio, presentes en todas las rutas.
-          dangerouslySetInnerHTML={{ __html: jsonLd(organizationSchema(dict.meta.siteDescription, dict.brand.tagline)) }}
+          dangerouslySetInnerHTML={{ __html: jsonLd(organizationSchema(dict.meta.siteDescription, dict.brand.taglineLines.join(" "))) }}
         />
         <script
           type="application/ld+json"

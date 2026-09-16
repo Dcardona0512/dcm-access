@@ -53,10 +53,23 @@ export function Hero({ locale, dict }: { readonly locale: Locale; readonly dict:
                   parte del mismo encabezado, no como un h2 suelto. */}
               <h1 className="flex flex-col gap-3">
                 <span className="eyebrow text-fg/75 text-[0.8rem]">{brand.name}</span>
+                {/*
+                  Cada renglón es un bloque a partir de `sm`, que es donde cabe
+                  entero. Por debajo siguen siendo texto corrido y el navegador
+                  parte donde puede: forzar el corte en un teléfono sacaría la
+                  palabra más larga fuera de la pantalla.
+                */}
                 <span className="font-display text-display-1 text-balance">
-                  {dict.brand.tagline
-                    .toLocaleLowerCase(locale)
-                    .replace(/^./, (character) => character.toLocaleUpperCase(locale))}
+                  {dict.brand.taglineLines.map((line, index) => (
+                    <span key={line} className="sm:block">
+                      {index === 0
+                        ? line
+                            .toLocaleLowerCase(locale)
+                            .replace(/^./, (character) => character.toLocaleUpperCase(locale))
+                        : line.toLocaleLowerCase(locale)}
+                      {index < dict.brand.taglineLines.length - 1 ? " " : null}
+                    </span>
+                  ))}
                 </span>
               </h1>
 

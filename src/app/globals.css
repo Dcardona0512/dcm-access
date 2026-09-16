@@ -127,7 +127,11 @@
 
      Van en píxeles y no en `rem` a propósito: la base es de 15px y estos
      valores no deben moverse con ella. */
-  --text-display-1: clamp(44px, 7.5vw, 104px);
+  /* Lo usa solo el titular de la portada, y su tope lo fija el renglón más
+     largo: «Acceso a oportunidades» tiene que caber entero. A 104px pedía
+     1125px en una columna de 840 y se partía en tres. A este tamaño entra en
+     dos renglones en español y en inglés, que es como está escrito. */
+  --text-display-1: clamp(36px, 5.2vw, 84px);
   --text-display-1--line-height: 0.98;
   --text-display-1--letter-spacing: -0.02em;
 

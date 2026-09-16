@@ -64,8 +64,18 @@ export type Dictionary = {
 
   /** Léxico de marca traducido. El nombre "DCM ACCESS" nunca se traduce. */
   readonly brand: {
-    /** Eslogan principal, en versalitas. */
-    readonly tagline: string;
+    /**
+     * Eslogan principal, partido en los renglones con los que se pinta.
+     *
+     * El corte va aquí y no en el CSS porque depende del idioma: en español
+     * el renglón cierra en «oportunidades» y en inglés en «exclusive». Ningún
+     * ajuste de ancho acierta las dos cosas a la vez.
+     *
+     * Es la única forma del eslogan que se guarda: donde hace falta seguido
+     * —los datos estructurados— se une con `join(" ")`, de modo que no hay dos
+     * versiones del mismo texto que puedan separarse.
+     */
+    readonly taglineLines: readonly string[];
     /** Variante para el pie y las imágenes sociales. */
     readonly signature: string;
   };
