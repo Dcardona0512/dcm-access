@@ -350,9 +350,10 @@ export function PublishForm({
           138 millones, pesos»— leída de izquierda a derecha sin saltos de
           línea en medio.
 
-          El precio va en el centro y se queda con todo el espacio sobrante.
-          Los otros dos tienen ancho fijo porque su contenido no crece: una
-          palabra y tres letras.
+          La operación y el precio se reparten a partes iguales lo que sobra
+          después de la moneda, que es la única con ancho fijo: «COP» no crece,
+          y darle más sitio sería sitio quitado a los dos campos que sí se
+          leen.
 
           No se usa `Field` aquí porque `Field` es una etiqueta encima de un
           campo, y esto son tres etiquetas encima de tres campos alineados por
@@ -367,7 +368,7 @@ export function PublishForm({
             una sola respuesta posible.
           */}
           {vertical === "real-estate" ? (
-            <label className="flex w-40 shrink-0 flex-col gap-2">
+            <label className="flex min-w-0 flex-1 flex-col gap-2">
               <span className="eyebrow text-fg-muted text-[0.8rem]">Operación</span>
               <select
                 name="listingType"
