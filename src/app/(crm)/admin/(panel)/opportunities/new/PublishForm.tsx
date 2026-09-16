@@ -36,8 +36,6 @@ export type AttributeField = {
   readonly options?: readonly { readonly value: string; readonly label: string }[];
 };
 
-export type VerticalOption = { readonly value: string; readonly label: string };
-
 type FileState = {
   readonly id: string;
   readonly file: File;
@@ -53,7 +51,6 @@ const initial: PublishState = { status: "idle" };
 export function PublishForm({
   listingId,
   initialVertical,
-  verticals,
   categories,
   currencies,
   countries,
@@ -67,7 +64,6 @@ export function PublishForm({
   readonly listingId: string;
   /** Viene de la pantalla anterior: aquí ya no se vuelve a preguntar. */
   readonly initialVertical: string;
-  readonly verticals: readonly VerticalOption[];
   readonly categories: readonly CategoryOption[];
   readonly currencies: readonly string[];
   readonly countries: readonly { readonly code: string; readonly name: string }[];
@@ -333,13 +329,9 @@ export function PublishForm({
 
       <input type="hidden" name="vertical" value={vertical} />
 
+      {/* La sección ya se anuncia en ámbar sobre el título: repetirla aquí,
+          en un campo que no se puede tocar, era decir dos veces lo mismo. */}
       <Group title="Dónde va">
-        <Field label="Sección">
-          <p className="border-line-soft text-fg-muted flex h-11 items-center rounded-(--radius-card) border border-dashed px-3 text-sm">
-            {verticals.find((v) => v.value === vertical)?.label ?? vertical}
-          </p>
-        </Field>
-
         {mustChoose ? (
           <Field label="Categoría">
             <select

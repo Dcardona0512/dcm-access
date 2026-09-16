@@ -7,7 +7,7 @@ import Link from "next/link";
 import { AdminHeading } from "@/components/admin/AdminUI";
 import { categories } from "@/lib/data/demo/seed/categories";
 import { verticalLabels } from "@/lib/domain/labels";
-import { currencies, isVertical, localized, verticals } from "@/lib/domain/types";
+import { currencies, isVertical, localized, type Vertical } from "@/lib/domain/types";
 import { formatCountry } from "@/lib/format";
 import { isSupabaseWritable } from "@/lib/supabase/server";
 
@@ -66,6 +66,7 @@ export default async function NewOpportunityPage({
   return (
     <>
       <AdminHeading
+        eyebrow={localized(verticalLabels[initialVertical as Vertical], "es")}
         title="Publicar una ficha"
         lede="Lo que publique aquí aparece de inmediato en el sitio. Las fotos y el vídeo suben directo al almacenamiento."
       />
@@ -74,10 +75,6 @@ export default async function NewOpportunityPage({
         <PublishForm
           listingId={`opp-${randomUUID().slice(0, 12)}`}
           initialVertical={initialVertical}
-          verticals={verticals.map((vertical) => ({
-            value: vertical,
-            label: localized(verticalLabels[vertical], "es"),
-          }))}
           categories={categoryOptions}
           currencies={[...currencies]}
           countries={countryOptions}

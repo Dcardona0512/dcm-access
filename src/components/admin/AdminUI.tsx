@@ -3,10 +3,20 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 export function AdminHeading({
+  eyebrow,
   title,
   lede,
   action,
 }: {
+  /**
+   * Rótulo en ámbar sobre el título.
+   *
+   * Vuelve tras haberse quitado de todas las pantallas, y solo para lo que
+   * dice algo que el título no dice: la sección en la que va a caer lo que se
+   * publique. «Catálogo» encima de «Publicar una ficha» era ruido; «Vehículos»
+   * es el dato que decide todo el formulario de abajo.
+   */
+  readonly eyebrow?: string;
   readonly title: string;
   readonly lede?: string;
   readonly action?: ReactNode;
@@ -14,6 +24,7 @@ export function AdminHeading({
   return (
     <header className="border-line mb-8 flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-end sm:justify-between">
       <div className="flex flex-col gap-2.5">
+        {eyebrow ? <p className="eyebrow text-accent">{eyebrow}</p> : null}
         <h1 className="font-display text-3xl text-balance">{title}</h1>
         {lede ? <p className="text-fg-muted max-w-[68ch] text-sm text-pretty">{lede}</p> : null}
       </div>
