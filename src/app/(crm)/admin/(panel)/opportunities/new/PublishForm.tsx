@@ -345,55 +345,68 @@ export function PublishForm({
         </Field>
 
         {/*
-          La operación solo se pregunta en inmobiliaria, que es donde de verdad
-          hay dos: un carro se vende, pero un apartamento se vende o se
-          arrienda, y de esa respuesta depende que el precio sea un valor o un
-          canon mensual. En las demás secciones sería un desplegable con una
-          sola respuesta posible.
-        */}
-        {vertical === "real-estate" ? (
-          <Field label="Operación">
-            <select name="listingType" defaultValue="sale" className={control}>
-              <option value="sale" className="bg-surface-raised">
-                Venta
-              </option>
-              <option value="rent" className="bg-surface-raised">
-                Arriendo
-              </option>
-            </select>
-          </Field>
-        ) : null}
+          Los tres en una sola fila, y en este orden: qué se hace con el
+          inmueble, por cuánto, y en qué moneda. Es la frase completa —«venta,
+          138 millones, pesos»— leída de izquierda a derecha sin saltos de
+          línea en medio.
 
-        {/*
-          El precio ocupa la fila entera. Es la cifra por la que alguien decide
-          si sigue mirando, y estaba compitiendo por media pantalla con un
-          desplegable de tres letras.
+          El precio va en el centro y se queda con todo el espacio sobrante.
+          Los otros dos tienen ancho fijo porque su contenido no crece: una
+          palabra y tres letras.
 
-          La moneda va pegada a su derecha porque juntas son un solo dato leído
-          en voz alta —«ciento treinta y ocho millones de pesos»—: separadas,
-          había que bajar la vista para confirmar en qué moneda se estaba
-          escribiendo.
+          No se usa `Field` aquí porque `Field` es una etiqueta encima de un
+          campo, y esto son tres etiquetas encima de tres campos alineados por
+          su base.
         */}
-        <Field label="Precio" full>
-          <div className="flex items-stretch gap-3">
+        <div className="flex flex-wrap items-end gap-3 sm:col-span-2">
+          {/*
+            La operación solo se pregunta en inmobiliaria, que es donde de
+            verdad hay dos: un carro se vende, pero un apartamento se vende o
+            se arrienda, y de esa respuesta depende que el precio sea un valor
+            o un canon mensual. En las demás secciones sería un desplegable con
+            una sola respuesta posible.
+          */}
+          {vertical === "real-estate" ? (
+            <label className="flex w-40 shrink-0 flex-col gap-2">
+              <span className="eyebrow text-fg-muted text-[0.8rem]">Operación</span>
+              <select
+                name="listingType"
+                defaultValue="sale"
+                className={`${controlBase} h-12 w-full text-base`}
+              >
+                <option value="sale" className="bg-surface-raised">
+                  Venta
+                </option>
+                <option value="rent" className="bg-surface-raised">
+                  Arriendo
+                </option>
+              </select>
+            </label>
+          ) : null}
+
+          <label className="flex min-w-0 flex-1 flex-col gap-2">
+            <span className="eyebrow text-fg-muted text-[0.8rem]">Precio</span>
             <input
               name="priceAmount"
               inputMode="numeric"
               required
               placeholder="0"
-              // `min-w-0` deja que el campo se encoja de verdad en pantallas
-              // estrechas: sin él, el ancho mínimo del contenido lo desborda.
-              className={`${controlBase} h-12 min-w-0 flex-1 text-base`}
+              // `min-w-0` en el contenedor deja que el campo se encoja de
+              // verdad en pantallas estrechas: sin él, el ancho mínimo del
+              // contenido lo desborda.
+              className={`${controlBase} h-12 w-full text-base`}
               data-numeric
             />
+          </label>
 
-            {/* COP por defecto: la mayoría del inventario está en Colombia. Las
-                demás siguen ahí para lo que se publica fuera. */}
+          <label className="flex w-28 shrink-0 flex-col gap-2">
+            <span className="eyebrow text-fg-muted text-[0.8rem]">Moneda</span>
+            {/* COP por defecto: la mayoría del inventario está en Colombia.
+                Las demás siguen ahí para lo que se publica fuera. */}
             <select
               name="currency"
               defaultValue="COP"
-              aria-label="Moneda"
-              className={`${controlBase} h-12 w-28 shrink-0 text-base`}
+              className={`${controlBase} h-12 w-full text-base`}
             >
               {currencies.map((c) => (
                 <option key={c} value={c} className="bg-surface-raised">
@@ -401,8 +414,8 @@ export function PublishForm({
                 </option>
               ))}
             </select>
-          </div>
-        </Field>
+          </label>
+        </div>
       </Group>
 
       {/* 3. Categoría · 4. Estado ---------------------------------------------
