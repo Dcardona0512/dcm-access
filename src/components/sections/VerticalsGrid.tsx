@@ -64,7 +64,7 @@ export function VerticalsGrid({
                   dos categorías que todavía no tienen vídeo se quedan con ella
                   sin ningún caso especial.
                 */}
-                <div className="dcm-card-media relative overflow-hidden rounded-(--radius-card)">
+                <div className="dcm-card-media relative overflow-hidden rounded-(--radius-media)">
                   <EditorialImage
                     media={{
                       id: `vertical-${item.vertical}`,

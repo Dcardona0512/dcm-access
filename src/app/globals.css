@@ -159,6 +159,12 @@
   --radius-card: 2px; /* casi recto: el lujo aquí es la línea, no la curva */
   --radius-pill: 999px;
 
+  /* Las placas grandes sí se redondean. Es el radio de tumarket, y a este
+     tamaño la curva se lee como tarjeta en lugar de como recuadro; en un
+     botón de treinta píxeles la misma curva se lo comería entero, y por eso
+     `--radius-card` se queda donde está. */
+  --radius-media: 24px;
+
   /* --- Movimiento (§31: transiciones discretas, nunca exageradas) ------ */
   --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
   --duration-fast: 180ms;
@@ -812,6 +818,9 @@ body:has(.dcm-video-layer[data-tone="bright"]) > header:not([class*="backdrop-bl
    ========================================================================== */
 
 .dcm-card-media {
+  /* Mismo radio que el recorte. Si la sombra y el filete siguieran otra
+     curva, se vería un borde recto asomando por fuera de la esquina. */
+  border-radius: var(--radius-media);
   transition:
     box-shadow var(--duration-fast) var(--ease-brand),
     translate var(--duration-fast) var(--ease-brand);
