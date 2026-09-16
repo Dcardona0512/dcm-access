@@ -25,7 +25,7 @@ export function Tag({ children, className, tone = "neutral" }: TagProps) {
     <span
       className={cn(
         "eyebrow inline-flex items-center gap-1.5 border px-2.5 py-1.5",
-        "rounded-(--radius-card) text-[0.625rem]",
+        "rounded-(--radius-card) text-[0.8rem]",
         tones[tone],
         className,
       )}
@@ -88,7 +88,7 @@ export function DemoTag({ className }: { readonly className?: string }) {
     <span
       className={cn(
         "eyebrow border-accent-dim/50 text-accent-dim inline-flex items-center",
-        "rounded-(--radius-card) border border-dashed px-1.5 py-1 text-[0.5625rem]",
+        "rounded-(--radius-card) border border-dashed px-1.5 py-1 text-[0.8rem]",
         className,
       )}
       title="Contenido de demostración"

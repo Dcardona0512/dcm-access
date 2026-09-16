@@ -48,7 +48,7 @@ export function LoginForm({ notice }: { readonly notice?: string }) {
       ) : null}
 
       <div className="flex flex-col gap-2">
-        <label htmlFor="admin-email" className="eyebrow text-fg-muted text-[0.5625rem]">
+        <label htmlFor="admin-email" className="eyebrow text-fg-muted text-[0.8rem]">
           Correo electrónico
         </label>
         <input

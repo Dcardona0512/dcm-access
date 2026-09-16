@@ -32,7 +32,7 @@ export function SiteFooter({
 
             <div className="flex flex-wrap gap-x-3 gap-y-2 pt-2">
               {regionKeys.map((key) => (
-                <span key={key} className="eyebrow text-fg-muted/60 text-[0.5625rem]">
+                <span key={key} className="eyebrow text-fg-muted/60 text-[0.8rem]">
                   {dict.regions[key]}
                 </span>
               ))}

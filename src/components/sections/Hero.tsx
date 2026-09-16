@@ -52,7 +52,7 @@ export function Hero({ locale, dict }: { readonly locale: Locale; readonly dict:
               {/* El nombre de la marca es el h1; el eslogan lo acompaña como
                   parte del mismo encabezado, no como un h2 suelto. */}
               <h1 className="flex flex-col gap-3">
-                <span className="eyebrow text-fg/75 text-[0.6875rem]">{brand.name}</span>
+                <span className="eyebrow text-fg/75 text-[0.8rem]">{brand.name}</span>
                 <span className="font-display text-display-1 text-balance">
                   {dict.brand.tagline
                     .toLocaleLowerCase(locale)

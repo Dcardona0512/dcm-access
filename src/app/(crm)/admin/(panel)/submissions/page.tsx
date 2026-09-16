@@ -127,7 +127,7 @@ function SubmissionCard({ submission }: { readonly submission: ListingSubmission
       {submission.publishedOpportunityId ? (
         <Link
           href="/admin/opportunities"
-          className="eyebrow text-accent text-[0.5rem] transition-opacity hover:opacity-80"
+          className="eyebrow text-accent text-[0.75rem] transition-opacity hover:opacity-80"
         >
           Ver en el catálogo
         </Link>
@@ -160,7 +160,7 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <dt className="eyebrow text-fg-muted/50 text-[0.5rem]">{label}</dt>
+      <dt className="eyebrow text-fg-muted/50 text-[0.75rem]">{label}</dt>
       <dd className="text-fg/90" data-numeric={numeric || undefined}>
         {value}
       </dd>

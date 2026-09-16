@@ -93,7 +93,7 @@ function Wordmark() {
 
 function Descriptor({ text }: { readonly text: string }) {
   return (
-    <span aria-hidden="true" className="eyebrow text-fg-muted text-[0.5rem] tracking-[0.2em]">
+    <span aria-hidden="true" className="eyebrow text-fg-muted text-[0.75rem] tracking-[0.2em]">
       {text}
     </span>
   );

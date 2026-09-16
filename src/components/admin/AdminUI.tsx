@@ -53,7 +53,7 @@ export function Stat({
 }) {
   return (
     <Panel className="flex flex-col gap-2">
-      <span className="eyebrow text-fg-muted text-[0.5rem]">{label}</span>
+      <span className="eyebrow text-fg-muted text-[0.75rem]">{label}</span>
       <span className="font-display text-3xl" data-numeric>
         {value}
       </span>
@@ -74,7 +74,7 @@ export function AdminButton({
     <button
       {...props}
       className={cn(
-        "eyebrow rounded-(--radius-card) border px-2.5 py-1.5 text-[0.5rem] transition-colors",
+        "eyebrow rounded-(--radius-card) border px-2.5 py-1.5 text-[0.75rem] transition-colors",
         tone === "accent" && "border-accent/50 text-accent hover:bg-accent/10",
         tone === "danger" && "border-danger/40 text-danger hover:bg-danger/10",
         tone === "quiet" && "border-line text-fg-muted hover:border-fg-muted/60 hover:text-fg",
@@ -103,7 +103,7 @@ export function DataTable({
               <th
                 key={header}
                 scope="col"
-                className="eyebrow text-fg-muted px-4 py-3 text-left text-[0.5rem] whitespace-nowrap"
+                className="eyebrow text-fg-muted px-4 py-3 text-left text-[0.75rem] whitespace-nowrap"
               >
                 {header}
               </th>

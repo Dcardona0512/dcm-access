@@ -79,7 +79,7 @@ export function OpportunityCard({
         <div className="flex flex-1 flex-col gap-4">
           <div className="text-fg-muted flex flex-wrap items-center gap-x-3 gap-y-1.5">
             {category ? (
-              <span className="eyebrow text-[0.5625rem]">{localized(category.name, locale)}</span>
+              <span className="eyebrow text-[0.8rem]">{localized(category.name, locale)}</span>
             ) : null}
             <span className="bg-line h-px w-4" aria-hidden="true" />
             <span className="text-xs">{formatLocation(opportunity.location, locale)}</span>
@@ -118,7 +118,7 @@ export function OpportunityCard({
               dict={dict}
               size={isFeature ? "lg" : "md"}
             />
-            <span className="eyebrow text-accent shrink-0 text-[0.5625rem] opacity-0 transition-opacity duration-(--duration-base) group-hover:opacity-100 group-focus-visible:opacity-100">
+            <span className="eyebrow text-accent shrink-0 text-[0.8rem] opacity-0 transition-opacity duration-(--duration-base) group-hover:opacity-100 group-focus-visible:opacity-100">
               {dict.common.viewOpportunity}
             </span>
           </div>

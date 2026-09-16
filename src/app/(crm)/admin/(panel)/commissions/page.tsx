@@ -55,14 +55,14 @@ export default async function AdminCommissionsPage() {
 
       <div className="mb-8 grid gap-4 sm:grid-cols-2">
         <Panel className="flex flex-col gap-2">
-          <span className="eyebrow text-fg-muted text-[0.5rem]">Total calculado</span>
+          <span className="eyebrow text-fg-muted text-[0.75rem]">Total calculado</span>
           <span className="font-display text-3xl" data-numeric>
             {formatCurrency(total, "USD", "es")}
           </span>
           <span className="text-fg-muted/60 text-xs">Todas las operaciones registradas</span>
         </Panel>
         <Panel className="flex flex-col gap-2">
-          <span className="eyebrow text-fg-muted text-[0.5rem]">Liquidable</span>
+          <span className="eyebrow text-fg-muted text-[0.75rem]">Liquidable</span>
           <span className="font-display text-accent text-3xl" data-numeric>
             {formatCurrency(won, "USD", "es")}
           </span>

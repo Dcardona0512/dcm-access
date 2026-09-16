@@ -66,7 +66,7 @@ export function LocaleSwitcher({
               hrefLang={localeMeta[code].hreflang}
               aria-current={active ? "true" : undefined}
               className={cn(
-                "eyebrow rounded-(--radius-card) px-1.5 py-1 text-[0.625rem] transition-colors",
+                "eyebrow rounded-(--radius-card) px-1.5 py-1 text-[0.8rem] transition-colors",
                 active ? "text-fg" : "text-fg-muted hover:text-fg",
               )}
             >

@@ -228,7 +228,7 @@ export async function MotorsMarketplace({
             <Container width="wide" className="relative mt-16 md:mt-24">
               <Link
                 href="#mercado"
-                className="eyebrow text-fg-muted hover:text-fg inline-flex items-center gap-3 text-[0.5625rem] transition-colors"
+                className="eyebrow text-fg-muted hover:text-fg inline-flex items-center gap-3 text-[0.8rem] transition-colors"
               >
                 {market.scrollCue}
                 <span aria-hidden="true" className="bg-line h-px w-10" />
@@ -351,11 +351,11 @@ function PageLink({
   readonly children: React.ReactNode;
 }) {
   if (disabled) {
-    return <span className="eyebrow text-fg-muted/30 text-[0.5625rem]">{children}</span>;
+    return <span className="eyebrow text-fg-muted/30 text-[0.8rem]">{children}</span>;
   }
 
   return (
-    <Link href={href} className="eyebrow text-fg-muted hover:text-fg text-[0.5625rem] transition-colors">
+    <Link href={href} className="eyebrow text-fg-muted hover:text-fg text-[0.8rem] transition-colors">
       {children}
     </Link>
   );

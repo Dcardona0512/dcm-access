@@ -42,7 +42,7 @@ export function AdminNav({ role }: { readonly role: Role }) {
                 href={entry.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "eyebrow block rounded-(--radius-card) px-3 py-2.5 text-[0.5625rem] transition-colors",
+                  "eyebrow block rounded-(--radius-card) px-3 py-2.5 text-[0.8rem] transition-colors",
                   active ? "bg-surface-sunken text-accent" : "text-fg-muted hover:text-fg",
                 )}
               >

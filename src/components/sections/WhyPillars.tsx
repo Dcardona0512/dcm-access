@@ -26,7 +26,7 @@ export function WhyPillars({ dict }: { readonly dict: Dictionary }) {
               index % 3 !== 0 && "lg:border-l lg:pl-10",
             )}
           >
-            <span className="eyebrow text-accent-dim text-[0.5625rem]" data-numeric>
+            <span className="eyebrow text-accent-dim text-[0.8rem]" data-numeric>
               {String(index + 1).padStart(2, "0")}
             </span>
             <h3 className="font-display text-2xl">{pillar.title}</h3>

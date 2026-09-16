@@ -54,14 +54,14 @@ export function DemoNotice({ dict }: { readonly dict: Dictionary }) {
     >
       <Container width="wide">
         <div className="flex items-start gap-4 py-3.5 sm:items-center">
-          <span className="eyebrow text-accent mt-0.5 shrink-0 text-[0.5625rem] sm:mt-0">
+          <span className="eyebrow text-accent mt-0.5 shrink-0 text-[0.8rem] sm:mt-0">
             Demo
           </span>
           <p className="text-fg-muted flex-1 text-xs text-pretty">{dict.common.demoNotice}</p>
           <button
             type="button"
             onClick={dismiss}
-            className="text-fg-muted hover:text-fg eyebrow shrink-0 text-[0.5625rem] transition-colors"
+            className="text-fg-muted hover:text-fg eyebrow shrink-0 text-[0.8rem] transition-colors"
           >
             {dict.common.close}
           </button>

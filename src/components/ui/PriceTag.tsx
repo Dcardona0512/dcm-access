@@ -41,7 +41,7 @@ export function PriceTag({ price, locale, dict, size = "md", className }: PriceT
   return (
     <span className={cn("text-fg inline-flex items-baseline gap-1.5", className)} data-numeric>
       {formatted.prefix ? (
-        <span className="eyebrow text-fg-muted text-[0.625rem]">{formatted.prefix}</span>
+        <span className="eyebrow text-fg-muted text-[0.8rem]">{formatted.prefix}</span>
       ) : null}
       <span className={cn(sizes[size], "font-medium tracking-tight")}>{formatted.value}</span>
       {formatted.suffix ? <span className="text-fg-muted text-sm">{formatted.suffix}</span> : null}

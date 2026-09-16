@@ -131,7 +131,7 @@ export function PlacePicker({
       <input type="hidden" name="city" value={city} />
 
       <div className="flex flex-col gap-2">
-        <span className="eyebrow text-fg-muted text-[0.5625rem]">País</span>
+        <span className="eyebrow text-fg-muted text-[0.8rem]">País</span>
         <select
           value={country}
           onChange={(event) => void pickCountry(event.target.value)}
@@ -147,7 +147,7 @@ export function PlacePicker({
 
       {states.length > 0 ? (
         <div className="flex flex-col gap-2">
-          <span className="eyebrow text-fg-muted text-[0.5625rem]">Departamento o estado</span>
+          <span className="eyebrow text-fg-muted text-[0.8rem]">Departamento o estado</span>
           <select
             value={state}
             onChange={(event) => void pickState(event.target.value)}
@@ -166,7 +166,7 @@ export function PlacePicker({
       ) : null}
 
       <div className="flex flex-col gap-2">
-        <span className="eyebrow text-fg-muted text-[0.5625rem]">Ciudad</span>
+        <span className="eyebrow text-fg-muted text-[0.8rem]">Ciudad</span>
         <select
           value={city}
           onChange={(event) => pickCity(event.target.value)}

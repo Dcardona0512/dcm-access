@@ -112,13 +112,13 @@ export function PublishForm({
           <Link
             href={`/es/${state.vertical}/${state.slug}`}
             target="_blank"
-            className="eyebrow border-accent/50 text-accent hover:bg-accent/10 rounded-(--radius-card) border px-3 py-2 text-[0.5rem] transition-colors"
+            className="eyebrow border-accent/50 text-accent hover:bg-accent/10 rounded-(--radius-card) border px-3 py-2 text-[0.75rem] transition-colors"
           >
             Ver la ficha
           </Link>
           <Link
             href="/admin/opportunities/new"
-            className="eyebrow border-line text-fg-muted hover:text-fg rounded-(--radius-card) border px-3 py-2 text-[0.5rem] transition-colors"
+            className="eyebrow border-line text-fg-muted hover:text-fg rounded-(--radius-card) border px-3 py-2 text-[0.75rem] transition-colors"
           >
             Publicar otra
           </Link>
@@ -293,7 +293,7 @@ export function PublishForm({
                     )}
 
                     {index === 0 ? (
-                      <span className="eyebrow bg-surface/85 text-accent absolute top-2 left-2 rounded-(--radius-card) px-2 py-1 text-[0.5rem] backdrop-blur-sm">
+                      <span className="eyebrow bg-surface/85 text-accent absolute top-2 left-2 rounded-(--radius-card) px-2 py-1 text-[0.75rem] backdrop-blur-sm">
                         Portada
                       </span>
                     ) : null}
@@ -310,7 +310,7 @@ export function PublishForm({
 
                   <div className="flex items-center justify-between gap-3">
                     <span
-                      className={`eyebrow text-[0.5rem] ${
+                      className={`eyebrow text-[0.75rem] ${
                         f.status === "listo"
                           ? "text-verified"
                           : f.status === "falló"
@@ -508,7 +508,7 @@ function Field({
 }) {
   return (
     <div className={`flex flex-col gap-2 ${full ? "sm:col-span-2" : ""}`}>
-      <span className="eyebrow text-fg-muted text-[0.5625rem]">{label}</span>
+      <span className="eyebrow text-fg-muted text-[0.8rem]">{label}</span>
       {children}
     </div>
   );

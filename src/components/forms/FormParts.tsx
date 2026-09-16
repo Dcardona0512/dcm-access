@@ -86,7 +86,7 @@ export function FormSuccess({
       <h3 className="font-display text-2xl text-balance">{heading}</h3>
       <p className="text-fg-muted max-w-[52ch] text-pretty">{body}</p>
       {reference ? (
-        <p className="eyebrow text-accent text-[0.5625rem]" data-numeric>
+        <p className="eyebrow text-accent text-[0.8rem]" data-numeric>
           {dict.opportunity.reference} · {reference}
         </p>
       ) : null}

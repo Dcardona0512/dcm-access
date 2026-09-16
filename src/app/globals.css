@@ -101,32 +101,41 @@
   --color-pending: var(--c-pending);
   --color-danger: var(--c-danger);
 
-  /* Una sola familia para todo, como Amazon. Arial primero porque es lo que
-     su propia hoja de estilos termina sirviendo; Helvetica y Liberation Sans
-     cubren macOS y Linux con las mismas métricas. */
-  --font-sans: Arial, "Helvetica Neue", Helvetica, "Liberation Sans", sans-serif;
+  /* La pila exacta de Facebook. No es una fuente: es la del sistema, la que
+     cada aparato ya tiene cargada. En Windows resuelve a Segoe UI, en Mac a
+     San Francisco, en Android a Roboto. Por eso Facebook no espera a
+     descargar nada y su texto nunca salta a mitad de pintado. */
+  --font-sans:
+    system-ui, -apple-system, BlinkMacSystemFont, ".SFNSText-Regular",
+    "Segoe UI Historic", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-display: var(--font-sans);
 }
 
 @theme {
   /* --- Escala tipográfica ---------------------------------------------- */
-  /* Los tamaños de siempre. Lo que cambió fue la familia —Arial, como
-     Amazon— y el peso de los encabezados, no la escala: un marketplace se
-     lee mejor en Arial, pero un titular sigue teniendo que ser un titular. */
-  --text-display-1: clamp(2.75rem, 7.5vw, 6.5rem);
-  --text-display-1--line-height: 0.98;
-  --text-display-1--letter-spacing: -0.02em;
+  /* La escala de Facebook, medida en su propio Marketplace: 28/32 en negrita
+     lo más grande que tienen, luego 24/28, 20/24, 17/20 semi para el precio
+     de una tarjeta, 15/20 el cuerpo y 13/16 la línea de la ciudad.
 
-  --text-display-2: clamp(2.25rem, 5vw, 4rem);
-  --text-display-2--line-height: 1.03;
-  --text-display-2--letter-spacing: -0.015em;
+     Sin `clamp()`, y es la diferencia de fondo: Facebook no estira el texto
+     con el ancho de la ventana. Un precio mide 17px en un teléfono y 17px en
+     un monitor; lo que cambia es cuántas tarjetas caben, no el tamaño de la
+     letra. Es lo que hace que una rejilla de anuncios se lea igual en todas
+     partes. */
+  --text-display-1: 1.8667rem; /* 28px */
+  --text-display-1--line-height: 2.1333rem; /* 32px */
+  --text-display-1--letter-spacing: 0;
 
-  --text-display-3: clamp(1.75rem, 3.2vw, 2.75rem);
-  --text-display-3--line-height: 1.1;
-  --text-display-3--letter-spacing: -0.01em;
+  --text-display-2: 1.6rem; /* 24px */
+  --text-display-2--line-height: 1.8667rem; /* 28px */
+  --text-display-2--letter-spacing: 0;
 
-  --text-lede: clamp(1.0625rem, 1.4vw, 1.3125rem);
-  --text-lede--line-height: 1.6;
+  --text-display-3: 1.3333rem; /* 20px */
+  --text-display-3--line-height: 1.6rem; /* 24px */
+  --text-display-3--letter-spacing: 0;
+
+  --text-lede: 1rem; /* 15px */
+  --text-lede--line-height: 1.3333rem; /* 20px */
 
   /* --- Ritmo y forma ---------------------------------------------------- */
   --spacing-section: clamp(5rem, 11vw, 9.5rem);
@@ -150,6 +159,11 @@
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    /* 15px de base, el cuerpo de Facebook. Al moverlo desde aquí, toda la
+       interfaz definida en `rem` cae con él a la escala de Facebook sin tocar
+       un solo componente: `text-sm` pasa a 13px —su línea de ciudad— y
+       `text-xs` a 11px. */
+    font-size: 93.75%;
   }
 
   body {
@@ -168,11 +182,18 @@
 
   /* En Amazon los encabezados no se distinguen por ser grandes y finos, sino
      por ser negrita. Es lo que permite que quepan a 18px sin perderse. */
+  /* En Facebook un encabezado se distingue por el peso, no por el tamaño:
+     700 arriba, 600 para el precio de una tarjeta. Es lo que les permite
+     tener títulos de 17px que siguen leyéndose como títulos. */
   h1,
   h2,
   h3 {
     font-family: var(--font-display);
     font-weight: 700;
+  }
+
+  body {
+    line-height: 1.3333; /* 20px sobre 15px */
   }
 
   /* Foco visible en el acento — nunca se elimina, solo se estiliza (§39). */
@@ -211,10 +232,14 @@
 /* El detalle que carga casi toda la señal de lujo: versalitas muy espaciadas. */
 @utility eyebrow {
   font-family: var(--font-sans);
-  font-size: 0.6875rem;
-  font-weight: 500;
+  /* 12px: el tamaño más pequeño que Facebook pone en pantalla. Por debajo de
+     ahí el texto deja de leerse y pasa a ser textura. */
+  font-size: 0.8rem;
+  font-weight: 600;
   line-height: 1;
-  letter-spacing: 0.18em;
+  /* El tracking baja de 0.18em a 0.08em. A 8px separaba; a 12px desparramaba,
+     y la barra de navegación no tiene ese ancho de sobra. */
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 

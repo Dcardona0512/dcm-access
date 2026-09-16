@@ -42,7 +42,7 @@ export function FieldShell({
 }: FieldShellProps) {
   return (
     <div className={cn("flex flex-col gap-2", className)}>
-      <label htmlFor={htmlFor} className="eyebrow text-fg-muted text-[0.5625rem]">
+      <label htmlFor={htmlFor} className="eyebrow text-fg-muted text-[0.8rem]">
         {label}
         {optional ? <span className="text-fg-muted/50 normal-case"> · {optionalLabel}</span> : null}
       </label>
@@ -212,7 +212,7 @@ export function RadioCards({
 
   return (
     <fieldset className="flex flex-col gap-3">
-      <legend className="eyebrow text-fg-muted mb-1 text-[0.5625rem]">{label}</legend>
+      <legend className="eyebrow text-fg-muted mb-1 text-[0.8rem]">{label}</legend>
 
       <div className="grid gap-3 sm:grid-cols-3">
         {options.map((option) => {
@@ -309,7 +309,7 @@ export function CheckboxGroup({
 
   return (
     <fieldset className="flex flex-col gap-3">
-      <legend className="eyebrow text-fg-muted mb-1 text-[0.5625rem]">{label}</legend>
+      <legend className="eyebrow text-fg-muted mb-1 text-[0.8rem]">{label}</legend>
 
       <div className="flex flex-wrap gap-2">
         {options.map((option) => {

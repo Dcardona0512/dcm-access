@@ -87,7 +87,7 @@ export function MotorsFilters({
           marca, ciudad y tipo dentro de una frase suelta.
         */}
         <div className="flex flex-col gap-2">
-          <label htmlFor="filter-q" className="eyebrow text-fg-muted text-[0.5625rem]">
+          <label htmlFor="filter-q" className="eyebrow text-fg-muted text-[0.8rem]">
             {copy.queryLabel}
           </label>
           <input
@@ -138,7 +138,7 @@ export function MotorsFilters({
           />
 
           <div className="flex flex-col gap-2">
-            <label htmlFor="filter-kmMax" className="eyebrow text-fg-muted text-[0.5625rem]">
+            <label htmlFor="filter-kmMax" className="eyebrow text-fg-muted text-[0.8rem]">
               {copy.kmMax}
             </label>
             <NumberInput
@@ -203,7 +203,7 @@ function Select({
 
   return (
     <div className="flex flex-col gap-2">
-      <label htmlFor={id} className="eyebrow text-fg-muted text-[0.5625rem]">
+      <label htmlFor={id} className="eyebrow text-fg-muted text-[0.8rem]">
         {label}
       </label>
       <select
@@ -240,7 +240,7 @@ function Range({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <span className="eyebrow text-fg-muted text-[0.5625rem]">{legend}</span>
+      <span className="eyebrow text-fg-muted text-[0.8rem]">{legend}</span>
       <div className="flex items-center gap-2">
         <NumberInput
           name={from.name}

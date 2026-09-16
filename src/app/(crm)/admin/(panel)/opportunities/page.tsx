@@ -48,7 +48,7 @@ export default async function AdminOpportunitiesPage() {
       <div className="mb-8">
         <Link
           href="/admin/opportunities/new"
-          className="eyebrow border-accent/50 text-accent hover:bg-accent/10 inline-flex rounded-(--radius-card) border px-4 py-2.5 text-[0.5rem] transition-colors"
+          className="eyebrow border-accent/50 text-accent hover:bg-accent/10 inline-flex rounded-(--radius-card) border px-4 py-2.5 text-[0.75rem] transition-colors"
         >
           Publicar una ficha
         </Link>

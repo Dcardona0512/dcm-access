@@ -50,7 +50,7 @@ export default async function AdminDealsPage() {
               className="border-line flex flex-col gap-3 rounded-(--radius-card) border p-4"
             >
               <div className="flex items-baseline justify-between gap-3">
-                <h2 className="eyebrow text-fg-muted text-[0.5625rem]">
+                <h2 className="eyebrow text-fg-muted text-[0.8rem]">
                   {localized(dealStageLabels[stage], "es")}
                 </h2>
                 <span className="text-fg-muted/60 text-xs" data-numeric>

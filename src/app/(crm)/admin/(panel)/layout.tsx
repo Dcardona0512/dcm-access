@@ -40,12 +40,12 @@ export default async function PanelLayout({ children }: { children: React.ReactN
         <AdminNav role={user.role} />
 
         <div className="border-line mt-auto flex flex-col gap-2 border-t pt-5">
-          <span className="eyebrow text-fg-muted text-[0.5rem]">{roleLabels[user.role].es}</span>
+          <span className="eyebrow text-fg-muted text-[0.75rem]">{roleLabels[user.role].es}</span>
 
           {session.open ? (
             // Que se vea. Un panel sin puerta del que uno se olvida es peor
             // que uno sin puerta del que se acuerda cada vez que lo abre.
-            <p className="border-danger/40 bg-danger/5 text-danger mt-1 rounded-(--radius-card) border px-2.5 py-2 text-[0.6875rem] leading-snug text-pretty">
+            <p className="border-danger/40 bg-danger/5 text-danger mt-1 rounded-(--radius-card) border px-2.5 py-2 text-[0.8rem] leading-snug text-pretty">
               Acceso abierto: cualquiera con esta dirección puede publicar.
               Ponga <code>ADMIN_GATE=on</code> en Vercel para volver a exigir el
               enlace por correo.
@@ -57,7 +57,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
               <form action={signOutAdmin} className="mt-2">
                 <button
                   type="submit"
-                  className="eyebrow border-line text-fg-muted hover:border-fg-muted/60 hover:text-fg rounded-(--radius-card) border px-2.5 py-1.5 text-[0.5rem] transition-colors"
+                  className="eyebrow border-line text-fg-muted hover:border-fg-muted/60 hover:text-fg rounded-(--radius-card) border px-2.5 py-1.5 text-[0.75rem] transition-colors"
                 >
                   Cerrar sesión
                 </button>
