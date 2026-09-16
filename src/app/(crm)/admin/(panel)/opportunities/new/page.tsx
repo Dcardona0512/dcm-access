@@ -93,7 +93,6 @@ export default async function NewOpportunityPage({
       <AdminHeading
         eyebrow={localized(verticalLabels[initialVertical as Vertical], "es")}
         title="Publicar una ficha"
-        lede="Lo que publique aquí aparece de inmediato en el sitio. Las fotos y el vídeo suben directo al almacenamiento."
       />
 
       {isSupabaseWritable() ? (
