@@ -108,20 +108,3 @@ export function Button(props: ButtonAsLink | ButtonAsButton) {
     </button>
   );
 }
-
-/** Flecha que acompaña a los CTA y se desplaza levemente al pasar el cursor. */
-export function ArrowEast({ className }: { readonly className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 16 16"
-      fill="none"
-      aria-hidden="true"
-      className={cn(
-        "h-3 w-3 transition-transform duration-(--duration-base) ease-(--ease-brand) group-hover:translate-x-1",
-        className,
-      )}
-    >
-      <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" />
-    </svg>
-  );
-}

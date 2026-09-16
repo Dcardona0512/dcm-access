@@ -43,9 +43,12 @@ export default async function PanelLayout({ children }: { children: React.ReactN
           <Logo />
         </Link>
 
-        <AdminNav role={user.role} />
-
-        {resumen ? <PanelSummary resumen={resumen} /> : null}
+        {/* El resumen es una entrada más del menú, no un bloque aparte: abre
+            su propia ventana y por eso vive junto a las demás opciones. */}
+        <div className="flex flex-col gap-1">
+          <AdminNav role={user.role} />
+          {resumen ? <PanelSummary resumen={resumen} /> : null}
+        </div>
 
         <div className="border-line mt-auto flex flex-col gap-2 border-t pt-5">
           <span className="eyebrow text-fg-muted text-[0.75rem]">{roleLabels[user.role].es}</span>

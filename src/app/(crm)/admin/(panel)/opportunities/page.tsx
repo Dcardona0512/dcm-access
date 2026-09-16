@@ -3,11 +3,8 @@ import Link from "next/link";
 import { AdminHeading, Cell, DataTable, Row } from "@/components/admin/AdminUI";
 import { Tag } from "@/components/ui/Tag";
 import { getRepositories } from "@/lib/data";
-import {
-  DIAS_PARA_VETERANA,
-  publicacionesDelPanel,
-  type VistaPanel,
-} from "@/lib/data/supabase/panel";
+import { DIAS_PARA_VETERANA, type VistaPanel } from "@/lib/data/panel-shared";
+import { publicacionesDelPanel } from "@/lib/data/supabase/panel";
 import { verticalLabels, visibilityLabels } from "@/lib/domain/labels";
 import { localized } from "@/lib/domain/types";
 import { formatDateShort, formatLocation, formatPrice } from "@/lib/format";

@@ -1,5 +1,5 @@
 import { AccessMark } from "@/components/brand/AccessMark";
-import { ArrowEast, Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { getDictionary } from "@/content";
 import { defaultLocale } from "@/lib/i18n/config";
@@ -29,7 +29,6 @@ export default function NotFound() {
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button href={`/${defaultLocale}`}>
             {dict.errors.notFoundCta}
-            <ArrowEast />
           </Button>
           <Button href={`/${defaultLocale}/motors`} variant="outline">
             {dict.navLabels.motors}

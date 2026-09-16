@@ -1,4 +1,4 @@
-import { ArrowEast, Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { RevealGroup, RevealItem } from "@/components/ui/Reveal";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import type { Dictionary } from "@/content/types";
@@ -28,7 +28,6 @@ export function ProcessSteps({
         action={
           <Button href={localizePath("/contact", locale)} variant="outline" size="sm">
             {dict.home.process.cta}
-            <ArrowEast />
           </Button>
         }
       />

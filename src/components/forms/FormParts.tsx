@@ -3,7 +3,6 @@
 import { useFormStatus } from "react-dom";
 
 import { AccessMark } from "@/components/brand/AccessMark";
-import { ArrowEast } from "@/components/ui/Button";
 import type { Dictionary } from "@/content/types";
 import type { FormState } from "@/lib/forms/state";
 import { cn } from "@/lib/utils";
@@ -37,7 +36,6 @@ export function SubmitButton({
       )}
     >
       {pending ? pendingLabel : label}
-      {pending ? null : <ArrowEast />}
     </button>
   );
 }

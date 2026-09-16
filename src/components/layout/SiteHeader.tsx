@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Logo } from "@/components/brand/Logo";
 import { navHrefs, verticalNav, whatsappHref } from "@/content/shared";
-import { ArrowEast, Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import type { Dictionary } from "@/content/types";
 import { panelVariants, veilVariants } from "@/lib/motion";
@@ -134,7 +134,6 @@ export function SiteHeader({
               className="hidden sm:inline-flex"
             >
               {dict.common.sell}
-              <ArrowEast />
             </Button>
 
             <button
@@ -301,7 +300,6 @@ function MobileDrawer({
                     onClick={onClose}
                   >
                     {dict.common.sell}
-                    <ArrowEast />
                   </Button>
                   <LocaleSwitcher locale={locale} dict={dict} />
                 </div>
@@ -342,7 +340,6 @@ function DrawerItem({
         )}
       >
         {children}
-        <ArrowEast className="opacity-40" />
       </Link>
     </li>
   );

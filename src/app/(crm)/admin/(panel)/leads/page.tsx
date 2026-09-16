@@ -110,7 +110,7 @@ export default async function AdminLeadsPage() {
                             <input type="hidden" name="id" value={lead.id} />
                             <input type="hidden" name="status" value={next} />
                             <AdminButton tone="accent">
-                              → {localized(leadStatusLabels[next], "es")}
+                              {localized(leadStatusLabels[next], "es")}
                             </AdminButton>
                           </form>
                         ) : null}

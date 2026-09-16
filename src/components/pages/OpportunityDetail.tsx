@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { InquiryForm } from "@/components/forms/InquiryForm";
 import { MediaGallery } from "@/components/opportunities/MediaGallery";
 import { OpportunityCard } from "@/components/opportunities/OpportunityCard";
-import { ArrowEast, Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { PriceTag } from "@/components/ui/PriceTag";
 import { Eyebrow } from "@/components/ui/Section";
@@ -290,7 +290,6 @@ export async function OpportunityDetail({
                   no acumular llamadas a la acción compitiendo entre sí. */}
               <Button href="#inquiry" variant="accent" fullWidth>
                 {dict.common.requestDetails}
-                <ArrowEast />
               </Button>
             </div>
           </aside>

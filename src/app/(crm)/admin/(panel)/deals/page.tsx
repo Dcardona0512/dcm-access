@@ -103,7 +103,7 @@ export default async function AdminDealsPage() {
                             <input type="hidden" name="id" value={deal.id} />
                             <input type="hidden" name="stage" value={next} />
                             <AdminButton tone="accent">
-                              → {localized(dealStageLabels[next], "es")}
+                              {localized(dealStageLabels[next], "es")}
                             </AdminButton>
                           </form>
                         ) : null}

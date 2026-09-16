@@ -1,5 +1,10 @@
 import "server-only";
 
+import {
+  DIAS_PARA_VETERANA,
+  type ResumenPublicaciones,
+  type VistaPanel,
+} from "@/lib/data/panel-shared";
 import type { Opportunity, OpportunityStatus } from "@/lib/domain/types";
 import { createAdminClient, isSupabaseWritable } from "@/lib/supabase/server";
 
@@ -21,18 +26,6 @@ import { rowToOpportunity, type OpportunityRow, type MediaRow } from "./mappers"
    una real: incluirlas convertiría el resumen en un número que no habla del
    negocio de nadie.
    ========================================================================== */
-
-/** A partir de aquí una ficha lleva demasiado tiempo sin moverse. */
-export const DIAS_PARA_VETERANA = 15;
-
-export type ResumenPublicaciones = {
-  readonly disponibles: number;
-  readonly veteranas: number;
-  readonly vendidas: number;
-};
-
-/** Filtro de la lista del panel, y también lo que cuenta cada número. */
-export type VistaPanel = "disponibles" | "veteranas" | "vendidas";
 
 function fechaDeCorte(): string {
   return new Date(Date.now() - DIAS_PARA_VETERANA * 24 * 60 * 60 * 1000).toISOString();

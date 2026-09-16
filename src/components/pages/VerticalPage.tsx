@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 
 import { OpportunityCard } from "@/components/opportunities/OpportunityCard";
 import { HeroVideo, type VideoTone } from "@/components/sections/HeroVideo";
-import { ArrowEast, Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { EditorialImage } from "@/components/ui/EditorialImage";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -146,7 +146,6 @@ export async function VerticalPage({
                 <div className="flex flex-col gap-3 pt-2 sm:flex-row">
                   <Button href="#publicadas" size="lg">
                     {dict.common.explore}
-                    <ArrowEast />
                   </Button>
                 </div>
               </div>
@@ -225,7 +224,6 @@ export async function VerticalPage({
               action={
                 <Button href={localizePath("/contact", locale)} variant="accent">
                   {dict.catalog.empty.cta}
-                  <ArrowEast />
                 </Button>
               }
             />

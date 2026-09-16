@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { MotorsFilters, type MotorsFilterState } from "@/components/motors/MotorsFilters";
 import { MotorsCard } from "@/components/opportunities/MotorsCard";
 import { HeroVideo, type VideoTone } from "@/components/sections/HeroVideo";
-import { ArrowEast, Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { RevealGroup, RevealItem } from "@/components/ui/Reveal";
@@ -214,7 +214,6 @@ export async function MotorsMarketplace({
               <div className="flex flex-col gap-3 pt-2 sm:flex-row">
                 <Button href={sellHref} target={sellExternal} size="lg">
                   {market.sellCta}
-                  <ArrowEast />
                 </Button>
                 <Button href="#buscar" variant="outline" size="lg">
                   {market.searchCta}
@@ -245,7 +244,6 @@ export async function MotorsMarketplace({
             action={
               <Button href={sellHref} target={sellExternal} variant="outline" size="sm">
                 {market.sellCta}
-                <ArrowEast />
               </Button>
             }
           />
@@ -268,7 +266,6 @@ export async function MotorsMarketplace({
               action={
                 <Button href={sellHref} target={sellExternal} variant="outline">
                   {market.sellCta}
-                  <ArrowEast />
                 </Button>
               }
             />
