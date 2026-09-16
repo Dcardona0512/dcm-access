@@ -11,13 +11,14 @@ import { PriceTag } from "@/components/ui/PriceTag";
 import { Eyebrow } from "@/components/ui/Section";
 import { DemoTag, Tag, VerificationBadge } from "@/components/ui/Tag";
 import { getDictionary } from "@/content";
+import { contact, whatsappHref } from "@/content/shared";
 import { getRepositories } from "@/lib/data";
 import { displayAttributes, groupAttributes } from "@/lib/domain/attributes";
 import { listingTypeLabels } from "@/lib/domain/labels";
 import { localized, type Opportunity, type Vertical } from "@/lib/domain/types";
 import { formatDate, formatLocation } from "@/lib/format";
 import { isLocale, localizePath, locales, type Locale } from "@/lib/i18n/config";
-import { breadcrumbSchema, buildMetadata, jsonLd, siteUrl } from "@/lib/seo";
+import { absoluteUrl, breadcrumbSchema, buildMetadata, jsonLd, siteUrl } from "@/lib/seo";
 
 /* ============================================================================
    FICHA DE OPORTUNIDAD
@@ -290,9 +291,35 @@ export async function OpportunityDetail({
                 </div>
               </dl>
 
-              {/* Un solo CTA: la solicitud privada ya no existe, y §42 pide
-                  no acumular llamadas a la acción compitiendo entre sí. */}
-              <Button href="#inquiry" variant="accent" fullWidth>
+              {/*
+                Un solo CTA (§42), y lleva a WhatsApp.
+
+                Antes bajaba a un formulario en la misma página: el interesado
+                escribía, se iba, y había que responderle por correo horas
+                después. Aquí el mensaje sale con el título y la referencia ya
+                escritos, así que la conversación empieza con la ficha
+                identificada y sigue en el sitio donde se negocia de verdad en
+                Colombia.
+
+                Si el número faltara, el botón vuelve al formulario en lugar de
+                quedarse muerto.
+              */}
+              <Button
+                href={
+                  whatsappHref(
+                    `${dict.common.whatsappInquiry
+                      .replace("{title}", localized(opportunity.title, locale))
+                      .replace("{ref}", opportunity.reference)} ${absoluteUrl(
+                      `/${locale}/${vertical}/${slug}`,
+                    )}`,
+                    contact.whatsappSales,
+                  ) ?? "#inquiry"
+                }
+                variant="accent"
+                fullWidth
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 {dict.common.requestDetails}
               </Button>
             </div>

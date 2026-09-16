@@ -44,6 +44,7 @@ export const es: Dictionary = {
     explore: "Explorar",
     viewOpportunity: "Ver oportunidad",
     requestDetails: "Solicitar detalles",
+    whatsappInquiry: "Hola, me interesa esta publicación: {title} (referencia {ref}).",
     contactBroker: "Contactar con un asesor",
     privateRequest: "Solicitud privada",
     sell: "Vender",

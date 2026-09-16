@@ -43,6 +43,7 @@ export const en: Dictionary = {
     explore: "Explore",
     viewOpportunity: "View opportunity",
     requestDetails: "Request details",
+    whatsappInquiry: "Hello, I'm interested in this listing: {title} (reference {ref}).",
     contactBroker: "Contact broker",
     privateRequest: "Private request",
     sell: "Sell",

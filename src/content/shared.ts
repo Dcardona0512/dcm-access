@@ -34,6 +34,15 @@ export const contact = {
   phone: process.env.NEXT_PUBLIC_DCM_PHONE ?? "",
   /** Solo dígitos con indicativo de país: es el formato que exige wa.me. */
   whatsapp: process.env.NEXT_PUBLIC_DCM_WHATSAPP ?? "573205088849",
+  /**
+   * Segundo número, el de quien atiende a los interesados en una ficha.
+   *
+   * Son dos líneas distintas a propósito: por la primera entra quien QUIERE
+   * VENDER y hay que valorar lo que trae; por esta entra quien quiere COMPRAR
+   * algo ya publicado. Mezclarlas obligaría a adivinar en cada mensaje de qué
+   * lado de la mesa está quien escribe.
+   */
+  whatsappSales: process.env.NEXT_PUBLIC_DCM_WHATSAPP_SALES ?? "573222607394",
   baseCity: "Medellín",
   baseCountry: "CO",
 } as const;
@@ -68,10 +77,10 @@ export const verticalNav: readonly { readonly key: NavKey; readonly vertical: Ve
  * Sin número configurado devuelve `null`, y quien llama cae al contacto: un
  * `wa.me/` sin destinatario lleva a una pantalla de error de WhatsApp.
  */
-export function whatsappHref(message: string): string | null {
-  const number = contact.whatsapp.replace(/\D/g, "");
-  if (!number) return null;
-  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+export function whatsappHref(message: string, number = contact.whatsapp): string | null {
+  const digits = number.replace(/\D/g, "");
+  if (!digits) return null;
+  return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
 }
 
 /** Regiones de la red (§35). Su nombre lo pone `dict.regions[key]`. */

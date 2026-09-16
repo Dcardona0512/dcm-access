@@ -97,6 +97,12 @@ export type Dictionary = {
     readonly explore: string;
     readonly viewOpportunity: string;
     readonly requestDetails: string;
+    /**
+     * Mensaje con el que se abre WhatsApp desde una ficha. `{title}` y `{ref}`
+     * se sustituyen; el enlace se añade aparte, porque la URL depende del
+     * idioma y de la sección.
+     */
+    readonly whatsappInquiry: string;
     readonly contactBroker: string;
     readonly privateRequest: string;
     readonly sell: string;
