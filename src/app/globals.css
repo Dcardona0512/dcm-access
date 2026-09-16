@@ -794,3 +794,43 @@ body:has(.dcm-video-layer[data-tone="bright"]) > header:not([class*="backdrop-bl
     transparent 100%
   );
 }
+
+/* ============================================================================
+   ELEVACIÓN DE TARJETA
+   ----------------------------------------------------------------------------
+   Los números no son inventados: son los de `.tarjeta-funcion` en tumarket.co,
+   leídos de su hoja de estilos para que las dos marcas se muevan igual.
+
+   En reposo, un filete de un píxel al 8 % de blanco dibuja el borde de la
+   tarjeta. Al pasar por encima sube cuatro píxeles, el filete se refuerza al
+   16 % y aparece una sombra ancha y suave —28 píxeles de difuminado a media
+   opacidad— que es la que hace que flote.
+
+   La sombra va en el bloque del medio y no en el enlace entero porque el
+   enlace no tiene fondo: una sombra alrededor de algo transparente perfila una
+   caja que no existe.
+   ========================================================================== */
+
+.dcm-card-media {
+  transition:
+    box-shadow var(--duration-fast) var(--ease-brand),
+    translate var(--duration-fast) var(--ease-brand);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.08);
+}
+
+.group:hover .dcm-card-media,
+.group:focus-visible .dcm-card-media {
+  translate: 0 -4px;
+  box-shadow:
+    0 14px 28px rgb(0 0 0 / 0.5),
+    0 0 0 1px rgb(255 255 255 / 0.16);
+}
+
+/* Con movimiento reducido se queda la sombra, que informa, y se va el salto,
+   que es lo que molesta. Igual que en el original. */
+@media (prefers-reduced-motion: reduce) {
+  .group:hover .dcm-card-media,
+  .group:focus-visible .dcm-card-media {
+    translate: none;
+  }
+}

@@ -64,7 +64,7 @@ export function VerticalsGrid({
                   dos categorías que todavía no tienen vídeo se quedan con ella
                   sin ningún caso especial.
                 */}
-                <div className="relative overflow-hidden rounded-(--radius-card) transition-transform duration-(--duration-base) ease-(--ease-brand) group-hover:-translate-y-1 group-focus-visible:-translate-y-1">
+                <div className="dcm-card-media relative overflow-hidden rounded-(--radius-card)">
                   <EditorialImage
                     media={{
                       id: `vertical-${item.vertical}`,
@@ -100,17 +100,9 @@ export function VerticalsGrid({
                     className="bg-surface/45 pointer-events-none absolute inset-0 transition-opacity duration-(--duration-base) ease-(--ease-brand) group-hover:opacity-0 group-focus-visible:opacity-0"
                   />
 
-                  {/* Filete de acento, por dentro del borde para que no mueva
-                      el trazado ni desplace nada al aparecer.
-
-                      La transición es `transition` a secas, no la de la
-                      variable de color: el anillo lo dibuja una `box-shadow`,
-                      así que animar `--tw-ring-color` no interpola nada y el
-                      filete aparecía de golpe. */}
-                  <div
-                    aria-hidden="true"
-                    className="ring-accent/0 group-hover:ring-accent/50 group-focus-visible:ring-accent/50 pointer-events-none absolute inset-0 rounded-(--radius-card) ring-1 ring-inset transition duration-(--duration-base) ease-(--ease-brand)"
-                  />
+                  {/* El filete de acento se fue: `.dcm-card-media` ya dibuja el
+                      suyo con la misma `box-shadow` que la elevación, así que
+                      eran dos bordes compitiendo por el mismo píxel. */}
                 </div>
 
                 <div className="flex flex-1 flex-col gap-3">
