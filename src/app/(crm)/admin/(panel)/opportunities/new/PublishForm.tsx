@@ -365,19 +365,26 @@ export function PublishForm({
         ) : null}
 
         {/*
-          El importe y la moneda van en la misma celda porque son un solo dato
-          leído en voz alta: «ciento treinta y ocho millones de pesos». Tenerlos
-          en filas distintas obligaba a bajar la vista para confirmar en qué
-          moneda se estaba escribiendo, y dejaba dos huecos anchos para un
-          número corto y tres letras.
+          El precio ocupa la fila entera. Es la cifra por la que alguien decide
+          si sigue mirando, y estaba compitiendo por media pantalla con un
+          desplegable de tres letras.
+
+          La moneda va pegada a su derecha porque juntas son un solo dato leído
+          en voz alta —«ciento treinta y ocho millones de pesos»—: separadas,
+          había que bajar la vista para confirmar en qué moneda se estaba
+          escribiendo.
         */}
-        <Field label={vertical === "real-estate" ? "Precio o canon" : "Precio"}>
-          <div className="flex gap-2">
+        <Field label="Precio" full>
+          <div className="flex items-stretch gap-3">
             <input
               name="priceAmount"
               inputMode="numeric"
               required
-              className={`${control} flex-1`}
+              placeholder="0"
+              // `min-w-0` deja que el campo se encoja de verdad en pantallas
+              // estrechas: sin él, el ancho mínimo del contenido lo desborda.
+              className={`${controlBase} h-12 min-w-0 flex-1 text-base`}
+              data-numeric
             />
 
             {/* COP por defecto: la mayoría del inventario está en Colombia. Las
@@ -386,7 +393,7 @@ export function PublishForm({
               name="currency"
               defaultValue="COP"
               aria-label="Moneda"
-              className={`${control} w-24 shrink-0`}
+              className={`${controlBase} h-12 w-28 shrink-0 text-base`}
             >
               {currencies.map((c) => (
                 <option key={c} value={c} className="bg-surface-raised">
@@ -560,8 +567,19 @@ export function PublishForm({
   );
 }
 
-const control =
-  "border-line text-fg placeholder:text-fg-muted/40 focus-visible:border-accent h-11 w-full rounded-(--radius-card) border bg-transparent px-3 text-sm outline-none transition-colors";
+/**
+ * El aspecto de un campo, SIN ancho.
+ *
+ * El ancho va aparte porque `control` llevaba `w-full` incrustado, y al meter
+ * dos campos en una misma fila ese `w-full` ganaba a cualquier ancho que se le
+ * pusiera encima: el importe se encogía a un dedo y la moneda se comía la
+ * fila. Una clase que decide el ancho no puede reutilizarse en una fila
+ * compartida.
+ */
+const controlBase =
+  "border-line text-fg placeholder:text-fg-muted/40 focus-visible:border-accent h-11 rounded-(--radius-card) border bg-transparent px-3 text-sm outline-none transition-colors";
+
+const control = `${controlBase} w-full`;
 
 function Group({
   title,
