@@ -385,26 +385,37 @@ export function PublishForm({
           </Field>
         ) : null}
 
-        <Field label="Precio">
-          <div className="flex items-stretch gap-3">
+        {/*
+          Dos campos con su propio rótulo dentro de una misma celda de la
+          rejilla. No se usa `Field`, que es UN rótulo encima de UN campo:
+          aquí la moneda necesita el suyo, visible como el resto. Antes solo lo
+          tenía para los lectores de pantalla, así que quien mira la pantalla
+          veía un desplegable sin nombre.
+        */}
+        <div className="flex items-end gap-3">
+          <label className="flex min-w-0 flex-1 flex-col gap-2">
+            <span className="eyebrow text-fg-muted text-[0.8rem]">Precio</span>
             <input
               name="priceAmount"
               inputMode="numeric"
               required
               placeholder="0"
-              // `min-w-0` deja que el campo se encoja de verdad en pantallas
-              // estrechas: sin él, el ancho mínimo del contenido lo desborda.
-              className={`${controlBase} h-12 min-w-0 flex-1 text-base`}
+              // `min-w-0` en el contenedor deja que el campo se encoja de
+              // verdad en pantallas estrechas: sin él, el ancho mínimo del
+              // contenido lo desborda.
+              className={`${controlBase} h-12 w-full text-base`}
               data-numeric
             />
+          </label>
 
+          <label className="flex w-28 shrink-0 flex-col gap-2">
+            <span className="eyebrow text-fg-muted text-[0.8rem]">Moneda</span>
             {/* COP por defecto: la mayoría del inventario está en Colombia.
                 Las demás siguen ahí para lo que se publica fuera. */}
             <select
               name="currency"
               defaultValue="COP"
-              aria-label="Moneda"
-              className={`${controlBase} h-12 w-28 shrink-0 text-base`}
+              className={`${controlBase} h-12 w-full text-base`}
             >
               {currencies.map((c) => (
                 <option key={c} value={c} className="bg-surface-raised">
@@ -412,8 +423,8 @@ export function PublishForm({
                 </option>
               ))}
             </select>
-          </div>
-        </Field>
+          </label>
+        </div>
       </Group>
 
       {/* 3. Categoría · 4. Estado ---------------------------------------------
