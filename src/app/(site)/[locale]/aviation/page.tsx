@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { VerticalPage, verticalMetadata } from "@/components/pages/VerticalPage";
+import { verticalVideos } from "@/content/shared";
 
 const VERTICAL = "aviation" as const;
 
@@ -25,7 +26,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
     <VerticalPage
       vertical={VERTICAL}
       localeRaw={locale}
-      backgroundVideo={{ src: "/media/aviation.mp4", tone: "bright" }}
+      backgroundVideo={verticalVideos["aviation"]}
     />
   );
 }

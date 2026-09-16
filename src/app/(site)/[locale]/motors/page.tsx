@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { MotorsMarketplace, motorsMetadata } from "@/components/pages/MotorsMarketplace";
+import { verticalVideos } from "@/content/shared";
 
 export async function generateMetadata({
   params,
@@ -34,7 +35,7 @@ export default async function Page({
     <MotorsMarketplace
       localeRaw={locale}
       searchParams={sp}
-      backgroundVideo={{ src: "/media/motors.mp4", tone: "bright" }}
+      backgroundVideo={verticalVideos["motors"]}
     />
   );
 }

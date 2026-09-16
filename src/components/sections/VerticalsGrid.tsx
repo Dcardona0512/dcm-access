@@ -1,10 +1,11 @@
 import Link from "next/link";
 
 import { ArrowEast } from "@/components/ui/Button";
+import { CardVideo } from "@/components/sections/CardVideo";
 import { EditorialImage } from "@/components/ui/EditorialImage";
 import { RevealGroup, RevealItem } from "@/components/ui/Reveal";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { navHrefs, verticalNav } from "@/content/shared";
+import { navHrefs, verticalNav, verticalVideos } from "@/content/shared";
 import type { Dictionary } from "@/content/types";
 import type { MediaTone, Vertical } from "@/lib/domain/types";
 import { localizePath, type Locale } from "@/lib/i18n/config";
@@ -49,7 +50,14 @@ export function VerticalsGrid({
               className={featured ? "sm:col-span-2 lg:col-span-2" : undefined}
             >
               <Link href={localizePath(navHrefs[item.key], locale)} className="group flex h-full flex-col gap-5">
-                <div className="overflow-hidden rounded-(--radius-card)">
+                {/*
+                  El metraje va ENCIMA de la placa, no en su lugar: mientras no
+                  haya un fotograma decodificado el vídeo no pinta nada y se ve
+                  la placa. Así la tarjeta nunca es un rectángulo vacío, y las
+                  dos categorías que todavía no tienen vídeo se quedan con ella
+                  sin ningún caso especial.
+                */}
+                <div className="relative overflow-hidden rounded-(--radius-card)">
                   <EditorialImage
                     media={{
                       id: `vertical-${item.vertical}`,
@@ -65,6 +73,10 @@ export function VerticalsGrid({
                     }
                     className="transition-transform duration-(--duration-slow) ease-(--ease-brand) group-hover:scale-[1.02]"
                   />
+
+                  {verticalVideos[item.vertical] ? (
+                    <CardVideo src={verticalVideos[item.vertical]!.src} />
+                  ) : null}
                 </div>
 
                 <div className="flex flex-1 flex-col gap-3">

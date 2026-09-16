@@ -94,3 +94,26 @@ export const legalSlugs = [
 ] as const;
 
 export type LegalSlug = (typeof legalSlugs)[number];
+
+/* ============================================================================
+   METRAJE DE FONDO POR CATEGORÍA
+   ----------------------------------------------------------------------------
+   Vive aquí y no en cada página porque ahora lo leen dos sitios: el fondo de
+   la propia página y la tarjeta de esa categoría en la portada. Repetir la
+   ruta en los dos garantizaba que un día enseñaran vídeos distintos.
+
+   `tone` describe la luminancia del metraje, y no es decorativo: la cortina
+   de entrada dibuja su halo encima y necesita saber contra qué compite.
+
+   Servicios y Negocios todavía no tienen metraje. No se inventa uno: su
+   tarjeta se queda con la placa editorial, que es lo honesto mientras no haya
+   material propio.
+   ========================================================================== */
+
+export const verticalVideos: Partial<
+  Record<Vertical, { readonly src: string; readonly tone: "dark" | "bright" }>
+> = {
+  "real-estate": { src: "/media/real-estate.mp4", tone: "bright" },
+  motors: { src: "/media/motors.mp4", tone: "bright" },
+  aviation: { src: "/media/aviation.mp4", tone: "bright" },
+};
