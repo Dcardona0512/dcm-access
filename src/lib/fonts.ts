@@ -1,30 +1,20 @@
-import { Instrument_Serif, Inter } from "next/font/google";
+/* ============================================================================
+   TIPOGRAFÍA
+   ----------------------------------------------------------------------------
+   No se descarga ninguna fuente, y es a propósito.
 
-/**
- * Tipografía (§9): elegancia, autoridad, modernidad, claridad.
- *
- * Instrument Serif para display — alto contraste y modulación editorial, sin
- * caer en el registro de revista de moda de una Bodoni ni en el de balneario
- * de una Cormorant. Solo tiene un peso, y a tamaño display no hace falta más.
- *
- * Inter para interfaz, con numerales tabulares activados en `globals.css`
- * para que las columnas de precios queden alineadas.
- */
+   El referente es Amazon, y Amazon no sirve una fuente para la mayor parte de
+   su interfaz: su hoja de estilos declara `"Amazon Ember", Arial`, y como
+   Ember está licenciada solo para ellos, lo que de hecho renderiza el
+   navegador en casi toda la página es Arial, a 14px con interlínea de 20px.
+   Copiar esa tipografía no es buscarle un parecido a Ember: es usar Arial.
 
-export const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  variable: "--font-instrument-serif",
-  display: "swap",
-  preload: true,
-});
+   Lo que se gana de paso: dos descargas menos, cero parpadeo al cargar y
+   ningún texto que salte de una fuente a otra a mitad de pintado.
 
-export const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-  preload: true,
-});
+   `fontVariables` se conserva —vacío— porque los dos layouts raíz lo aplican
+   al `<html>`. Volver a una fuente web es rellenar esta constante, no ir a
+   buscar dónde se enganchaba.
+   ========================================================================== */
 
-export const fontVariables = `${instrumentSerif.variable} ${inter.variable}`;
+export const fontVariables = "";
