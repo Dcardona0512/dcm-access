@@ -100,6 +100,38 @@ export async function publicacionesDelPanel(vista: VistaPanel): Promise<readonly
 }
 
 /**
+ * Todo el inventario propio, de cualquier estado y cualquier sección.
+ *
+ * Una sola consulta y el reparto por categoría se hace en memoria: son las
+ * publicaciones de una casa, no un catálogo de millones, y cinco consultas
+ * —una por sección— para pintar cinco pestañas con su cuenta sería pagar
+ * cinco viajes por un dato que cabe entero en el primero.
+ *
+ * Incluye las vendidas a propósito: esto es el catálogo de lo que se ha
+ * subido, no el escaparate. Cada ficha lleva su estado y ahí se distingue.
+ */
+export async function catalogoDelPanel(): Promise<readonly Opportunity[]> {
+  if (!isSupabaseWritable()) return [];
+
+  const { data, error } = await createAdminClient()
+    .from("opportunities")
+    .select("*, opportunity_media(*)")
+    .eq("is_demo", false)
+    .order("published_at", { ascending: false });
+
+  if (error) throw new Error(`Supabase (catálogo): ${error.message}`);
+
+  return ((data as RowWithMedia[] | null) ?? []).map((row) =>
+    rowToOpportunity(
+      row,
+      row.opportunity_media ?? [],
+      (bucket, path) =>
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`,
+    ),
+  );
+}
+
+/**
  * Cambia el estado de una ficha.
  *
  * `closed` es «vendida» y `published` es «vuelve al catálogo». No se borra
