@@ -104,6 +104,14 @@ export async function OpportunityDetail({
   const restricted = opportunity.visibility !== "public";
   const yesNo = { yes: locale === "es" ? "Sí" : "Yes", no: "No" };
 
+  /**
+   * Windows manda CR LF y el navegador solo trata como salto de línea el LF
+   * cuando el texto llega desde datos y no desde el HTML. Se normaliza al
+   * pintar para que las fichas ya publicadas se vean bien sin volver a
+   * guardarlas.
+   */
+  const description = localized(opportunity.description, locale).replace(/\r\n?/g, "\n");
+
   const attributes = displayAttributes(opportunity, category ?? undefined, locale, yesNo);
   const grouped = groupAttributes(attributes);
   const allCategories = await categories.list();
@@ -177,11 +185,19 @@ export async function OpportunityDetail({
               </section>
             ) : null}
 
-            {localized(opportunity.description, locale) ? (
+            {description ? (
               <section className="flex flex-col gap-5">
                 <h2 className="font-display text-2xl">{dict.opportunity.overview}</h2>
-                <p className="text-fg-muted max-w-[68ch] leading-relaxed text-pretty">
-                  {localized(opportunity.description, locale)}
+                {/*
+                  `whitespace-pre-line` respeta los saltos de línea y sigue
+                  partiendo los renglones largos. Quien describe un carro
+                  escribe una lista —kilometraje, SOAT, impuestos, extras— y sin
+                  esto todo se pegaba en un párrafo corrido imposible de leer.
+                  No se usa `pre`, que además conservaría la sangría y sacaría
+                  el texto de la caja.
+                */}
+                <p className="text-fg-muted max-w-[68ch] leading-relaxed whitespace-pre-line">
+                  {description}
                 </p>
               </section>
             ) : null}

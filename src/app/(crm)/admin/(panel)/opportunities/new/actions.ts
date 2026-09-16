@@ -146,7 +146,9 @@ export async function publishListing(
     return { status: "error", message: "El título es obligatorio." };
   }
 
-  const description = text(formData, "description");
+  // Se normaliza al guardar para que en la base no convivan dos formas del
+  // mismo salto según el sistema desde el que se publicó.
+  const description = text(formData, "description").replace(/\r\n?/g, "\n");
   const summary = summarize(description);
   const city = text(formData, "city");
   const region = text(formData, "region");
