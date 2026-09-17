@@ -5,6 +5,7 @@ import { useActionState, useMemo, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 import { AddressSearch } from "@/components/admin/AddressSearch";
+import { AutoTextarea } from "@/components/admin/AutoTextarea";
 import { LocationPicker } from "@/components/admin/LocationPicker";
 import { PlacePicker, type Place } from "@/components/admin/PlacePicker";
 import { TagsInput } from "@/components/admin/TagsInput";
@@ -638,9 +639,8 @@ export function PublishForm({
       {/* 5. Descripción -------------------------------------------------------- */}
       <Group title="Descripción" wide>
         <Field label="Descripción (opcional)" full>
-          <textarea
+          <AutoTextarea
             name="description"
-            rows={5}
             defaultValue={inicial?.description ?? ""}
             className={`${control} h-auto py-3`}
           />
