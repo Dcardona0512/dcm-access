@@ -106,18 +106,33 @@ export function LocationPicker({
         attribution: "&copy; OpenStreetMap",
       }).addTo(instance);
 
-      /**
-       * El icono por defecto de Leaflet apunta a imágenes por ruta relativa que
-       * el empaquetador no resuelve, y salen marcadores rotos. Un `divIcon` es
-       * HTML propio: sin assets que perder y con el color de la marca.
-       */
       leaflet.current = L;
 
+      /*
+        El icono por defecto de Leaflet apunta a imágenes por ruta relativa que
+        el empaquetador no resuelve, y salen marcadores rotos. Un `divIcon` es
+        HTML propio: sin archivos que perder.
+
+        Forma de marcador y en rojo, no el punto dorado de antes.
+
+        Sobre un mapa claro un círculo pequeño se confunde con los iconos del
+        propio OpenStreetMap —farmacias, gasolineras, cajeros— y el dorado de
+        la marca es justo el color que peor se despega de sus carreteras
+        amarillas. Un marcador rojo se lee al instante y en cualquier parte.
+
+        El ancla va en la PUNTA (14, 36), no en el centro: la punta es la que
+        señala la coordenada. Anclarlo al medio dejaría el punto real medio
+        marcador por debajo de donde se ve.
+      */
       const pin = L.divIcon({
         className: "",
-        html: '<span style="display:block;width:14px;height:14px;border-radius:999px;background:#c9a96a;box-shadow:0 0 0 4px rgba(201,169,106,.3)"></span>',
-        iconSize: [14, 14],
-        iconAnchor: [7, 7],
+        html:
+          '<svg viewBox="0 0 28 36" width="28" height="36" xmlns="http://www.w3.org/2000/svg">' +
+          '<path d="M14 0C6.3 0 0 6.3 0 14c0 10.5 14 22 14 22s14-11.5 14-22C28 6.3 21.7 0 14 0Z" fill="#e5484d"/>' +
+          '<circle cx="14" cy="13.5" r="5" fill="#ffffff"/>' +
+          "</svg>",
+        iconSize: [28, 36],
+        iconAnchor: [14, 36],
       });
 
       icon.current = pin;
@@ -183,13 +198,17 @@ export function LocationPicker({
         aria-label="Mapa para marcar la ubicación"
         className="border-line h-72 w-full overflow-hidden rounded-(--radius-card) border"
       />
-      <p className="text-fg-muted/70 text-xs">
-        {point
-          ? looking
+      {/*
+        Ya marcado, no se dice nada: el pin está a la vista y repetir la
+        coordenada en números no añade nada que el mapa no muestre mejor.
+      */}
+      {point && !looking ? null : (
+        <p className="text-fg-muted/70 text-xs">
+          {looking
             ? "Buscando la ciudad…"
-            : `Marcado en ${point.lat.toFixed(4)}, ${point.lng.toFixed(4)}. Al público solo se le muestra la ciudad.`
-          : "Opcional: haga clic para marcar el punto exacto. La ciudad ya se tomó del desplegable."}
-      </p>
+            : "Opcional: haga clic para marcar el punto exacto. La ciudad ya se tomó del desplegable."}
+        </p>
+      )}
     </div>
   );
 }
