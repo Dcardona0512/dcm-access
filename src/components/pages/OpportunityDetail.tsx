@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 
 import { InquiryForm } from "@/components/forms/InquiryForm";
 import { MediaGallery } from "@/components/opportunities/MediaGallery";
-import { LocationMap } from "@/components/opportunities/LocationMap";
+import { SeccionUbicacion } from "@/components/opportunities/SeccionUbicacion";
 import { OpportunityCard } from "@/components/opportunities/OpportunityCard";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
@@ -114,6 +114,9 @@ export async function OpportunityDetail({
    */
   const description = localized(opportunity.description, locale).replace(/\r\n?/g, "\n");
 
+  const etiquetaUbicacion = formatLocation(opportunity.location, locale, { detail: "full" });
+  const enlaceFicha = absoluteUrl(`/${locale}/${vertical}/${slug}`);
+
   const attributes = displayAttributes(opportunity, category ?? undefined, locale, yesNo);
   const grouped = groupAttributes(attributes);
   const allCategories = await categories.list();
@@ -180,7 +183,15 @@ export async function OpportunityDetail({
               */}
             </header>
 
-            <MediaGallery media={opportunity.media} label={dict.opportunity.overview} />
+            <MediaGallery
+              media={opportunity.media}
+              label={dict.opportunity.overview}
+              lat={opportunity.location.lat}
+              lng={opportunity.location.lng}
+              etiqueta={etiquetaUbicacion}
+              titulo={localized(opportunity.title, locale)}
+              url={enlaceFicha}
+            />
 
             {restricted ? (
               <section className="border-accent/25 bg-accent/[0.03] flex flex-col gap-4 rounded-(--radius-card) border px-6 py-8">
@@ -206,6 +217,18 @@ export async function OpportunityDetail({
                   {description}
                 </p>
               </section>
+            ) : null}
+
+            {opportunity.location.lat != null && opportunity.location.lng != null ? (
+              <SeccionUbicacion
+                titulo={dict.opportunity.location}
+                etiqueta={etiquetaUbicacion}
+                lat={opportunity.location.lat}
+                lng={opportunity.location.lng}
+                media={opportunity.media}
+                tituloFicha={localized(opportunity.title, locale)}
+                url={enlaceFicha}
+              />
             ) : null}
 
             {attributes.length > 0 ? (
@@ -275,21 +298,7 @@ export async function OpportunityDetail({
                 <div className="flex justify-between gap-4">
                   <dt className="text-fg-muted/70">{dict.opportunity.location}</dt>
                   <dd className="text-right">
-                    {/*
-                      Con coordenadas, la ubicación abre el mapa; sin ellas se
-                      queda como texto. Las fichas de la semilla no las traen, y
-                      un botón que no abre nada es peor que no tenerlo.
-                    */}
-                    {opportunity.location.lat != null && opportunity.location.lng != null ? (
-                      <LocationMap
-                        lat={opportunity.location.lat}
-                        lng={opportunity.location.lng}
-                        etiqueta={formatLocation(opportunity.location, locale, { detail: "full" })}
-                        cerrar={locale === "es" ? "Cerrar" : "Close"}
-                      />
-                    ) : (
-                      formatLocation(opportunity.location, locale, { detail: "full" })
-                    )}
+                    {formatLocation(opportunity.location, locale, { detail: "full" })}
                   </dd>
                 </div>
                 {opportunity.availability ? (

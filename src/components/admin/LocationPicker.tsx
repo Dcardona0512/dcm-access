@@ -3,6 +3,8 @@
 import "leaflet/dist/leaflet.css";
 
 import type { DivIcon, Map as LeafletMap, Marker } from "leaflet";
+
+import { PIN_ANCHOR, PIN_HTML, PIN_SIZE } from "@/components/ui/mapPin";
 import { useEffect, useRef, useState } from "react";
 
 /* ============================================================================
@@ -15,8 +17,9 @@ import { useEffect, useRef, useState } from "react";
    Leaflet toca `window` al importarse, así que se carga con `import()` dentro
    de un efecto. Importarlo arriba rompería el renderizado en servidor.
 
-   El punto exacto se guarda, pero la ficha pública solo muestra la ciudad. La
-   dirección de un vehículo o una vivienda no es información de catálogo.
+   El punto que se marque aquí SÍ se publica: la ficha lo enseña en su propio
+   mapa, con este mismo pin. Marcar la puerta de la casa es decirle a cualquiera
+   dónde está el activo.
    ========================================================================== */
 
 const MEDELLIN: [number, number] = [6.2442, -75.5812];
@@ -113,26 +116,15 @@ export function LocationPicker({
         el empaquetador no resuelve, y salen marcadores rotos. Un `divIcon` es
         HTML propio: sin archivos que perder.
 
-        Forma de marcador y en rojo, no el punto dorado de antes.
-
-        Sobre un mapa claro un círculo pequeño se confunde con los iconos del
-        propio OpenStreetMap —farmacias, gasolineras, cajeros— y el dorado de
-        la marca es justo el color que peor se despega de sus carreteras
-        amarillas. Un marcador rojo se lee al instante y en cualquier parte.
-
-        El ancla va en la PUNTA (14, 36), no en el centro: la punta es la que
-        señala la coordenada. Anclarlo al medio dejaría el punto real medio
-        marcador por debajo de donde se ve.
+        El pin vive en un módulo aparte porque lo comparte con el mapa de la
+        ficha: lo que se coloca aquí al publicar es exactamente lo que ve quien
+        mira después.
       */
       const pin = L.divIcon({
         className: "",
-        html:
-          '<svg viewBox="0 0 28 36" width="28" height="36" xmlns="http://www.w3.org/2000/svg">' +
-          '<path d="M14 0C6.3 0 0 6.3 0 14c0 10.5 14 22 14 22s14-11.5 14-22C28 6.3 21.7 0 14 0Z" fill="#e5484d"/>' +
-          '<circle cx="14" cy="13.5" r="5" fill="#ffffff"/>' +
-          "</svg>",
-        iconSize: [28, 36],
-        iconAnchor: [14, 36],
+        html: PIN_HTML,
+        iconSize: PIN_SIZE,
+        iconAnchor: PIN_ANCHOR,
       });
 
       icon.current = pin;
