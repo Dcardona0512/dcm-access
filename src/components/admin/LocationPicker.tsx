@@ -2,7 +2,7 @@
 
 import "leaflet/dist/leaflet.css";
 
-import type { Map as LeafletMap, Marker } from "leaflet";
+import type { DivIcon, Map as LeafletMap, Marker } from "leaflet";
 import { useEffect, useRef, useState } from "react";
 
 /* ============================================================================
@@ -50,15 +50,33 @@ async function lookupCity(lat: number, lng: number): Promise<string | undefined>
 
 export function LocationPicker({
   center,
+  marca,
   onChange,
 }: {
   /** Ciudad elegida arriba. El mapa la sigue en vez de obligar a buscarla. */
   readonly center?: { readonly lat: number; readonly lng: number } | null;
+  /**
+   * Punto que viene de buscar una dirección. Distinto de `center` a propósito:
+   * una ciudad se mira desde arriba y no lleva pin —no es un punto, es un
+   * área—, mientras que una dirección SÍ es un punto y hay que marcarlo.
+   */
+  readonly marca?: { readonly lat: number; readonly lng: number } | null;
   readonly onChange: (point: PickedPoint) => void;
 }) {
   const container = useRef<HTMLDivElement>(null);
   const map = useRef<LeafletMap | null>(null);
   const marker = useRef<Marker | null>(null);
+
+  /**
+   * El módulo y el icono se guardan al montar.
+   *
+   * Antes el pin se creaba DENTRO del manejador del clic, así que solo existía
+   * si alguien hacía clic: al elegir una dirección el mapa volaba hasta ella y
+   * no marcaba nada. Guardarlos aquí permite colocar el pin desde cualquier
+   * sitio, venga de un clic o de una búsqueda.
+   */
+  const leaflet = useRef<typeof import("leaflet") | null>(null);
+  const icon = useRef<DivIcon | null>(null);
 
   /**
    * El mapa se monta una sola vez, así que el efecto capturaría el `onChange`
@@ -93,12 +111,16 @@ export function LocationPicker({
        * el empaquetador no resuelve, y salen marcadores rotos. Un `divIcon` es
        * HTML propio: sin assets que perder y con el color de la marca.
        */
+      leaflet.current = L;
+
       const pin = L.divIcon({
         className: "",
         html: '<span style="display:block;width:14px;height:14px;border-radius:999px;background:#c9a96a;box-shadow:0 0 0 4px rgba(201,169,106,.3)"></span>',
         iconSize: [14, 14],
         iconAnchor: [7, 7],
       });
+
+      icon.current = pin;
 
       instance.on("click", (event) => {
         const { lat, lng } = event.latlng;
@@ -126,11 +148,32 @@ export function LocationPicker({
   }, []);
 
   // Al elegir ciudad arriba, el mapa vuela hasta ella. Sin esto habría que
-  // arrastrar el mundo entero desde Medellín cada vez.
+  // arrastrar el mundo entero desde Medellín cada vez. Zoom de ciudad: se
+  // quiere ver el municipio entero, no una esquina.
   useEffect(() => {
     if (!center || !map.current) return;
     map.current.setView([center.lat, center.lng], 12);
   }, [center]);
+
+  /**
+   * Al elegir una dirección, el pin se coloca solo.
+   *
+   * Y con zoom de calle, no de ciudad: a zoom 12 el punto exacto es un píxel
+   * perdido en el municipio, imposible de afinar arrastrando. A 17 se ven las
+   * manzanas, que es donde se corrige lo que la búsqueda no supo precisar.
+   */
+  useEffect(() => {
+    const L = leaflet.current;
+    if (!marca || !map.current || !L || !icon.current) return;
+
+    const posicion: [number, number] = [marca.lat, marca.lng];
+
+    if (marker.current) marker.current.setLatLng(posicion);
+    else marker.current = L.marker(posicion, { icon: icon.current }).addTo(map.current);
+
+    map.current.setView(posicion, 17);
+    setPoint({ lat: marca.lat, lng: marca.lng });
+  }, [marca]);
 
   return (
     <div className="flex flex-col gap-2">

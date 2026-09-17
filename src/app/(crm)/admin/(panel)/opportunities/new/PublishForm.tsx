@@ -561,9 +561,9 @@ export function PublishForm({
           />
 
           <LocationPicker
-            // Manda lo último que se decidió: la dirección buscada si la hay,
-            // y si no, la ciudad elegida en los desplegables de arriba.
-            center={buscado ?? (place.lat && place.lng ? { lat: place.lat, lng: place.lng } : null)}
+            // La ciudad centra la vista; la dirección buscada, además, marca.
+            center={place.lat && place.lng ? { lat: place.lat, lng: place.lng } : null}
+            marca={buscado}
             onChange={(picked) => setPoint({ lat: picked.lat, lng: picked.lng })}
           />
         </div>
