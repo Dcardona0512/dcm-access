@@ -42,7 +42,7 @@ export const en: Dictionary = {
   common: {
     explore: "Explore",
     viewOpportunity: "View opportunity",
-    requestDetails: "Request details",
+    contactCta: "Contact",
     whatsappInquiry: "Hello, I'm interested in this listing: {title} (reference {ref}).",
     contactBroker: "Contact broker",
     privateRequest: "Private request",

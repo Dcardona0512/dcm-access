@@ -96,7 +96,8 @@ export type Dictionary = {
   readonly common: {
     readonly explore: string;
     readonly viewOpportunity: string;
-    readonly requestDetails: string;
+    /** Texto del único botón dorado de la ficha. */
+    readonly contactCta: string;
     /**
      * Mensaje con el que se abre WhatsApp desde una ficha. `{title}` y `{ref}`
      * se sustituyen; el enlace se añade aparte, porque la URL depende del
