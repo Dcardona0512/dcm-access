@@ -136,32 +136,53 @@ async function uniqueSlug(base: string, taken: ReadonlySet<string>): Promise<str
   return `${base}-${n}`;
 }
 
-export async function publishListing(
-  _previous: PublishState,
-  formData: FormData,
-): Promise<PublishState> {
-  try {
-    await requireAdmin();
-  } catch {
-    return { status: "error", message: "Sesión caducada. Vuelva a entrar." };
-  }
+/* --- Leer el formulario ----------------------------------------------------
+   Publicar y editar reciben EXACTAMENTE los mismos campos, así que los leen
+   con el mismo código. Tener dos copias sería garantizar que un día el tope
+   de etiquetas, el redondeo del precio o la lista de atributos se arreglen en
+   una y no en la otra, y que nadie lo note hasta ver una ficha rara.
 
+   Devuelve lo leído, o el primer motivo por el que no se puede seguir.
+   ------------------------------------------------------------------------ */
+
+type Leido = {
+  readonly listingId: string;
+  readonly verticalRaw: string;
+  readonly categoryId: string;
+  readonly titleEs: string;
+  readonly description: string;
+  readonly summary: string;
+  readonly city: string;
+  readonly region: string;
+  readonly country: string;
+  readonly priceAmount: number;
+  readonly currency: Currency;
+  readonly listingType: ListingType;
+  readonly pricePeriod: "month" | null;
+  readonly attributes: Record<string, AttributeValue>;
+  readonly lat: number | null;
+  readonly lng: number | null;
+  readonly sku: string;
+  readonly manifest: string[];
+};
+
+function leerFormulario(formData: FormData): Leido | { readonly error: string } {
   const listingId = text(formData, "listingId");
   const verticalRaw = text(formData, "vertical");
   const categoryId = text(formData, "categoryId");
 
   if (!listingId || !isVertical(verticalRaw)) {
-    return { status: "error", message: "Sección no válida." };
+    return { error: "Sección no válida." };
   }
 
   const category = categoriesById.get(categoryId);
   if (!category || category.vertical !== verticalRaw) {
-    return { status: "error", message: "La categoría no corresponde a la sección elegida." };
+    return { error: "La categoría no corresponde a la sección elegida." };
   }
 
   const titleEs = text(formData, "title");
   if (titleEs.length < 3) {
-    return { status: "error", message: "El título es obligatorio." };
+    return { error: "El título es obligatorio." };
   }
 
   // Se normaliza al guardar para que en la base no convivan dos formas del
@@ -176,7 +197,7 @@ export async function publishListing(
   // publica aquí sabe lo que pide, y una ficha sin precio no es una oferta.
   const priceAmount = amount(text(formData, "priceAmount"));
   if (priceAmount === undefined) {
-    return { status: "error", message: "Indique el precio." };
+    return { error: "Indique el precio." };
   }
 
   const currencyRaw = text(formData, "currency");
@@ -265,6 +286,180 @@ export async function publishListing(
   } catch {
     declared = [];
   }
+
+  return {
+    listingId,
+    verticalRaw,
+    categoryId,
+    titleEs,
+    description,
+    summary,
+    city,
+    region,
+    country,
+    priceAmount,
+    currency,
+    listingType,
+    pricePeriod,
+    attributes,
+    lat,
+    lng,
+    sku,
+    manifest: declared,
+  };
+}
+
+/* --- Paso 3: editar una ficha ya publicada --------------------------------- */
+
+/**
+ * Guardar cambios NO es volver a publicar, y tres campos lo demuestran.
+ *
+ * El `slug` se queda como está aunque cambie el título: es la URL, y cambiarla
+ * rompe todo enlace que alguien haya mandado por WhatsApp. La `reference` es
+ * la que el cliente cantó por teléfono. Y `published_at` es cuándo salió al
+ * mercado, no cuándo se corrigió una falta de ortografía.
+ *
+ * Los medios se reescriben enteros con lo que traiga el formulario: es la
+ * única forma de que quitar una foto la quite de verdad, y mantiene el orden
+ * que se ve en pantalla.
+ */
+export async function updateListing(
+  _previous: PublishState,
+  formData: FormData,
+): Promise<PublishState> {
+  try {
+    await requireAdmin();
+  } catch {
+    return { status: "error", message: "Sesión caducada. Vuelva a entrar." };
+  }
+
+  const datos = leerFormulario(formData);
+  if ("error" in datos) return { status: "error", message: datos.error };
+
+  const listingId = text(formData, "listingId");
+  if (!listingId) return { status: "error", message: "Falta la ficha que se edita." };
+
+  try {
+    const client = createAdminClient();
+
+    // Se relee la ficha en lugar de fiarse de lo que mande el formulario: el
+    // slug y la vertical deciden qué páginas hay que refrescar, y llegan del
+    // navegador, donde se pueden cambiar.
+    const { data: actual, error: errorLectura } = await client
+      .from("opportunities")
+      .select("slug, vertical, is_demo")
+      .eq("id", listingId)
+      .maybeSingle();
+
+    if (errorLectura) throw new Error(errorLectura.message);
+    if (!actual) return { status: "error", message: "Esa ficha ya no existe." };
+    if (actual.is_demo) {
+      return { status: "error", message: "Las fichas de demostración no se editan." };
+    }
+
+    const media = await verifyUploads(listingId, datos.manifest);
+
+    const { error: errorUpdate } = await client
+      .from("opportunities")
+      .update({
+        category_id: datos.categoryId,
+        title: { es: datos.titleEs, en: datos.titleEs },
+        summary: datos.summary ? { es: datos.summary, en: datos.summary } : {},
+        description: datos.description
+          ? { es: datos.description, en: datos.description }
+          : null,
+        listing_type: datos.listingType,
+        price_mode: "fixed",
+        price_amount: datos.priceAmount,
+        price_period: datos.pricePeriod,
+        price_currency: datos.currency,
+        country: datos.country,
+        region: datos.region || null,
+        city: datos.city || null,
+        city_slug: datos.city ? slugify(datos.city).replace(/-/g, " ").trim() : null,
+        lat: datos.lat,
+        lng: datos.lng,
+        sku: datos.sku || null,
+        attributes: datos.attributes,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", listingId);
+
+    if (errorUpdate) throw new Error(errorUpdate.message);
+
+    // Fuera los medios viejos y dentro los actuales, en su orden. Borrar
+    // primero es lo que hace que quitar una foto tenga efecto.
+    const { error: errorBorrado } = await client
+      .from("opportunity_media")
+      .delete()
+      .eq("opportunity_id", listingId);
+    if (errorBorrado) throw new Error(errorBorrado.message);
+
+    if (media.length > 0) {
+      const rows = media.map((item, index) => ({
+        opportunity_id: listingId,
+        position: index,
+        kind: item.mimeType.startsWith("video/") ? "video" : "image",
+        bucket: "listing-media",
+        path: item.path,
+        alt: datos.titleEs,
+        mime_type: item.mimeType,
+        bytes: item.bytes,
+      }));
+
+      const { error: errorMedia } = await client.from("opportunity_media").insert(rows);
+      if (errorMedia) throw new Error(errorMedia.message);
+    }
+
+    revalidatePath("/admin/opportunities");
+    revalidatePath("/admin/catalogo");
+    for (const locale of locales) {
+      revalidatePath(`/${locale}/${actual.vertical}`);
+      revalidatePath(`/${locale}/${actual.vertical}/${actual.slug}`);
+    }
+
+    return { status: "success", slug: actual.slug, vertical: actual.vertical };
+  } catch (error) {
+    return {
+      status: "error",
+      message: error instanceof Error ? error.message : "No se pudo guardar.",
+    };
+  }
+}
+
+export async function publishListing(
+  _previous: PublishState,
+  formData: FormData,
+): Promise<PublishState> {
+  try {
+    await requireAdmin();
+  } catch {
+    return { status: "error", message: "Sesión caducada. Vuelva a entrar." };
+  }
+
+  const datos = leerFormulario(formData);
+  if ("error" in datos) return { status: "error", message: datos.error };
+
+  const {
+    listingId,
+    verticalRaw,
+    titleEs,
+    description,
+    summary,
+    city,
+    region,
+    country,
+    priceAmount,
+    currency,
+    listingType,
+    pricePeriod,
+    attributes,
+    lat,
+    lng,
+    sku,
+    categoryId,
+    manifest: declared,
+  } = datos;
 
   try {
     const repo = createAdminOpportunities();

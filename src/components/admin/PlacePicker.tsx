@@ -58,16 +58,31 @@ const INITIAL_COUNTRY = "CO";
 
 export function PlacePicker({
   countries,
+  inicial,
   onChange,
 }: {
   readonly countries: readonly Named[];
+  /**
+   * Lo que ya tiene la ficha al abrirla para editar.
+   *
+   * La región llega por NOMBRE y no por código, porque es lo que se guarda en
+   * la base: al cargar las divisiones del país hay que buscar cuál se llama
+   * así para poder preseleccionarla.
+   */
+  readonly inicial?: {
+    readonly country?: string;
+    readonly region?: string;
+    readonly city?: string;
+  };
   readonly onChange: (place: Place) => void;
 }) {
-  const [country, setCountry] = useState(INITIAL_COUNTRY);
+  const paisInicial = inicial?.country || INITIAL_COUNTRY;
+
+  const [country, setCountry] = useState(paisInicial);
   const [states, setStates] = useState<readonly Named[]>([]);
   const [state, setState] = useState("");
   const [cities, setCities] = useState<readonly Town[]>([]);
-  const [city, setCity] = useState("");
+  const [city, setCity] = useState(inicial?.city ?? "");
   const [loading, setLoading] = useState(false);
 
   const stateName = states.find((entry) => entry.code === state)?.name;
@@ -77,17 +92,38 @@ export function PlacePicker({
   useEffect(() => {
     let cancelled = false;
 
-    void getStates(INITIAL_COUNTRY).then((data) => {
+    void (async () => {
+      const divisiones = await getStates(paisInicial);
       if (cancelled) return;
-      setStates(data);
-      if (data.length === 0) {
-        void getCities(INITIAL_COUNTRY, "").then((towns) => !cancelled && setCities(towns));
+      setStates(divisiones);
+
+      /*
+        Al editar hay que rehacer la cascada entera, no solo pintar el país: el
+        departamento guardado se busca por su nombre para recuperar su código, y
+        con ese código se cargan sus ciudades. Sin esto, abrir una ficha de
+        Palmira mostraría «Elija uno» y obligaría a volver a seleccionar lo que
+        ya estaba bien.
+      */
+      const guardada = inicial?.region
+        ? divisiones.find((division) => division.name === inicial.region)
+        : undefined;
+
+      if (guardada) {
+        setState(guardada.code);
+        const pueblos = await getCities(paisInicial, guardada.code);
+        if (!cancelled) setCities(pueblos);
+      } else if (divisiones.length === 0) {
+        const pueblos = await getCities(paisInicial, "");
+        if (!cancelled) setCities(pueblos);
       }
-    });
+    })();
 
     return () => {
       cancelled = true;
     };
+    // Solo al montar: a partir de ahí manda lo que elija quien edita, no lo
+    // que estaba guardado.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function pickCountry(iso: string) {

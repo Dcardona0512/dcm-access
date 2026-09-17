@@ -152,3 +152,51 @@ export async function cambiarEstado(id: string, status: OpportunityStatus): Prom
 
   if (error) throw new Error(`Supabase (cambiarEstado): ${error.message}`);
 }
+
+export type FichaEditable = {
+  readonly ficha: Opportunity;
+  /**
+   * Las rutas de almacenamiento de cada archivo, en orden.
+   *
+   * Hacen falta aparte porque `Opportunity` guarda la URL pública y no la
+   * ruta, y para volver a escribir los medios el servidor necesita la ruta.
+   * Derivarla recortando la URL funcionaría hoy y se rompería el día que
+   * cambie el dominio del almacenamiento.
+   */
+  readonly rutas: readonly string[];
+};
+
+/**
+ * Una ficha propia para editarla.
+ *
+ * Solo lo que no es de demostración: la semilla son ejemplos y dejarla
+ * editable invitaría a «arreglar» datos que se regeneran solos.
+ */
+export async function fichaParaEditar(id: string): Promise<FichaEditable | null> {
+  if (!isSupabaseWritable()) return null;
+
+  const { data, error } = await createAdminClient()
+    .from("opportunities")
+    .select("*, opportunity_media(*)")
+    .eq("id", id)
+    .eq("is_demo", false)
+    .maybeSingle();
+
+  if (error) throw new Error(`Supabase (fichaParaEditar): ${error.message}`);
+  if (!data) return null;
+
+  const fila = data as RowWithMedia;
+  const medios = [...(fila.opportunity_media ?? [])].sort(
+    (a, b) => (a.position ?? 0) - (b.position ?? 0),
+  );
+
+  return {
+    ficha: rowToOpportunity(
+      fila,
+      medios,
+      (bucket, path) =>
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`,
+    ),
+    rutas: medios.map((medio) => medio.path),
+  };
+}

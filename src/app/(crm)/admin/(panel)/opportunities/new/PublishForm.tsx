@@ -10,7 +10,12 @@ import { PlacePicker, type Place } from "@/components/admin/PlacePicker";
 import { TagsInput } from "@/components/admin/TagsInput";
 import { createBrowserClient } from "@/lib/supabase/browser";
 
-import { publishListing, requestUploadSlots, type PublishState } from "./actions";
+import {
+  publishListing,
+  requestUploadSlots,
+  updateListing,
+  type PublishState,
+} from "./actions";
 
 /* ============================================================================
    PUBLICAR UNA FICHA
@@ -47,6 +52,31 @@ type FileState = {
 
 const MAX_FILES = 20;
 
+/**
+ * Lo que ya tiene una ficha cuando se abre para editarla.
+ *
+ * Los medios llegan con su ruta de almacenamiento Y su URL: la ruta es lo que
+ * se vuelve a guardar y la URL es lo que se pinta. Sin la ruta no se podría
+ * conservar una foto que ya estaba; sin la URL no se vería.
+ */
+export type ValoresIniciales = {
+  readonly categoryId: string;
+  readonly title: string;
+  readonly description: string;
+  readonly listingType: string;
+  readonly priceAmount: number | null;
+  readonly currency: string;
+  readonly country: string;
+  readonly region: string;
+  readonly city: string;
+  readonly lat: number | null;
+  readonly lng: number | null;
+  readonly sku: string;
+  readonly tags: readonly string[];
+  readonly attributes: Readonly<Record<string, unknown>>;
+  readonly media: readonly { readonly path: string; readonly src: string; readonly kind: string }[];
+};
+
 const initial: PublishState = { status: "idle" };
 
 export function PublishForm({
@@ -55,6 +85,7 @@ export function PublishForm({
   categories,
   currencies,
   countries,
+  inicial,
 }: {
   /**
    * Se acuña en el SERVIDOR y llega como prop: es la carpeta del
@@ -68,17 +99,74 @@ export function PublishForm({
   readonly categories: readonly CategoryOption[];
   readonly currencies: readonly string[];
   readonly countries: readonly { readonly code: string; readonly name: string }[];
+  /**
+   * Presente solo al editar. Su ausencia es lo que distingue los dos modos:
+   * un `modo` aparte podría contradecir a los valores, y dos fuentes para la
+   * misma verdad siempre acaban discrepando.
+   */
+  readonly inicial?: ValoresIniciales;
 }) {
-  const [state, action] = useActionState(publishListing, initial);
+  const editando = inicial !== undefined;
+
+  /**
+   * El valor guardado de un atributo, como cadena para los `defaultValue`.
+   *
+   * Los booleanos se guardan como `true`/`false` y el desplegable usa esas
+   * mismas palabras, así que `String()` basta. Las listas no pasan por aquí:
+   * tienen su propio ayudante porque marcan casillas, no rellenan un campo.
+   */
+  function valorInicial(clave: string): string {
+    const valor = inicial?.attributes?.[clave];
+    if (valor == null || Array.isArray(valor)) return "";
+    return String(valor);
+  }
+
+  function marcadoInicial(clave: string, opcion: string): boolean {
+    const valor = inicial?.attributes?.[clave];
+    return Array.isArray(valor) && valor.includes(opcion);
+  }
+  const [state, action] = useActionState(editando ? updateListing : publishListing, initial);
 
   const [vertical] = useState(initialVertical);
-  const [categoryId, setCategoryId] = useState("");
-  const [place, setPlace] = useState<Place>({ country: "CO" });
-  const [point, setPoint] = useState<{ lat: number; lng: number } | null>(null);
+  const [categoryId, setCategoryId] = useState(inicial?.categoryId ?? "");
+  const [place, setPlace] = useState<Place>(
+    inicial
+      ? {
+          country: inicial.country,
+          region: inicial.region || undefined,
+          city: inicial.city || undefined,
+          lat: inicial.lat ?? undefined,
+          lng: inicial.lng ?? undefined,
+        }
+      : { country: "CO" },
+  );
+  const [point, setPoint] = useState<{ lat: number; lng: number } | null>(
+    inicial?.lat != null && inicial?.lng != null ? { lat: inicial.lat, lng: inicial.lng } : null,
+  );
   /** Lo que devolvió la búsqueda de dirección; manda sobre la ciudad. */
   const [buscado, setBuscado] = useState<{ lat: number; lng: number } | null>(null);
-  const [tags, setTags] = useState<readonly string[]>([]);
-  const [files, setFiles] = useState<FileState[]>([]);
+  const [tags, setTags] = useState<readonly string[]>(inicial?.tags ?? []);
+  const [files, setFiles] = useState<FileState[]>(
+    /*
+      Los medios que ya tiene la ficha entran como archivos «listos». Así el
+      manifiesto que se envía —`ready.map(f => f.path)`— incluye lo que se
+      conserva y lo que se acaba de subir, sin tratarlos aparte, y quitar uno
+      es la misma operación en los dos casos.
+
+      `file` va vacío porque no hay archivo local que subir: ya está en el
+      almacenamiento.
+    */
+    () =>
+      (inicial?.media ?? []).map((medio) => ({
+        id: medio.path,
+        file: new File([], medio.path.split("/").pop() ?? "archivo", {
+          type: medio.kind === "video" ? "video/mp4" : "image/jpeg",
+        }),
+        preview: medio.src,
+        status: "listo" as const,
+        path: medio.path,
+      })),
+  );
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [touched, setTouched] = useState(false);
@@ -105,8 +193,10 @@ export function PublishForm({
         role="status"
         className="border-accent/30 bg-accent/[0.04] flex flex-col items-start gap-4 rounded-(--radius-card) border px-6 py-10"
       >
-        <h2 className="font-display text-xl">Publicada</h2>
-        <p className="text-fg-muted text-sm">La ficha ya está visible en el sitio.</p>
+        <h2 className="font-display text-xl">{editando ? "Cambios guardados" : "Publicada"}</h2>
+        <p className="text-fg-muted text-sm">
+          {editando ? "La ficha ya muestra los cambios." : "La ficha ya está visible en el sitio."}
+        </p>
         <div className="flex flex-wrap gap-3">
           <Link
             href={`/es/${state.vertical}/${state.slug}`}
@@ -116,10 +206,10 @@ export function PublishForm({
             Ver la ficha
           </Link>
           <Link
-            href="/admin/opportunities/new"
+            href={editando ? "/admin/catalogo" : "/admin/opportunities/new"}
             className="eyebrow border-line text-fg-muted hover:text-fg rounded-(--radius-card) border px-3 py-2 text-[0.75rem] transition-colors"
           >
-            Publicar otra
+            {editando ? "Volver al catálogo" : "Publicar otra"}
           </Link>
         </div>
       </div>
@@ -344,7 +434,13 @@ export function PublishForm({
       {/* 1. Título · 2. Precio ------------------------------------------------ */}
       <Group title="Qué es y cuánto cuesta">
         <Field label="Título" full>
-          <input name="title" required minLength={3} className={control} />
+          <input
+            name="title"
+            required
+            minLength={3}
+            defaultValue={inicial?.title ?? ""}
+            className={control}
+          />
         </Field>
 
         {/*
@@ -375,7 +471,7 @@ export function PublishForm({
           <Field label="Operación">
             <select
               name="listingType"
-              defaultValue="sale"
+              defaultValue={inicial?.listingType ?? "sale"}
               className={`${controlBase} h-12 w-full text-base`}
             >
               <option value="sale" className="bg-surface-raised">
@@ -403,6 +499,7 @@ export function PublishForm({
               inputMode="numeric"
               required
               placeholder="0"
+              defaultValue={inicial?.priceAmount ?? ""}
               // `min-w-0` en el contenedor deja que el campo se encoja de
               // verdad en pantallas estrechas: sin él, el ancho mínimo del
               // contenido lo desborda.
@@ -417,7 +514,7 @@ export function PublishForm({
                 Las demás siguen ahí para lo que se publica fuera. */}
             <select
               name="currency"
-              defaultValue="COP"
+              defaultValue={inicial?.currency ?? "COP"}
               className={`${controlBase} h-12 w-full text-base`}
             >
               {currencies.map((c) => (
@@ -474,6 +571,7 @@ export function PublishForm({
                         type="checkbox"
                         name={`attr_${attr.key}`}
                         value={o.value}
+                        defaultChecked={marcadoInicial(attr.key, o.value)}
                         className="accent-accent h-4 w-4 shrink-0"
                       />
                       <span className="text-fg-muted text-pretty">{o.label}</span>
@@ -493,7 +591,11 @@ export function PublishForm({
                   casilla solo sabe decir sí o no, y su «no» se confunde con no
                   haberla tocado.
                 */
-                <select name={`attr_${attr.key}`} defaultValue="" className={control}>
+                <select
+                  name={`attr_${attr.key}`}
+                  defaultValue={valorInicial(attr.key)}
+                  className={control}
+                >
                   <option value="" className="bg-surface-raised">
                     —
                   </option>
@@ -505,7 +607,11 @@ export function PublishForm({
                   </option>
                 </select>
               ) : attr.options && attr.options.length > 0 ? (
-                <select name={`attr_${attr.key}`} defaultValue="" className={control}>
+                <select
+                  name={`attr_${attr.key}`}
+                  defaultValue={valorInicial(attr.key)}
+                  className={control}
+                >
                   <option value="" className="bg-surface-raised">
                     —
                   </option>
@@ -520,6 +626,7 @@ export function PublishForm({
                   name={`attr_${attr.key}`}
                   type={attr.type === "number" ? "number" : "text"}
                   inputMode={attr.type === "number" ? "numeric" : undefined}
+                  defaultValue={valorInicial(attr.key)}
                   className={control}
                 />
               )}
@@ -531,7 +638,12 @@ export function PublishForm({
       {/* 5. Descripción -------------------------------------------------------- */}
       <Group title="Descripción" wide>
         <Field label="Descripción (opcional)" full>
-          <textarea name="description" rows={5} className={`${control} h-auto py-3`} />
+          <textarea
+            name="description"
+            rows={5}
+            defaultValue={inicial?.description ?? ""}
+            className={`${control} h-auto py-3`}
+          />
         </Field>
       </Group>
 
@@ -541,7 +653,15 @@ export function PublishForm({
           mapa afina la posición exacta, se guarda para uso interno y no se
           muestra en ninguna página pública. */}
       <Group title="Ubicación">
-        <PlacePicker countries={countries} onChange={setPlace} />
+        <PlacePicker
+            countries={countries}
+            inicial={
+              inicial
+                ? { country: inicial.country, region: inicial.region, city: inicial.city }
+                : undefined
+            }
+            onChange={setPlace}
+          />
       </Group>
 
       <Group title="Punto exacto en el mapa" wide>
@@ -572,11 +692,11 @@ export function PublishForm({
       {/* 7. Etiquetas · 8. SKU -------------------------------------------------- */}
       <Group title="Etiquetas y referencia interna" wide>
         <Field label="Etiquetas (opcional, máximo 20)" full>
-          <TagsInput onChange={setTags} />
+          <TagsInput inicial={inicial?.tags} onChange={setTags} />
         </Field>
 
         <Field label="SKU (opcional)" full>
-          <input name="sku" className={control} />
+          <input name="sku" defaultValue={inicial?.sku ?? ""} className={control} />
           <span className="text-fg-muted/60 text-xs">
             Su referencia interna. Solo visible para usted: no se muestra en ninguna página
             pública.
@@ -604,6 +724,7 @@ export function PublishForm({
       <Submit
         disabled={uploading || pending || ready.length === 0}
         pendingUploads={pending}
+        editando={editando}
         onAttempt={() => setTouched(true)}
       />
     </form>
@@ -665,10 +786,12 @@ function Field({
 function Submit({
   disabled,
   pendingUploads,
+  editando,
   onAttempt,
 }: {
   readonly disabled: boolean;
   readonly pendingUploads: boolean;
+  readonly editando: boolean;
   readonly onAttempt: () => void;
 }) {
   const { pending } = useFormStatus();
@@ -682,7 +805,7 @@ function Submit({
         disabled={blocked}
         className="eyebrow bg-fg text-surface h-12 rounded-(--radius-card) px-8 transition-opacity hover:opacity-90 disabled:pointer-events-none disabled:opacity-40"
       >
-        {pending ? "Publicando…" : "Publicar"}
+        {pending ? (editando ? "Guardando…" : "Publicando…") : editando ? "Guardar cambios" : "Publicar"}
       </button>
       {pendingUploads ? (
         <span className="text-fg-muted/70 text-xs">Espere a que terminen de subir los archivos.</span>

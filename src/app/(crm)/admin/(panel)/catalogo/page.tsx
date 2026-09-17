@@ -151,17 +151,26 @@ export default async function AdminCatalogoPage({
                     {formatDateShort(opportunity.publishedAt, "es")}
                   </span>
 
-                  <form action={vendida ? reabrir : marcarVendida} className="mt-1.5">
-                    <input type="hidden" name="id" value={opportunity.id} />
-                    <input type="hidden" name="vertical" value={opportunity.vertical} />
-                    <input type="hidden" name="slug" value={opportunity.slug} />
-                    <button
-                      type="submit"
-                      className="eyebrow border-line text-fg-muted hover:border-fg-muted/60 hover:text-fg rounded-(--radius-card) border px-2.5 py-1.5 text-[0.75rem] transition-colors"
+                  <div className="mt-1.5 flex flex-wrap gap-2">
+                    <Link
+                      href={`/admin/opportunities/${opportunity.id}/editar`}
+                      className="eyebrow border-accent/50 text-accent hover:bg-accent/10 rounded-(--radius-card) border px-2.5 py-1.5 text-[0.75rem] transition-colors"
                     >
-                      {vendida ? "Reabrir" : "Marcar vendida"}
-                    </button>
-                  </form>
+                      Editar
+                    </Link>
+
+                    <form action={vendida ? reabrir : marcarVendida}>
+                      <input type="hidden" name="id" value={opportunity.id} />
+                      <input type="hidden" name="vertical" value={opportunity.vertical} />
+                      <input type="hidden" name="slug" value={opportunity.slug} />
+                      <button
+                        type="submit"
+                        className="eyebrow border-line text-fg-muted hover:border-fg-muted/60 hover:text-fg rounded-(--radius-card) border px-2.5 py-1.5 text-[0.75rem] transition-colors"
+                      >
+                        {vendida ? "Reabrir" : "Marcar vendida"}
+                      </button>
+                    </form>
+                  </div>
                 </div>
               </li>
             );

@@ -12,12 +12,15 @@ import { useState } from "react";
  */
 export function TagsInput({
   max = 20,
+  inicial,
   onChange,
 }: {
   readonly max?: number;
+  /** Las que ya tiene la ficha cuando se abre para editar. */
+  readonly inicial?: readonly string[];
   readonly onChange: (tags: readonly string[]) => void;
 }) {
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>(() => [...(inicial ?? [])]);
   const [draft, setDraft] = useState("");
 
   function commit(raw: string) {

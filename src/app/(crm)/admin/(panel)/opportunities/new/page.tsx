@@ -31,7 +31,7 @@ export const dynamic = "force-dynamic";
  * `tags` además venía en el esquema de vehículos, así que pintaba una segunda
  * casilla de etiquetas junto a la de verdad. Este filtro también la quita.
  */
-const FORM_ATTRIBUTES: Partial<Record<string, readonly string[]>> = {
+export const FORM_ATTRIBUTES: Partial<Record<string, readonly string[]>> = {
   motors: ["condition"],
 };
 
