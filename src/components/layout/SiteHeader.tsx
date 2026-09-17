@@ -181,7 +181,9 @@ function NavAnchor({
       href={href}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "eyebrow rounded-(--radius-card) px-3 py-2.5 transition-colors duration-(--duration-fast)",
+        // `eyebrow` trae 12px y semi; aquí se sube el cuerpo y el peso porque
+        // es la navegación principal, no un rótulo de apoyo.
+        "eyebrow rounded-(--radius-card) px-3 py-2.5 text-[0.9rem] font-bold transition-colors duration-(--duration-fast)",
         active ? "text-fg" : "text-fg-muted hover:text-fg",
         className,
       )}

@@ -44,7 +44,7 @@ export function Logo({ variant = "full", className, descriptor }: LogoProps) {
 
   return (
     <span className={cn("flex items-center gap-3 text-current", className)}>
-      <AccessMark className="h-7 w-7 shrink-0" />
+      <AccessMark className="h-9 w-9 shrink-0" />
       <span className="flex flex-col gap-1">
         <Wordmark />
         {descriptor ? <Descriptor text={descriptor} /> : null}
@@ -80,7 +80,12 @@ function Wordmark() {
   return (
     <span
       aria-hidden="true"
-      className="text-[0.9375rem] leading-none font-medium tracking-[0.22em] whitespace-nowrap uppercase"
+      /*
+        Más cuerpo y en negrita. El tracking baja de 0.22em a 0.16em: a este
+        tamaño la misma separación desparramaba el lockup y lo sacaba de la
+        cabecera. Las versales necesitan menos aire cuanto más grandes son.
+      */
+      className="text-[1.25rem] leading-none font-bold tracking-[0.16em] whitespace-nowrap uppercase"
     >
       {brand.initials}
       <span className="mx-[0.44em] inline-block translate-y-[0.045em] align-baseline text-[0.76em] font-normal tracking-normal opacity-55">
