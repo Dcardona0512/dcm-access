@@ -11,16 +11,16 @@
    con nombre se distingue de un marcador cualquiera.
 
    Va en dorado de marca, y es una de las excepciones que la regla del acento
-   permite: no es un relleno grande, es un objeto de catorce píxeles de ancho
+   permite: no es un relleno grande, es un objeto de cuarenta y seis píxeles
    sobre un mapa claro, donde además es el color que mejor contrasta con el
-   verde y el gris de OpenStreetMap.
+   verde y el gris de OpenStreetMap. Las siglas van en tinta sobre el dorado,
+   no en blanco: el dorado es claro y el blanco encima se lee mal.
 
-   Las siglas van en tinta sobre el dorado, no en blanco: el dorado es claro y
-   el blanco encima se lee mal.
+   EL MARCADO VA EN UN SOLO LITERAL, sin trocearlo con `+`. La versión anterior
+   lo montaba por partes y una de ellas se perdió por el camino: el navegador
+   acabó con `<text` metido DENTRO del atributo `fill`, el pin salió negro y
+   las siglas no aparecieron. Una cadena de marcado es más segura de una pieza.
    ========================================================================== */
-
-const ORO = "#c9a96a";
-const TINTA = "#08090a";
 
 /**
  * El ancla va en la PUNTA, no en el centro.
@@ -32,13 +32,4 @@ const TINTA = "#08090a";
 export const PIN_SIZE: [number, number] = [46, 52];
 export const PIN_ANCHOR: [number, number] = [23, 52];
 
-export const PIN_HTML =
-  `<svg viewBox="0 0 46 52" width="46" height="52" xmlns="http://www.w3.org/2000/svg">` +
-  // Cuerpo y punta en un solo trazado: así el borde los rodea como una pieza
-  // y no se ve la costura entre el rectángulo y el triángulo.
-  `<path d="M8 0h30a8 8 0 0 1 8 8v20a8 8 0 0 1-8 8H29l-6 16-6-16H8a8 8 0 0 1-8-8V8a8 8 0 0 1 8-8Z" ` +
-  `fill="${ORO}" stroke="rgba(0,0,0,.28)" stroke-width="1"/>` +
-  `<text x="23" y="24" text-anchor="middle" fill="${TINTA}" ` +
-  `font-family="system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" ` +
-  `font-size="13" font-weight="700" letter-spacing="0.5">DCM</text>` +
-  `</svg>`;
+export const PIN_HTML = `<svg viewBox="0 0 46 52" width="46" height="52" xmlns="http://www.w3.org/2000/svg"><path d="M8 0h30a8 8 0 0 1 8 8v20a8 8 0 0 1-8 8H29l-6 16-6-16H8a8 8 0 0 1-8-8V8a8 8 0 0 1 8-8Z" fill="#c9a96a" stroke="rgba(0,0,0,0.28)" stroke-width="1"></path><text x="23" y="25" text-anchor="middle" fill="#08090a" font-family="system-ui, sans-serif" font-size="13" font-weight="700">DCM</text></svg>`;

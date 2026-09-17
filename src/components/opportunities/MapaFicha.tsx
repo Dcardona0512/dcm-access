@@ -57,6 +57,7 @@ export function MapaFicha({
 }) {
   const contenedor = useRef<HTMLDivElement>(null);
   const mapa = useRef<LeafletMap | null>(null);
+  const tamano = useRef<ResizeObserver | null>(null);
 
   useEffect(() => {
     const nodo = contenedor.current;
@@ -101,6 +102,23 @@ export function MapaFicha({
 
       L.marker([lat, lng], { icon: pin, keyboard: false }).addTo(instancia);
       mapa.current = instancia;
+
+      /*
+        Leaflet mide el contenedor al crearse y no vuelve a mirar. Dentro del
+        visor el mapa nace en una ventana que se acaba de abrir, cuyo alto
+        todavía se está resolviendo, así que se queda con una medida que no es
+        la definitiva: los mosaicos se piden para un recuadro equivocado y lo
+        que se ve es un gris uniforme con el pin en medio.
+
+        `invalidateSize` le dice que vuelva a medir. Se llama una vez en el
+        siguiente fotograma y luego cada vez que el contenedor cambie de
+        tamaño, que además cubre el giro del teléfono.
+      */
+      requestAnimationFrame(() => instancia.invalidateSize());
+
+      const observadorTamano = new ResizeObserver(() => instancia.invalidateSize());
+      observadorTamano.observe(nodo);
+      tamano.current = observadorTamano;
     }
 
     const observador = new IntersectionObserver(
@@ -119,6 +137,8 @@ export function MapaFicha({
     return () => {
       cancelado = true;
       observador.disconnect();
+      tamano.current?.disconnect();
+      tamano.current = null;
       mapa.current?.remove();
       mapa.current = null;
     };
