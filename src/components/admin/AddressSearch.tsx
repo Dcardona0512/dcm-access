@@ -99,7 +99,7 @@ export function AddressSearch({
             setTexto(evento.target.value);
             setElegido(null);
           }}
-          placeholder="Calle 13e #68-90, Cali"
+          placeholder="Dirección"
           className="border-line text-fg placeholder:text-fg-muted/40 focus-visible:border-accent h-11 w-full rounded-(--radius-card) border bg-transparent px-3 text-sm outline-none transition-colors"
         />
       </label>
