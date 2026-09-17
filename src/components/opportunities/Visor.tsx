@@ -113,8 +113,12 @@ export function Visor({
 
         Los topes en `vw` y `dvh` son para que en un portátil o un teléfono no
         se salga: manda lo que quepa.
+
+        `m-auto` no es decorativo: un `<dialog>` con alto y ancho propios se
+        queda pegado a la esquina superior izquierda si no se le dice que
+        reparta el margen sobrante.
       */
-      className="bg-surface text-fg h-[min(44rem,calc(100dvh-4rem))] w-[min(80rem,calc(100vw-3rem))] overflow-hidden rounded-(--radius-media) border-0 p-0 backdrop:bg-black/85"
+      className="bg-surface text-fg m-auto h-[min(44rem,calc(100dvh-4rem))] w-[min(80rem,calc(100vw-3rem))] overflow-hidden rounded-(--radius-media) border-0 p-0 backdrop:bg-black/85"
     >
       <div className="flex h-full flex-col">
         <header className="border-line-soft flex shrink-0 flex-wrap items-center gap-2 border-b px-4 py-3 sm:px-6">
