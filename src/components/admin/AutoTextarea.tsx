@@ -29,17 +29,26 @@ export function AutoTextarea({
 }) {
   const campo = useRef<HTMLTextAreaElement>(null);
 
-  /**
-   * `auto` antes de medir, y no es prescindible: `scrollHeight` nunca baja de
-   * la altura ya fijada, así que sin reiniciarla la caja crecería al escribir
-   * y jamás encogería al borrar.
-   */
   const ajustar = useCallback(() => {
     const el = campo.current;
     if (!el) return;
 
+    /*
+      `auto` antes de medir, y no es prescindible: `scrollHeight` nunca baja de
+      la altura ya fijada, así que sin reiniciarla la caja crecería al escribir
+      y jamás encogería al borrar.
+    */
     el.style.height = "auto";
-    el.style.height = `${el.scrollHeight}px`;
+
+    /*
+      Y hay que sumarle los bordes. `scrollHeight` mide el contenido, pero
+      `height` con `box-sizing: border-box` incluye los bordes, así que
+      igualarlos deja el contenido dos píxeles corto y recorta por abajo el
+      último renglón. Se ve poco y se ve mal, y no lo delata ninguna barra de
+      desplazamiento porque está oculta.
+    */
+    const bordes = el.offsetHeight - el.clientHeight;
+    el.style.height = `${el.scrollHeight + bordes}px`;
   }, []);
 
   // Al montar: es cuando llega el texto que ya tenía la ficha al editarla.
