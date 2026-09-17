@@ -40,6 +40,7 @@ export function MapaFicha({
   etiqueta,
   className,
   interactivo = true,
+  inmediato = false,
 }: {
   readonly lat: number;
   readonly lng: number;
@@ -54,6 +55,14 @@ export function MapaFicha({
    * donde de verdad se explora.
    */
   readonly interactivo?: boolean;
+  /**
+   * Monta el mapa sin esperar a que asome.
+   *
+   * Lo usa el visor: ahí el mapa es lo que se acaba de pedir pulsando su
+   * pestaña, así que esperar a que «entre en pantalla» no ahorra nada y añade
+   * un modo de fallo —si el observador no avisa, no aparece nada—.
+   */
+  readonly inmediato?: boolean;
 }) {
   const contenedor = useRef<HTMLDivElement>(null);
   const mapa = useRef<LeafletMap | null>(null);
@@ -121,6 +130,26 @@ export function MapaFicha({
       tamano.current = observadorTamano;
     }
 
+    /*
+      Si ya está a la vista, se monta y punto. No se espera a que un observador
+      confirme lo que una medida directa ya dice, y así el mapa aparece aunque
+      el navegador no llegue a entregar ese aviso nunca —ocurre cuando la
+      pestaña no se está pintando—.
+    */
+    const caja = nodo.getBoundingClientRect();
+    const cerca = caja.bottom > -400 && caja.top < window.innerHeight + 400;
+
+    if (inmediato || cerca) {
+      void montar();
+      return () => {
+        cancelado = true;
+        tamano.current?.disconnect();
+        tamano.current = null;
+        mapa.current?.remove();
+        mapa.current = null;
+      };
+    }
+
     const observador = new IntersectionObserver(
       ([entrada]) => {
         if (!entrada.isIntersecting) return;
@@ -142,7 +171,7 @@ export function MapaFicha({
       mapa.current?.remove();
       mapa.current = null;
     };
-  }, [lat, lng, interactivo]);
+  }, [lat, lng, interactivo, inmediato]);
 
   return (
     <div

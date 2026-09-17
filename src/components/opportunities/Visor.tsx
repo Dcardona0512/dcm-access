@@ -193,7 +193,13 @@ export function Visor({
 
           {abierta === "mapa" && hayMapa ? (
             <div className="h-full w-full p-2 sm:p-3">
-              <MapaFicha lat={lat!} lng={lng!} etiqueta={etiqueta} className="h-full min-h-80" />
+              <MapaFicha
+                lat={lat!}
+                lng={lng!}
+                etiqueta={etiqueta}
+                className="h-full min-h-80"
+                inmediato
+              />
             </div>
           ) : null}
         </div>
