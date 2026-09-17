@@ -112,10 +112,17 @@ export type Location = {
   readonly city?: string;
   readonly area?: string;
   /**
-   * Punto marcado en el mapa. Se guarda para uso interno —saber dónde está de
-   * verdad un activo— pero NO se publica: al visitante se le muestra la ciudad
-   * y nada más. Publicar la coordenada exacta de un vehículo o una vivienda
-   * expone a quien lo vende.
+   * Punto marcado en el mapa.
+   *
+   * La coordenada EXACTA nunca sale de aquí: no se escribe en la página, no va
+   * en los datos estructurados y no aparece en ningún texto. Publicar dónde
+   * está parqueado un carro o cuál de las tres casas de la cuadra se vende
+   * expone a quien vende.
+   *
+   * Lo que SÍ se publica es la ZONA: el mapa de la ficha se centra en este
+   * punto con un círculo de 300 metros encima y sin pin, a zoom de barrio. Se
+   * ve el sector, que es lo que un comprador necesita para decidir si le
+   * sirve, y no la fachada.
    */
   readonly lat?: number;
   readonly lng?: number;
