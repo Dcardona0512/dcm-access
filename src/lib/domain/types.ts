@@ -112,17 +112,18 @@ export type Location = {
   readonly city?: string;
   readonly area?: string;
   /**
-   * Punto marcado en el mapa.
+   * Punto marcado en el mapa, y SÍ SE PUBLICA.
    *
-   * La coordenada EXACTA nunca sale de aquí: no se escribe en la página, no va
-   * en los datos estructurados y no aparece en ningún texto. Publicar dónde
-   * está parqueado un carro o cuál de las tres casas de la cuadra se vende
-   * expone a quien vende.
+   * El mapa de la ficha lo enseña con marcador y a zoom de calle, igual que
+   * FincaRaíz. Fue una decisión tomada a conciencia: hubo una versión que solo
+   * mostraba un círculo de 300 metros, por no decir en qué portal está
+   * parqueado un carro, y se cambió por enseñar lo mismo que enseña el portal
+   * con el que se compara.
    *
-   * Lo que SÍ se publica es la ZONA: el mapa de la ficha se centra en este
-   * punto con un círculo de 300 metros encima y sin pin, a zoom de barrio. Se
-   * ve el sector, que es lo que un comprador necesita para decidir si le
-   * sirve, y no la fachada.
+   * Quién publique aquí debe saberlo: la dirección marcada en el formulario es
+   * la que verá cualquiera que abra la ficha. El número no se escribe en
+   * ningún texto ni va en los datos estructurados, pero el punto en el mapa lo
+   * dice igual.
    */
   readonly lat?: number;
   readonly lng?: number;
