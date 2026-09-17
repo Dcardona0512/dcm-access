@@ -104,7 +104,17 @@ export function Visor({
     <dialog
       ref={dialogo}
       onClose={onCerrar}
-      className="bg-surface text-fg h-dvh max-h-none w-screen max-w-none border-0 p-0 backdrop:bg-black/85"
+      /*
+        Ventana centrada, no pantalla completa. Medido en el visor de
+        FincaRaíz: unos 1200 × 660 sobre una pantalla de 1920, es decir algo
+        menos de dos tercios. A pantalla completa las fotos salían enormes y se
+        perdía el contexto —no se ve que hay una página detrás y que esto se
+        cierra—, que es justo lo que una ventana sí comunica.
+
+        Los topes en `vw` y `dvh` son para que en un portátil o un teléfono no
+        se salga: manda lo que quepa.
+      */
+      className="bg-surface text-fg h-[min(44rem,calc(100dvh-4rem))] w-[min(80rem,calc(100vw-3rem))] overflow-hidden rounded-(--radius-media) border-0 p-0 backdrop:bg-black/85"
     >
       <div className="flex h-full flex-col">
         <header className="border-line-soft flex shrink-0 flex-wrap items-center gap-2 border-b px-4 py-3 sm:px-6">
