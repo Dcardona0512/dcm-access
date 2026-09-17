@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState, useMemo, useState } from "react";
 import { useFormStatus } from "react-dom";
 
+import { AddressSearch } from "@/components/admin/AddressSearch";
 import { LocationPicker } from "@/components/admin/LocationPicker";
 import { PlacePicker, type Place } from "@/components/admin/PlacePicker";
 import { TagsInput } from "@/components/admin/TagsInput";
@@ -74,6 +75,8 @@ export function PublishForm({
   const [categoryId, setCategoryId] = useState("");
   const [place, setPlace] = useState<Place>({ country: "CO" });
   const [point, setPoint] = useState<{ lat: number; lng: number } | null>(null);
+  /** Lo que devolvió la búsqueda de dirección; manda sobre la ciudad. */
+  const [buscado, setBuscado] = useState<{ lat: number; lng: number } | null>(null);
   const [tags, setTags] = useState<readonly string[]>([]);
   const [files, setFiles] = useState<FileState[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -542,10 +545,28 @@ export function PublishForm({
       </Group>
 
       <Group title="Punto exacto en el mapa" wide>
-        <LocationPicker
-          center={place.lat && place.lng ? { lat: place.lat, lng: place.lng } : null}
-          onChange={(picked) => setPoint({ lat: picked.lat, lng: picked.lng })}
-        />
+        <div className="flex flex-col gap-4">
+          {/*
+            Buscar la dirección es el atajo; arrastrar el pin sigue siendo la
+            última palabra. Al elegir una sugerencia se mueve el centro del
+            mapa Y el punto guardado: si solo se moviera el centro, el pin se
+            quedaría donde estaba y habría que arrastrarlo igual.
+          */}
+          <AddressSearch
+            country={place.country}
+            onPick={(resultado) => {
+              setBuscado({ lat: resultado.lat, lng: resultado.lng });
+              setPoint({ lat: resultado.lat, lng: resultado.lng });
+            }}
+          />
+
+          <LocationPicker
+            // Manda lo último que se decidió: la dirección buscada si la hay,
+            // y si no, la ciudad elegida en los desplegables de arriba.
+            center={buscado ?? (place.lat && place.lng ? { lat: place.lat, lng: place.lng } : null)}
+            onChange={(picked) => setPoint({ lat: picked.lat, lng: picked.lng })}
+          />
+        </div>
       </Group>
 
       {/* 7. Etiquetas · 8. SKU -------------------------------------------------- */}
