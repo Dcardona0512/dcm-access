@@ -9,13 +9,12 @@ import type { Resultado } from "@/app/api/geo/buscar/route";
    ----------------------------------------------------------------------------
    Se escribe la dirección, se elige una sugerencia y el pin del mapa salta
    ahí. Es lo único que le faltaba al selector de ubicación frente al de
-   FincaRaíz, y se resuelve con OpenStreetMap: sin clave, sin cuenta y sin
-   tarjeta.
+   FincaRaíz.
 
-   SOBRE LO QUE ENCUENTRA, SIN ADORNOS: la nomenclatura colombiana fina —el
-   «#68-90» de una calle— muchas veces no está mapeada. Lo normal es que deje
-   en la cuadra correcta y de ahí se afine arrastrando el pin. Sigue siendo
-   mucho menos trabajo que buscar la ciudad a mano.
+   QUÉ TAN FINO HILA depende del proveedor que conteste, y eso lo decide el
+   servidor: con la clave de Google puesta, el portal exacto; sin ella,
+   OpenStreetMap, que en Colombia no tiene un solo número de puerta y deja en
+   la calle correcta. La lista lo dice en cada resultado.
 
    No pasa nada si no encuentra: el mapa y el pin siguen funcionando como
    antes. Esto añade un atajo, no sustituye nada.
@@ -125,6 +124,15 @@ export function AddressSearch({
                 className="hover:bg-surface-sunken block w-full px-3 py-2.5 text-left text-sm text-pretty transition-colors"
               >
                 {resultado.etiqueta}
+                {/*
+                  Se avisa cuando el resultado es solo la zona, porque cambia lo
+                  que hay que hacer: con una dirección exacta el pin ya queda
+                  puesto; con una aproximada hay que arrastrarlo. Callarlo
+                  obligaría a comprobarlo cada vez.
+                */}
+                {resultado.exacta === false ? (
+                  <span className="text-fg-muted/40 mt-0.5 block text-xs">Aproximada</span>
+                ) : null}
               </button>
             </li>
           ))}
