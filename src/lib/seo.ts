@@ -46,14 +46,16 @@ type BuildMetadataInput = {
   readonly title: string;
   readonly description: string;
   readonly noIndex?: boolean;
+  /**
+   * Imagen propia de esta página, cuando la tiene.
+   *
+   * Solo la usan las fichas: al pegar el enlace en WhatsApp, lo que se ve es
+   * el carro o el apartamento, no la tarjeta de marca. Sin ella, todas las
+   * páginas comparten la misma tarjeta —que es lo correcto para las que no
+   * tienen fotografía propia.
+   */
+  readonly image?: { readonly url: string; readonly alt: string };
 };
-
-/*
- * Sin `image` ni `type`: ninguno tenía efecto una vez retirado el bloque
- * `openGraph` (ver abajo), y un parámetro que se acepta pero se ignora es peor
- * que no tenerlo. La imagen se resuelve por convención de archivo; el tipo lo
- * fija el layout.
- */
 
 export function buildMetadata({
   locale,
@@ -61,6 +63,7 @@ export function buildMetadata({
   title,
   description,
   noIndex = false,
+  image,
 }: BuildMetadataInput): Metadata {
   const canonical = `${siteUrl}/${locale}${path === "/" ? "" : path}`;
 
@@ -72,8 +75,8 @@ export function buildMetadata({
       ...alternatesFor(path),
     },
     /**
-     * AQUÍ NO SE DECLARA `openGraph` NI `twitter`. Es deliberado y cuesta
-     * explicarlo, así que queda escrito:
+     * `openGraph` SOLO se declara cuando la página trae imagen propia. Es
+     * deliberado y cuesta explicarlo, así que queda escrito:
      *
      * `opengraph-image.tsx` vive en el segmento `[locale]`, y Next lo hereda a
      * todas las rutas hijas — MIENTRAS ninguna declare su propio `openGraph`.
@@ -91,10 +94,24 @@ export function buildMetadata({
      * Lo único que se pierde es `og:url`, que la canónica de arriba ya declara
      * — mal negocio sería cambiar eso por la imagen en todo el sitio.
      *
-     * Si algún día una ruta necesita imagen PROPIA, no basta con pasarla por
-     * `image`: hay que darle a esa ruta su propio `opengraph-image.tsx`, que
-     * es el mecanismo que Next respeta sin efectos colaterales.
+     * Y cuando SÍ hay imagen propia —las fichas, que enseñan su fotografía—
+     * se aprovecha justo ese comportamiento: declarar el bloque apaga la
+     * herencia, que es exactamente lo que hace falta para que WhatsApp no
+     * muestre la tarjeta de marca en lugar del carro. El título y la
+     * descripción se repiten dentro a propósito: al declarar el bloque, Next
+     * deja de derivarlos.
      */
+    openGraph: image
+      ? {
+          title,
+          description,
+          url: canonical,
+          images: [{ url: image.url, width: 1200, height: 900, alt: image.alt }],
+        }
+      : undefined,
+    twitter: image
+      ? { card: "summary_large_image", title, description, images: [image.url] }
+      : undefined,
     robots: noIndex ? { index: false, follow: false } : undefined,
   };
 }

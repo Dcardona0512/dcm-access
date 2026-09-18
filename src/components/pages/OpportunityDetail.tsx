@@ -58,12 +58,34 @@ export async function opportunityMetadata(
 
   const dict = getDictionary(locale);
   const restricted = opportunity.visibility !== "public";
+  const tituloFicha = localized(opportunity.title, locale);
+
+  /*
+    La portada de la ficha es lo que verá quien reciba el enlace por WhatsApp.
+
+    Va por el optimizador de imágenes y no por la URL cruda del almacenamiento,
+    y no es un capricho: las fotos de un celular pesan medio mega y WhatsApp
+    descarta las que se pasan de su límite, así que el enlace saldría sin
+    imagen justo cuando más se necesita. Optimizada baja a menos de doscientos
+    kilobytes y llega siempre.
+
+    Se busca la primera FOTO, no el primer medio: si la ficha abre con un
+    vídeo, un `.mp4` como imagen de vista previa no lo entiende nadie.
+  */
+  const portada = opportunity.media.find((item) => item.kind !== "video" && item.src)?.src;
+  const image = portada
+    ? {
+        url: `${siteUrl}/_next/image?url=${encodeURIComponent(portada)}&w=1200&q=75`,
+        alt: tituloFicha,
+      }
+    : undefined;
 
   return buildMetadata({
     locale,
     path: `/${vertical}/${slug}`,
-    title: localized(opportunity.title, locale),
+    title: tituloFicha,
     description: localized(opportunity.summary, locale) || dict.meta.siteDescription,
+    image,
     // Lo reservado no se indexa: publicarlo en buscadores contradiría el
     // propósito de que sea reservado (§16).
     noIndex: restricted,
