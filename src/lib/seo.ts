@@ -100,19 +100,36 @@ export function buildMetadata({
      * muestre la tarjeta de marca en lugar del carro. El título y la
      * descripción se repiten dentro a propósito: al declarar el bloque, Next
      * deja de derivarlos.
+     *
+     * VA POR PROPAGACIÓN CONDICIONAL Y NO POR `openGraph: image ? … :
+     * undefined`. No es estilo: Next recorre las CLAVES del objeto, así que
+     * una clave presente con valor `undefined` sí entra en el reparto y
+     * sobrescribe con nada lo que venía del layout. Se vio en producción —
+     * `/es/motors` se quedó sin una sola etiqueta de vista previa—. Sin la
+     * clave, no hay nada que sobrescribir.
      */
-    openGraph: image
+    ...(image
       ? {
-          title,
-          description,
-          url: canonical,
-          images: [{ url: image.url, width: 1200, height: 900, alt: image.alt }],
+          openGraph: {
+            title,
+            description,
+            url: canonical,
+            images: [{ url: image.url, width: 1200, height: 900, alt: image.alt }],
+          },
+          twitter: {
+            card: "summary_large_image" as const,
+            title,
+            description,
+            images: [image.url],
+          },
         }
-      : undefined,
-    twitter: image
-      ? { card: "summary_large_image", title, description, images: [image.url] }
-      : undefined,
-    robots: noIndex ? { index: false, follow: false } : undefined,
+      : {}),
+    /*
+      Mismo motivo que arriba: `robots: undefined` no es «no opino», es
+      «bórralo», y dejaba a todo el sitio sin la etiqueta `index, follow` que
+      declara el layout. Solo se habla de robots cuando hay algo que decir.
+    */
+    ...(noIndex ? { robots: { index: false, follow: false } } : {}),
   };
 }
 
