@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 
 import { EditorialImage } from "@/components/ui/EditorialImage";
@@ -12,74 +11,28 @@ import { Visor, type Pestana } from "./Visor";
 /* ============================================================================
    GALERÍA DE MEDIOS
    ----------------------------------------------------------------------------
-   Radios ocultos más selectores de hermano: cambiar de foto no ejecuta una
-   sola línea de JavaScript, y sin embargo funciona con teclado —un grupo de
-   radios se recorre con las flechas de forma nativa—, lo anuncia un lector de
-   pantalla y el foco cae donde debe.
+   Mosaico: una fotografía grande y dos al lado, como en los portales
+   inmobiliarios. Antes había una escena y una tira de miniaturas debajo, y la
+   tira tenía dos problemas. Empujaba hacia abajo todo lo que importa —precio,
+   ficha técnica, contacto— y dejaba las fotos a tamaño de sello; y con las
+   miniaturas ahí, nadie adivina que pulsando se abre el visor, porque parece
+   que ya están todas a la vista.
 
-   La alternativa habitual, anclas con `:target`, también sería cero JS, pero
-   ensucia la URL con hashes y rompe el botón atrás. Los radios no.
+   El mosaico enseña tres de golpe, a tamaño en que se ve algo, y la insignia
+   «+N» de la última dice cuántas faltan: es lo que invita a abrirlo. Lo demás
+   —el resto del carrete, los vídeos y el mapa— vive en el visor, y los atajos
+   de la esquina llevan a cada pestaña sin tener que adivinar.
 
-   Con un solo medio no hay galería: se cae a la placa de siempre, así que las
-   fichas que aún no tienen fotografía se ven exactamente igual que antes.
-
-   EL COMPONENTE ES DE CLIENTE, y solo por la lupa. Cambiar de foto sigue sin
-   ejecutar JavaScript: los radios y el CSS se sirven ya renderizados y
-   funcionan desde el primer byte, antes de que React hidrate. Lo único que
-   espera a la hidratación es abrir la foto a pantalla completa, que es una
-   mejora y no la función principal. Si el JavaScript no llega, la galería
-   sigue entera.
+   EL CAMBIO TIENE UN COSTE Y CONVIENE ESCRIBIRLO. La versión anterior eran
+   radios ocultos con selectores de hermano: se cambiaba de foto sin ejecutar
+   una sola línea de JavaScript. Ahora, sin JavaScript, se ven tres fotos en
+   vez de todas. Se acepta porque el visor —pestañas, mapa, compartir— ya
+   exigía JavaScript de todos modos, y porque tres fotos grandes informan más
+   que doce sellos de correo.
    ========================================================================== */
 
-/**
- * Tailwind necesita ver las clases completas para generarlas: construirlas
- * como `peer-checked/${i}:block` no produce CSS. Doce posiciones cubren el
- * límite de subida (12 fotos + 2 vídeos se recorta a este máximo).
- */
-const PEERS = [
-  "peer/m0",
-  "peer/m1",
-  "peer/m2",
-  "peer/m3",
-  "peer/m4",
-  "peer/m5",
-  "peer/m6",
-  "peer/m7",
-  "peer/m8",
-  "peer/m9",
-  "peer/m10",
-  "peer/m11",
-] as const;
-
-const PANELS = [
-  "peer-checked/m0:block",
-  "peer-checked/m1:block",
-  "peer-checked/m2:block",
-  "peer-checked/m3:block",
-  "peer-checked/m4:block",
-  "peer-checked/m5:block",
-  "peer-checked/m6:block",
-  "peer-checked/m7:block",
-  "peer-checked/m8:block",
-  "peer-checked/m9:block",
-  "peer-checked/m10:block",
-  "peer-checked/m11:block",
-] as const;
-
-const THUMBS = [
-  "peer-checked/m0:border-accent",
-  "peer-checked/m1:border-accent",
-  "peer-checked/m2:border-accent",
-  "peer-checked/m3:border-accent",
-  "peer-checked/m4:border-accent",
-  "peer-checked/m5:border-accent",
-  "peer-checked/m6:border-accent",
-  "peer-checked/m7:border-accent",
-  "peer-checked/m8:border-accent",
-  "peer-checked/m9:border-accent",
-  "peer-checked/m10:border-accent",
-  "peer-checked/m11:border-accent",
-] as const;
+/** Tope de subida: 12 fotos + 2 vídeos se recortan a este máximo. */
+const MAXIMO = 12;
 
 export function MediaGallery({
   media,
@@ -92,7 +45,7 @@ export function MediaGallery({
   url,
 }: {
   readonly media: readonly MediaItem[];
-  /** Nombre accesible del grupo de radios. */
+  /** Nombre accesible del bloque. */
   readonly label: string;
   readonly className?: string;
   /** Lo que el visor necesita para su pestaña de mapa y para compartir. */
@@ -102,127 +55,92 @@ export function MediaGallery({
   readonly titulo: string;
   readonly url: string;
 }) {
-  const items = media.slice(0, PEERS.length);
+  const items = media.slice(0, MAXIMO);
 
   /** Pestaña del visor, o `null` con el visor cerrado. */
   const [pestana, setPestana] = useState<Pestana | null>(null);
 
-  if (items.length <= 1) {
-    return (
-      <EditorialImage
-        media={items[0]}
-        ratio="16/9"
-        priority
-        sizes="(max-width: 1024px) 100vw, 62vw"
-        className={className}
-      />
-    );
+  /*
+    Solo cuenta lo que tiene archivo. Un medio sin `src` se pinta como placa
+    editorial —nunca como cuadro roto—, y contarlo prometería en el atajo una
+    galería que al abrirse estaría vacía.
+  */
+  const fotos = items.filter((item) => item.kind !== "video" && item.src);
+  const videos = items.filter((item) => item.kind === "video" && item.src);
+  const hayMapa = lat != null && lng != null;
+
+  // Una ficha sin nada que enseñar se queda con la placa editorial, sin cursor
+  // de mano ni atajos: no hay visor que abrir.
+  if (fotos.length === 0 && videos.length === 0) {
+    return <EditorialImage media={items[0]} ratio="16/9" className={className} />;
   }
 
+  /*
+    La portada es la primera FOTO, y solo si no hay ninguna manda el vídeo: una
+    ficha que abre con el fotograma congelado de un vídeo se ve peor que la
+    misma ficha abriendo con su mejor fotografía.
+  */
+  const portada = fotos[0] ?? videos[0];
+  const laterales = fotos.slice(1, 3);
+  const ocultas = fotos.length - 1 - laterales.length;
+  const mosaico = laterales.length > 0;
+
+  const atajos: readonly { readonly clave: Pestana; readonly texto: string }[] = [
+    ...(fotos.length > 0 ? [{ clave: "fotos" as const, texto: `Galería · ${fotos.length}` }] : []),
+    ...(videos.length > 0 ? [{ clave: "videos" as const, texto: "Vídeo" }] : []),
+    ...(hayMapa ? [{ clave: "mapa" as const, texto: "Mapa" }] : []),
+  ];
+
   return (
-    <fieldset className={cn("flex flex-col gap-3", className)}>
-      <legend className="sr-only">{label}</legend>
+    <section aria-label={label} className={cn("relative", className)}>
+      <div className={cn("grid gap-2", mosaico && "grid-cols-2 sm:grid-cols-3 sm:grid-rows-2")}>
+        <Placa
+          item={portada}
+          prioritaria
+          sizes={mosaico ? "(max-width: 640px) 100vw, 41vw" : "(max-width: 1024px) 100vw, 62vw"}
+          onAbrir={() => setPestana(portada.kind === "video" ? "videos" : "fotos")}
+          className={mosaico ? "col-span-2 aspect-[4/3] sm:row-span-2" : "aspect-video"}
+        />
+
+        {laterales.map((foto, indice) => (
+          <Placa
+            key={foto.id}
+            item={foto}
+            sizes="(max-width: 640px) 50vw, 21vw"
+            onAbrir={() => setPestana("fotos")}
+            insignia={indice === laterales.length - 1 && ocultas > 0 ? ocultas : undefined}
+            /*
+              En móvil las dos laterales van una al lado de otra con su propia
+              proporción; en pantalla ancha se estiran a la altura que les deja
+              la portada, que es la que manda la forma del mosaico.
+            */
+            className={cn("aspect-[4/3] sm:aspect-auto", laterales.length === 1 && "sm:row-span-2")}
+          />
+        ))}
+      </div>
 
       {/*
-        Los radios van ANTES de todo lo que dependa de ellos: `peer` solo
-        alcanza a los hermanos POSTERIORES. Por eso la escena y las miniaturas
-        cuelgan del mismo nivel y no de un contenedor intermedio.
+        Los atajos flotan sobre la esquina, no debajo del mosaico: debajo
+        volverían a empujar la ficha hacia abajo, que es justo lo que se quitó.
+        `pointer-events-none` en la banda para no robarle el clic a la foto, y
+        de vuelta en cada botón.
       */}
-      {items.map((item, index) => (
-        <input
-          key={`radio-${item.id}`}
-          type="radio"
-          name="dcm-gallery"
-          id={`dcm-media-${item.id}`}
-          defaultChecked={index === 0}
-          className={cn("sr-only", PEERS[index])}
-        />
-      ))}
-
-      {items.map((item, index) => (
-        <div key={`panel-${item.id}`} className={cn("hidden", PANELS[index])}>
-          {item.kind === "video" && item.src ? (
-            /*
-              `preload="none"`: el vídeo de fondo de la vertical ya viene con
-              `preload="auto"`, y un segundo vídeo precargando le pelearía el
-              ancho de banda en la misma página sin que nadie lo haya pedido.
-            */
-            <video
-              controls
-              preload="none"
-              playsInline
-              poster={item.poster}
-              className="bg-surface-sunken aspect-video w-full rounded-(--radius-card) object-cover"
-            >
-              <source src={item.src} type="video/mp4" />
-            </video>
-          ) : (
-            /*
-              La escena entera es el botón que abre la lupa. Un icono en una
-              esquina obligaría a apuntar; aquí se pulsa donde uno ya está
-              mirando, que es lo que se hace por instinto con una foto.
-            */
-            <button
-              type="button"
-              onClick={() => setPestana(item.kind === "video" ? "videos" : "fotos")}
-              aria-label={`Ampliar: ${item.alt}`}
-              className="focus-visible:outline-accent block w-full cursor-zoom-in focus-visible:outline-2 focus-visible:outline-offset-2"
-            >
-              <EditorialImage
-                media={item}
-                ratio="16/9"
-                priority={index === 0}
-                sizes="(max-width: 1024px) 100vw, 62vw"
-              />
-            </button>
-          )}
-        </div>
-      ))}
-
-      <ul className="grid grid-cols-4 gap-2 sm:grid-cols-6">
-        {items.map((item, index) => {
-          const thumb = item.kind === "video" ? item.poster : item.src;
-
-          return (
-            <li key={`thumb-${item.id}`}>
-              <label
-                htmlFor={`dcm-media-${item.id}`}
-                className={cn(
-                  "border-line-soft hover:border-fg-muted/60 bg-surface-sunken relative block aspect-square",
-                  "cursor-pointer overflow-hidden rounded-(--radius-card) border transition-colors",
-                  THUMBS[index],
-                )}
-              >
-                <span className="sr-only">{item.alt}</span>
-
-                {thumb ? (
-                  <Image
-                    src={thumb}
-                    alt=""
-                    fill
-                    sizes="(max-width: 640px) 25vw, 12vw"
-                    className="object-cover"
-                  />
-                ) : null}
-
-                {item.kind === "video" ? (
-                  <span
-                    aria-hidden="true"
-                    className="bg-surface/70 text-fg absolute inset-0 grid place-items-center"
-                  >
-                    <svg viewBox="0 0 12 12" className="h-3 w-3">
-                      <path d="M3 2.2 10 6l-7 3.8Z" fill="currentColor" />
-                    </svg>
-                  </span>
-                ) : null}
-              </label>
-            </li>
-          );
-        })}
-      </ul>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-wrap justify-end gap-2 p-3">
+        {atajos.map((atajo) => (
+          <button
+            key={atajo.clave}
+            type="button"
+            onClick={() => setPestana(atajo.clave)}
+            className="eyebrow border-line-soft bg-surface/90 text-fg hover:border-fg-muted pointer-events-auto cursor-pointer rounded-(--radius-card) border px-3 py-1.5 text-[0.7rem] backdrop-blur transition-colors"
+          >
+            {atajo.texto}
+          </button>
+        ))}
+      </div>
 
       <Visor
-        media={items}
+        /* Lo mismo que arriba: al visor solo van los medios con archivo. */
+        media={[...fotos, ...videos]}
         lat={lat}
         lng={lng}
         etiqueta={etiqueta}
@@ -232,6 +150,83 @@ export function MediaGallery({
         onCerrar={() => setPestana(null)}
         onCambiar={setPestana}
       />
-    </fieldset>
+    </section>
+  );
+}
+
+/**
+ * Una pieza del mosaico.
+ *
+ * Es un `<button>` entero, no un icono en una esquina: se pulsa donde uno ya
+ * está mirando. De ahí el cursor de mano —lo que se espera de algo que se
+ * pulsa— y el realce al pasar por encima, que es lo que avisa de que la foto
+ * hace algo antes de que nadie pruebe a pulsarla.
+ */
+function Placa({
+  item,
+  className,
+  sizes,
+  prioritaria = false,
+  insignia,
+  onAbrir,
+}: {
+  readonly item: MediaItem;
+  readonly className?: string;
+  readonly sizes: string;
+  readonly prioritaria?: boolean;
+  /** Cuántas fotos quedan fuera del mosaico; solo en la última pieza. */
+  readonly insignia?: number;
+  readonly onAbrir: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onAbrir}
+      aria-label={insignia ? `Ver las ${insignia} fotos restantes` : `Ampliar: ${item.alt}`}
+      className={cn(
+        "group/placa focus-visible:outline-accent relative block w-full cursor-pointer",
+        "overflow-hidden rounded-(--radius-card) focus-visible:outline-2 focus-visible:outline-offset-2",
+        className,
+      )}
+    >
+      <EditorialImage
+        media={item}
+        ratio="fill"
+        priority={prioritaria}
+        sizes={sizes}
+        className="transition-transform duration-(--duration-slow) ease-(--ease-brand) group-hover/placa:scale-[1.04]"
+      />
+
+      {/* Velo de realce: oscurece apenas lo justo para que se note el paso del ratón. */}
+      <span
+        aria-hidden="true"
+        className="absolute inset-0 bg-black/0 transition-colors duration-(--duration-fast) group-hover/placa:bg-black/20"
+      />
+
+      {item.kind === "video" ? (
+        <span
+          aria-hidden="true"
+          className="bg-surface/70 text-fg absolute inset-0 grid place-items-center"
+        >
+          <svg viewBox="0 0 12 12" className="h-8 w-8">
+            <path d="M3 2.2 10 6l-7 3.8Z" fill="currentColor" />
+          </svg>
+        </span>
+      ) : null}
+
+      {/*
+        Marca de esquina y no un velo sobre la foto entera: tapar la tercera
+        fotografía para avisar de que hay más es pagar con lo que se venía a
+        enseñar. Pequeña basta, porque el atajo «Galería» ya lleva la cuenta.
+      */}
+      {insignia ? (
+        <span
+          aria-hidden="true"
+          className="bg-surface/85 text-fg absolute top-2 right-2 rounded-(--radius-card) px-2 py-1 text-[0.7rem] font-semibold backdrop-blur"
+        >
+          +{insignia}
+        </span>
+      ) : null}
+    </button>
   );
 }
