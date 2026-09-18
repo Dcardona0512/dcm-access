@@ -99,6 +99,47 @@ export default async function AdminLeadsPage() {
                           ) : null}
                         </dl>
 
+                        {/*
+                          Teléfono y correo, y como ENLACES.
+
+                          Estaban guardados pero no se veían: la tarjeta
+                          enseñaba el nombre y el mensaje, así que para
+                          devolver la llamada había que ir a buscar el dato a
+                          la base de datos. Un lead que no se puede contestar
+                          desde donde se lee no sirve de nada.
+
+                          El de WhatsApp lleva los dígitos sin espacios ni
+                          signos, que es lo único que entiende wa.me.
+                        */}
+                        <div className="flex flex-wrap items-center gap-2 text-xs">
+                          {lead.contact.phone ? (
+                            <>
+                              <a
+                                href={`tel:${lead.contact.phone.replace(/[^\d+]/g, "")}`}
+                                className="border-line-soft text-fg hover:border-fg-muted rounded-(--radius-card) border px-2.5 py-1"
+                                data-numeric
+                              >
+                                {lead.contact.phone}
+                              </a>
+                              <a
+                                href={`https://wa.me/${lead.contact.phone.replace(/\D/g, "")}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="border-line-soft text-fg-muted hover:text-fg rounded-(--radius-card) border px-2.5 py-1"
+                              >
+                                WhatsApp
+                              </a>
+                            </>
+                          ) : null}
+
+                          <a
+                            href={`mailto:${lead.contact.email}`}
+                            className="text-fg-muted hover:text-fg truncate underline-offset-2 hover:underline"
+                          >
+                            {lead.contact.email}
+                          </a>
+                        </div>
+
                         {lead.message ? (
                           <p className="text-fg-muted/70 line-clamp-3 text-xs text-pretty">
                             {lead.message}
