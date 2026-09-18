@@ -114,7 +114,15 @@ export function buildMetadata({
             title,
             description,
             url: canonical,
-            images: [{ url: image.url, width: 1200, height: 900, alt: image.alt }],
+            /*
+              Sin `width` ni `height`: el ancho lo fija el optimizador, pero
+              el alto depende de la foto y va desde un panorama hasta un
+              vertical de celular. Medido en una ficha real: 1200 × 1109
+              donde se había declarado 1200 × 900. Unas medidas inventadas
+              le hacen reservar a WhatsApp un hueco con la forma equivocada;
+              sin ellas mira la imagen y acierta siempre.
+            */
+            images: [{ url: image.url, alt: image.alt }],
           },
           twitter: {
             card: "summary_large_image" as const,
