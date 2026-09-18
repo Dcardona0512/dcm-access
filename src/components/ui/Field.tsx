@@ -263,7 +263,12 @@ export function CheckboxField({
   defaultChecked,
 }: {
   readonly name: string;
-  readonly label: string;
+  /**
+   * Acepta nodos y no solo texto: la autorización de datos tiene que enlazar
+   * los documentos que dice aceptar, y una casilla que los nombra sin poder
+   * abrirlos no es un consentimiento informado.
+   */
+  readonly label: React.ReactNode;
   readonly error?: string;
   readonly defaultChecked?: boolean;
 }) {

@@ -346,15 +346,30 @@ export type Dictionary = {
 
   readonly inquiry: {
     readonly heading: string;
+    readonly lede: string;
     readonly fields: {
       readonly name: FieldCopy;
       readonly email: FieldCopy;
       readonly phone: FieldCopy;
       readonly message: FieldCopy;
     };
+    readonly phoneCode: string;
+    /** Lleva `{terms}` y `{privacy}`, que el formulario convierte en enlaces. */
+    readonly consent: string;
+    readonly consentTerms: string;
+    readonly consentPrivacy: string;
     readonly submit: string;
+    readonly whatsapp: string;
+    /**
+     * Mensaje con el que arranca la conversación en WhatsApp. Lleva `{message}`
+     * —lo que la persona escribió, que ya empieza saludando— y `{name}`, que va
+     * al final y no delante: anteponer «Hola, soy X» dejaba dos saludos
+     * pegados en el mismo mensaje.
+     */
+    readonly whatsappTemplate: string;
     readonly successHeading: string;
     readonly successBody: string;
+    readonly successWhatsapp: string;
   };
 
   readonly legal: {
@@ -390,6 +405,7 @@ export type Dictionary = {
     readonly number: string;
     readonly selectOne: string;
     readonly consent: string;
+    readonly phone: string;
     readonly rateLimited: string;
     readonly generic: string;
     readonly notFoundHeading: string;

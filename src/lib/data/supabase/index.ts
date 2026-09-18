@@ -9,6 +9,7 @@ import {
 } from "@/lib/supabase/server";
 
 import type { OpportunityRepository, Repositories } from "../repositories";
+import { createSupabaseLeads } from "./leads";
 import type { PublicUrl } from "./mappers";
 import { createSupabaseOpportunities } from "./opportunities";
 
@@ -44,6 +45,19 @@ export function createSupabaseRepositories(): Partial<Repositories> {
 
   return {
     opportunities: createSupabaseOpportunities(createPublicClient(), publicUrl),
+
+    /*
+      Los leads van con la clave SECRETA, al revés que el catálogo, y no es una
+      incoherencia: el catálogo es público y se apoya en RLS para no enseñar de
+      más, mientras que un lead no debe ser legible por nadie desde el
+      navegador. Su tabla no tiene ninguna política, así que la publicable no
+      entra; esta sí, y solo existe en el servidor.
+
+      Sin clave secreta se caen al adaptador de memoria, como antes. Es peor
+      —se pierden al reiniciar— pero el formulario no se rompe, y el aviso de
+      arriba ya dice que falta configuración.
+    */
+    ...(isSupabaseWritable() ? { leads: createSupabaseLeads(createAdminClient()) } : {}),
   };
 }
 

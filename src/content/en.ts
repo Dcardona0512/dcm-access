@@ -433,8 +433,9 @@ export const en: Dictionary = {
 
   inquiry: {
     heading: "Request information",
+    lede: "Complete your details to unlock the contact channel.",
     fields: {
-      name: { label: "Name" },
+      name: { label: "Full name" },
       email: { label: "Email" },
       phone: { label: "Phone" },
       message: {
@@ -442,9 +443,16 @@ export const en: Dictionary = {
         placeholder: "What would you like to know about this opportunity?",
       },
     },
-    submit: "Send enquiry",
+    phoneCode: "Country",
+    consent: "I authorise the processing of my data under the {terms} and the {privacy}.",
+    consentTerms: "terms and conditions",
+    consentPrivacy: "privacy policy",
+    submit: "Contact",
+    whatsapp: "WhatsApp",
+    whatsappTemplate: "{message}\n\nI'm {name}.",
     successHeading: "Enquiry sent",
     successBody: "A broker will review your enquiry and reply with the available detail.",
+    successWhatsapp: "Opening WhatsApp with this listing. If it does not open, tap here.",
   },
 
   legal: {
@@ -644,6 +652,7 @@ export const en: Dictionary = {
     number: "Enter a valid number.",
     selectOne: "Select at least one option.",
     consent: "You must authorise data processing to continue.",
+    phone: "Enter a valid phone number.",
     rateLimited: "You have sent several requests in a row. Wait a moment and try again.",
     generic: "The request could not be processed. Please try again.",
     notFoundHeading: "This page does not exist",

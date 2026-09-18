@@ -2,17 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { InquiryForm } from "@/components/forms/InquiryForm";
+import { FormularioFicha } from "@/components/forms/FormularioFicha";
 import { MediaGallery } from "@/components/opportunities/MediaGallery";
 import { SeccionUbicacion } from "@/components/opportunities/SeccionUbicacion";
 import { OpportunityCard } from "@/components/opportunities/OpportunityCard";
-import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { PriceTag } from "@/components/ui/PriceTag";
 import { Eyebrow } from "@/components/ui/Section";
 import { DemoTag, Tag, VerificationBadge } from "@/components/ui/Tag";
 import { getDictionary } from "@/content";
-import { contact, whatsappHref } from "@/content/shared";
 import { getRepositories } from "@/lib/data";
 import { displayAttributes, groupAttributes } from "@/lib/domain/attributes";
 import { listingTypeLabels } from "@/lib/domain/labels";
@@ -338,76 +336,32 @@ export async function OpportunityDetail({
               </dl>
 
               {/*
-                Un solo CTA (§42), y lleva a WhatsApp.
+                El formulario, y no un botón que salta directo a WhatsApp.
 
-                Antes bajaba a un formulario en la misma página: el interesado
-                escribía, se iba, y había que responderle por correo horas
-                después. Aquí el mensaje sale con el título y la referencia ya
-                escritos, así que la conversación empieza con la ficha
-                identificada y sigue en el sitio donde se negocia de verdad en
-                Colombia.
+                Con el botón, una consulta dejaba al otro lado un número de
+                teléfono suelto: sin nombre, sin correo y sin saber por cuál de
+                las fichas preguntaba. Y si la persona abría WhatsApp y no
+                llegaba a escribir, no quedaba ni el número.
 
-                Si el número faltara, el botón vuelve al formulario en lugar de
-                quedarse muerto.
+                WhatsApp sigue estando —es donde se negocia de verdad en
+                Colombia— pero como uno de los dos botones del formulario: se
+                guardan los datos y acto seguido se abre la conversación con el
+                mensaje ya escrito.
               */}
-              <Button
-                href={
-                  whatsappHref(
-                    `${dict.common.whatsappInquiry
-                      .replace("{title}", localized(opportunity.title, locale))
-                      .replace("{ref}", opportunity.reference)} ${absoluteUrl(
-                      `/${locale}/${vertical}/${slug}`,
-                    )}`,
-                    contact.whatsappSales,
-                  ) ?? "#inquiry"
-                }
-                variant="accent"
-                size="lg"
-                fullWidth
-                target="_blank"
-                rel="noopener noreferrer"
-                /*
-                  Dorado macizo, no el filete de siempre.
-
-                  La regla de marca prohíbe el dorado como relleno grande
-                  salvo en UN botón por vista, y este es exactamente ese: la
-                  única acción de la ficha. En contorno se leía como un botón
-                  secundario y competía con el resto de filetes de la columna;
-                  relleno, no hay duda de dónde se pulsa.
-                */
-                className="bg-accent text-surface border-accent hover:bg-accent hover:opacity-90"
-              >
-                <MarcaWhatsApp />
-                {dict.common.contactCta}
-              </Button>
+              <FormularioFicha
+                locale={locale}
+                dict={dict}
+                opportunityId={opportunity.id}
+                vertical={vertical}
+                slug={slug}
+                mensajeInicial={dict.common.whatsappInquiry
+                  .replace("{title}", localized(opportunity.title, locale))
+                  .replace("{ref}", opportunity.reference)}
+              />
             </div>
           </aside>
         </div>
       </Container>
-
-      {/* --- Consulta ------------------------------------------------------- */}
-      <section id="inquiry" className="border-line border-t py-(--spacing-section)">
-        <Container width="narrow">
-          <div className="flex flex-col gap-8">
-            <div className="flex flex-col gap-4">
-              <Eyebrow>{dict.opportunity.inquiryHeading}</Eyebrow>
-              <h2 className="font-display text-display-3 text-balance">
-                {dict.common.contactBroker}
-              </h2>
-              <p className="text-fg-muted max-w-[58ch] text-pretty">
-                {dict.opportunity.inquiryLede}
-              </p>
-            </div>
-
-            <InquiryForm
-              locale={locale}
-              dict={dict}
-              opportunityId={opportunity.id}
-              vertical={opportunity.vertical}
-            />
-          </div>
-        </Container>
-      </section>
 
       {related.length > 0 ? (
         <section className="border-line border-t py-(--spacing-section)">
@@ -474,19 +428,4 @@ function listingSchema(opportunity: Opportunity, locale: Locale) {
         }
       : {}),
   };
-}
-
-/**
- * La marca de WhatsApp.
- *
- * No es adorno: dice a qué se abre el botón antes de pulsarlo. Quien lo lea
- * sabe que va a una conversación y no a un formulario, que es justo lo que
- * cambió.
- */
-function MarcaWhatsApp() {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-4 w-4">
-      <path d="M12.04 2a9.9 9.9 0 0 0-8.5 14.95L2 22l5.2-1.5A9.9 9.9 0 1 0 12.04 2Zm0 1.8a8.1 8.1 0 1 1-4.13 15.06l-.3-.18-3.08.9.9-3-.2-.31A8.1 8.1 0 0 1 12.05 3.8Zm4.65 11.1c-.25-.13-1.47-.73-1.7-.81-.23-.09-.4-.13-.56.12-.17.25-.65.8-.8.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-2-1.24a7.5 7.5 0 0 1-1.38-1.72c-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.43.13-.15.17-.25.25-.42.09-.16.04-.31-.02-.43-.06-.13-.56-1.35-.77-1.84-.2-.48-.4-.42-.55-.43h-.48c-.16 0-.43.06-.65.31-.23.25-.86.84-.86 2.05s.88 2.38 1 2.54c.13.17 1.74 2.66 4.22 3.73.59.25 1.05.4 1.4.52.6.18 1.14.16 1.57.1.48-.07 1.47-.6 1.68-1.19.2-.58.2-1.08.14-1.18-.06-.11-.23-.17-.48-.29Z" />
-    </svg>
-  );
 }

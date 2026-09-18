@@ -19,6 +19,7 @@ function messages(dict: Dictionary) {
     url: dict.errors.url,
     selectOne: dict.errors.selectOne,
     consent: dict.errors.consent,
+    phone: dict.errors.phone,
     min: (min: number) => interpolate(dict.errors.minLength, { min }),
     max: (max: number) => interpolate(dict.errors.maxLength, { max }),
   };
@@ -60,14 +61,45 @@ function consent(dict: Dictionary) {
   return z.literal("on", { message: messages(dict).consent });
 }
 
+/**
+ * Teléfono OBLIGATORIO.
+ *
+ * En el resto del sitio es opcional, y aquí no: es el único dato con el que se
+ * puede devolver la llamada el mismo día. Se cuentan dígitos en lugar de
+ * imponer un formato porque la gente escribe el suyo con espacios, puntos,
+ * guiones y paréntesis, y rechazárselo por eso es perder el contacto por una
+ * regla de puntuación. Siete dígitos es un fijo colombiano; quince es el
+ * máximo que admite el estándar internacional.
+ */
+function phone(dict: Dictionary) {
+  const m = messages(dict);
+  return z
+    .string()
+    .trim()
+    .min(1, m.required)
+    .max(40)
+    .refine((value) => {
+      const digitos = (value.match(/\d/g) ?? []).length;
+      return digitos >= 7 && digitos <= 15;
+    }, m.phone);
+}
+
 /** Consulta desde la ficha de una oportunidad. */
 export function inquirySchema(dict: Dictionary) {
   return z.object({
     name: requiredText(dict),
     email: email(dict),
-    phone: optionalText(40),
+    /* Indicativo del país, del desplegable. Se valida la FORMA y no la lista:
+       no es un dato que decida nada, solo se pega delante del número. */
+    phoneCode: z
+      .string()
+      .trim()
+      .regex(/^\+\d{1,4}$/)
+      .catch("+57"),
+    phone: phone(dict),
     message: requiredText(dict, { min: 10, max: 2000 }),
     opportunityId: optionalText(64),
+    consent: consent(dict),
   });
 }
 

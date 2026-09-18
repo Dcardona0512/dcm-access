@@ -435,8 +435,9 @@ export const es: Dictionary = {
 
   inquiry: {
     heading: "Solicitar información",
+    lede: "Complete sus datos para habilitar el medio de contacto.",
     fields: {
-      name: { label: "Nombre" },
+      name: { label: "Nombre y apellido" },
       email: { label: "Correo electrónico" },
       phone: { label: "Teléfono" },
       message: {
@@ -444,9 +445,16 @@ export const es: Dictionary = {
         placeholder: "¿Qué necesita saber sobre esta oportunidad?",
       },
     },
-    submit: "Enviar consulta",
+    phoneCode: "País",
+    consent: "Autorizo el tratamiento de mis datos conforme a los {terms} y la {privacy}.",
+    consentTerms: "términos y condiciones",
+    consentPrivacy: "política de privacidad",
+    submit: "Contactar",
+    whatsapp: "WhatsApp",
+    whatsappTemplate: "{message}\n\nSoy {name}.",
     successHeading: "Consulta enviada",
     successBody: "Un asesor revisa su consulta y le responde con el detalle disponible.",
+    successWhatsapp: "Abriendo WhatsApp con la ficha. Si no se abre solo, pulse aquí.",
   },
 
   legal: {
@@ -646,6 +654,7 @@ export const es: Dictionary = {
     number: "Introduzca un número válido.",
     selectOne: "Seleccione al menos una opción.",
     consent: "Debe autorizar el tratamiento de datos para continuar.",
+    phone: "Introduzca un teléfono válido.",
     rateLimited: "Ha enviado varias solicitudes seguidas. Espere un momento e inténtelo de nuevo.",
     generic: "No se pudo procesar la solicitud. Inténtelo de nuevo.",
     notFoundHeading: "Esta página no existe",

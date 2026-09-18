@@ -2,13 +2,15 @@
 
 import { headers } from "next/headers";
 
-import { getDictionary } from "@/content";
+import { getDictionary, interpolate } from "@/content";
+import { contact, whatsappHref } from "@/content/shared";
 import { getRepositories } from "@/lib/data";
 import type { LeadInput } from "@/lib/data/repositories";
 import { track } from "@/lib/analytics";
 import { isVertical } from "@/lib/domain/types";
 import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
 import { checkRateLimit, isHoneypotTripped } from "@/lib/security/rate-limit";
+import { absoluteUrl } from "@/lib/seo";
 
 import { contactSchema, flattenIssues, inquirySchema } from "./schemas";
 import type { FormState } from "./state";
@@ -48,6 +50,24 @@ function values(formData: FormData): Record<string, unknown> {
   }
   return result;
 }
+
+/**
+ * Devuelve lo escrito para repoblar el formulario tras un error.
+ *
+ * Con lista blanca: el campo trampa del honeypot y cualquier cosa que llegue
+ * de más se quedan fuera, y así un error no le devuelve al navegador nada que
+ * no haya puesto la persona.
+ */
+function devueltos(formData: FormData, campos: readonly string[]): Record<string, string> {
+  const result: Record<string, string> = {};
+  for (const campo of campos) {
+    const value = formData.get(campo);
+    if (typeof value === "string") result[campo] = value;
+  }
+  return result;
+}
+
+const CAMPOS_FICHA = ["name", "phone", "phoneCode", "email", "message", "consent"] as const;
 
 type Guard = { readonly ok: true } | { readonly ok: false; readonly state: FormState };
 
@@ -89,11 +109,25 @@ export async function submitInquiry(
 
   const parsed = inquirySchema(dict).safeParse(values(formData));
   if (!parsed.success) {
-    return { status: "error", errors: flattenIssues(parsed.error) };
+    return {
+      status: "error",
+      errors: flattenIssues(parsed.error),
+      values: devueltos(formData, CAMPOS_FICHA),
+    };
   }
 
   const verticalRaw = formData.get("vertical");
   const vertical = typeof verticalRaw === "string" && isVertical(verticalRaw) ? verticalRaw : undefined;
+
+  /*
+    Quien pulsa «WhatsApp» quiere seguir por ahí, no en el correo. Pero pasa
+    por el mismo camino que el otro botón: primero se valida y se guarda el
+    lead, y solo entonces se devuelve el enlace. El orden es lo que importa —
+    si WhatsApp se abriera antes, bastaría con no escribir el mensaje para que
+    del interesado no quedara rastro, que es justo lo que se quiere evitar.
+  */
+  const porWhatsapp = formData.get("intent") === "whatsapp";
+  const telefono = `${parsed.data.phoneCode} ${parsed.data.phone}`;
 
   try {
     const lead = await createLead({
@@ -102,7 +136,8 @@ export async function submitInquiry(
       contact: {
         name: parsed.data.name,
         email: parsed.data.email,
-        phone: parsed.data.phone,
+        phone: telefono,
+        preferredChannel: porWhatsapp ? "whatsapp" : "email",
       },
       vertical,
       opportunityId: parsed.data.opportunityId,
@@ -110,10 +145,55 @@ export async function submitInquiry(
     });
 
     track({ name: "inquiry_submitted", opportunityId: parsed.data.opportunityId, vertical });
-    return { status: "success", reference: lead.reference };
+
+    return {
+      status: "success",
+      reference: lead.reference,
+      whatsapp: porWhatsapp ? enlaceWhatsapp(formData, locale, parsed.data) : undefined,
+    };
   } catch {
-    return { status: "error", message: dict.errors.generic };
+    return {
+      status: "error",
+      message: dict.errors.generic,
+      values: devueltos(formData, CAMPOS_FICHA),
+    };
   }
+}
+
+/**
+ * Enlace con el que arranca la conversación, armado EN EL SERVIDOR.
+ *
+ * La ruta no se toma tal cual del formulario: se reconstruye a partir de la
+ * vertical y del slug, y solo si los dos pasan su comprobación. Un campo
+ * oculto lo puede reescribir cualquiera desde las herramientas del navegador,
+ * y de ahí saldría un enlace con el dominio de otro dentro de un mensaje que
+ * parece de la casa.
+ */
+function enlaceWhatsapp(
+  formData: FormData,
+  locale: Locale,
+  datos: { readonly name: string; readonly message: string },
+): string | undefined {
+  const dict = getDictionary(locale);
+
+  const verticalRaw = formData.get("vertical");
+  const slugRaw = formData.get("slug");
+
+  const vertical = typeof verticalRaw === "string" && isVertical(verticalRaw) ? verticalRaw : null;
+  const slug =
+    typeof slugRaw === "string" && /^[a-z0-9-]{1,120}$/.test(slugRaw) ? slugRaw : null;
+
+  const enlace = vertical && slug ? absoluteUrl(`/${locale}/${vertical}/${slug}`) : null;
+
+  const texto = interpolate(dict.inquiry.whatsappTemplate, {
+    name: datos.name,
+    message: datos.message,
+  });
+
+  // El enlace va al final y separado: WhatsApp lo convierte en tarjeta.
+  const conEnlace = enlace ? `${texto}\n\n${enlace}` : texto;
+
+  return whatsappHref(conEnlace, contact.whatsappSales) ?? undefined;
 }
 
 /* --- Contacto general ---------------------------------------------------------- */
