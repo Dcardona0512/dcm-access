@@ -127,9 +127,31 @@ export type LegalSlug = (typeof legalSlugs)[number];
    ========================================================================== */
 
 export const verticalVideos: Partial<
-  Record<Vertical, { readonly src: string; readonly tone: "dark" | "bright" }>
+  Record<
+    Vertical,
+    {
+      readonly src: string;
+      readonly tone: "dark" | "bright";
+      /**
+       * Segundo por el que empieza, cuando el principio del metraje no es lo
+       * que se quiere enseñar. El vídeo sigue hasta el final desde ahí, y al
+       * terminar vuelve a este punto en lugar de al cero.
+       */
+      readonly start?: number;
+    }
+  >
 > = {
-  "real-estate": { src: "/media/real-estate.mp4", tone: "bright" },
+  /*
+    Arranca en el segundo 6,34, que es el fotograma exacto en el que corta a
+    la toma aérea de la casa. Los seis primeros segundos son un contrapicado
+    de un tejado contra el cielo: se entiende cuando ya se está viendo el
+    vídeo, y es un mal comienzo para quien acaba de entrar en la sección.
+
+    El número no es a ojo. Se midió la diferencia entre fotogramas
+    consecutivos a lo largo de esa franja: dentro de una toma la diferencia es
+    casi cero y en el corte se dispara, y el salto está entre 6,32 y 6,34.
+  */
+  "real-estate": { src: "/media/real-estate.mp4", tone: "bright", start: 6.34 },
   motors: { src: "/media/motors.mp4", tone: "bright" },
   aviation: { src: "/media/aviation.mp4", tone: "bright" },
 };

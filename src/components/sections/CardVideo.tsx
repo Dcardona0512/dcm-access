@@ -21,7 +21,14 @@ import { useEffect, useRef, useState } from "react";
    rectángulo vacío.
    ========================================================================== */
 
-export function CardVideo({ src }: { readonly src: string }) {
+export function CardVideo({
+  src,
+  start = 0,
+}: {
+  readonly src: string;
+  /** Mismo punto de entrada que el fondo de la sección: ver `HeroVideo`. */
+  readonly start?: number;
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [activo, setActivo] = useState(false);
 
@@ -84,10 +91,27 @@ export function CardVideo({ src }: { readonly src: string }) {
   return (
     <video
       ref={videoRef}
-      // `activo` gobierna la descarga: sin `src` el navegador no pide nada.
-      src={activo ? src : undefined}
+      /*
+        `activo` gobierna la descarga: sin `src` el navegador no pide nada. Y
+        el punto de entrada viaja dentro de la dirección, como fragmento
+        temporal, para que el primer fotograma que se decodifique ya sea el
+        bueno y no haya un salto a la vista.
+      */
+      src={activo ? (start > 0 ? `${src}#t=${start}` : src) : undefined}
       muted
-      loop
+      // Con punto de entrada el bucle va a mano: `loop` rebobinaría al cero.
+      loop={start === 0}
+      onEnded={(event) => {
+        if (start === 0) return;
+        const video = event.currentTarget;
+        video.currentTime = start;
+        void video.play().catch(() => {});
+      }}
+      onLoadedMetadata={(event) => {
+        if (start > 0 && event.currentTarget.currentTime < start) {
+          event.currentTarget.currentTime = start;
+        }
+      }}
       playsInline
       preload="none"
       tabIndex={-1}

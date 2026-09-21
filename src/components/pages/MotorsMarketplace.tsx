@@ -74,7 +74,12 @@ export async function MotorsMarketplace({
 }: {
   readonly localeRaw: string;
   readonly searchParams: Record<string, string | string[] | undefined>;
-  readonly backgroundVideo?: { readonly src: string; readonly tone: VideoTone };
+  readonly backgroundVideo?: {
+    readonly src: string;
+    readonly tone: VideoTone;
+    /** Segundo por el que empieza el metraje. Ver `HeroVideo`. */
+    readonly start?: number;
+  };
 }) {
   if (!isLocale(localeRaw)) notFound();
 
@@ -176,7 +181,13 @@ export async function MotorsMarketplace({
         />
       ) : null}
 
-      {backgroundVideo ? <HeroVideo src={backgroundVideo.src} tone={backgroundVideo.tone} /> : null}
+      {backgroundVideo ? (
+        <HeroVideo
+          src={backgroundVideo.src}
+          tone={backgroundVideo.tone}
+          start={backgroundVideo.start}
+        />
+      ) : null}
 
       <div className={backgroundVideo ? "dcm-over-video relative" : undefined}>
         {/* --- Cabecera: el vídeo a pantalla completa ----------------------- */}
@@ -195,7 +206,9 @@ export async function MotorsMarketplace({
           ) : null}
 
           <Container width="wide" className={backgroundVideo ? "relative" : undefined}>
-            <div className={`flex max-w-3xl flex-col gap-6 ${backgroundVideo ? "dcm-text-halo" : ""}`}>
+            <div
+              className={`flex max-w-3xl flex-col gap-6 ${backgroundVideo ? "dcm-text-halo" : ""}`}
+            >
               <Eyebrow>{market.eyebrow}</Eyebrow>
               <h1 className="font-display text-display-2 text-balance">{copy.title}</h1>
               <p
@@ -332,7 +345,6 @@ export async function MotorsMarketplace({
             ) : null}
           </div>
         </Section>
-
       </div>
     </>
   );
@@ -352,7 +364,10 @@ function PageLink({
   }
 
   return (
-    <Link href={href} className="eyebrow text-fg-muted hover:text-fg text-[0.8rem] transition-colors">
+    <Link
+      href={href}
+      className="eyebrow text-fg-muted hover:text-fg text-[0.8rem] transition-colors"
+    >
       {children}
     </Link>
   );

@@ -82,7 +82,10 @@ export function VerticalsGrid({
                   />
 
                   {verticalVideos[item.vertical] ? (
-                    <CardVideo src={verticalVideos[item.vertical]!.src} />
+                    <CardVideo
+                      src={verticalVideos[item.vertical]!.src}
+                      start={verticalVideos[item.vertical]!.start}
+                    />
                   ) : null}
 
                   {/*

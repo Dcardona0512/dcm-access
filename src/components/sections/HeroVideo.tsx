@@ -44,9 +44,19 @@ export type VideoTone = "dark" | "bright";
 export function HeroVideo({
   src = "/media/hero.mp4",
   tone = "dark",
+  start = 0,
 }: {
   readonly src?: string;
   readonly tone?: VideoTone;
+  /**
+   * Segundo por el que empieza el metraje.
+   *
+   * No todos los vídeos empiezan por su mejor plano. Inmobiliario abre con
+   * seis segundos de tejado contra el cielo antes de cortar a la toma aérea
+   * que sí cuenta algo, y recortar el archivo para eso sería perder metraje
+   * que quizá quiera usarse más adelante.
+   */
+  readonly start?: number;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -77,13 +87,28 @@ export function HeroVideo({
     }
 
     /**
+     * Segunda red para el punto de entrada, por si el fragmento de la
+     * dirección no se respetó.
+     *
+     * Aquí NO vale escuchar `loadedmetadata`: con `preload="auto"` el
+     * navegador tiene los metadatos mucho antes de que React hidrate, así que
+     * el evento ya pasó y el escuchador llega tarde —el mismo tropiezo que en
+     * su día dejó este vídeo invisible esperando un `canplay` que nunca
+     * volvió a dispararse—. Se comprueba el estado, que es un hecho, en lugar
+     * de esperar un aviso.
+     */
+    if (start > 0 && video.currentTime < start && video.readyState >= 1) {
+      video.currentTime = start;
+    }
+
+    /**
      * Red de seguridad para el atributo `autoplay`. Normalmente el navegador
      * ya arrancó por su cuenta durante el parseo; esto solo cubre los casos en
      * que lo rechazó. Si vuelve a rechazarlo tampoco pasa nada: el fondo
      * compuesto sostiene la composición por sí solo.
      */
     if (video.paused) void video.play().catch(() => {});
-  }, []);
+  }, [start]);
 
   return (
     <div
@@ -108,7 +133,7 @@ export function HeroVideo({
          * el mismo elemento y seguiría reproduciendo el vídeo anterior: cambiar
          * el `<source>` de un vídeo ya cargado no dispara una carga nueva.
          */
-        key={src}
+        key={`${src}#${start}`}
         ref={videoRef}
         /**
          * `autoPlay` en el atributo, no un `play()` desde el efecto: así el
@@ -118,7 +143,29 @@ export function HeroVideo({
          */
         autoPlay
         muted
-        loop
+        /**
+         * El bucle se hace a mano en cuanto hay punto de entrada.
+         *
+         * El atributo `loop` vuelve siempre al cero, así que con él el vídeo
+         * enseñaría el principio descartado en cada vuelta: bien la primera
+         * pasada y mal todas las demás. Sin el atributo salta `ended`, y ahí
+         * se rebobina al punto que toca.
+         */
+        loop={start === 0}
+        onEnded={(event) => {
+          if (start === 0) return;
+          const video = event.currentTarget;
+          video.currentTime = start;
+          void video.play().catch(() => {});
+        }}
+        // Por si el navegador cargó los metadatos después de hidratar. No es
+        // la defensa principal —esa va en la dirección y en el efecto—, pero
+        // cuesta una línea y cubre el orden contrario.
+        onLoadedMetadata={(event) => {
+          if (start > 0 && event.currentTarget.currentTime < start) {
+            event.currentTarget.currentTime = start;
+          }
+        }}
         playsInline
         // `auto`, no `metadata`: el vídeo es lo primero que se ve y su
         // descarga queda tapada por los ~2,8 s de la cortina de entrada, así
@@ -138,7 +185,15 @@ export function HeroVideo({
          */
         className="absolute inset-0 h-full w-full object-cover"
       >
-        <source src={src} type="video/mp4" />
+        {/*
+          EL PUNTO DE ENTRADA VA EN LA DIRECCIÓN, como fragmento temporal.
+          Es la única forma de que el navegador empiece donde toca SIN
+          JavaScript: lo aplica al abrir el archivo, antes de que React
+          hidrate, así que no hay un parpadeo del fotograma cero ni se depende
+          de que un escuchador llegue a tiempo. El rebobinado del bucle sí es
+          cosa nuestra, arriba.
+        */}
+        <source src={start > 0 ? `${src}#t=${start}` : src} type="video/mp4" />
       </video>
 
       <HeroScrim />

@@ -57,7 +57,12 @@ export async function VerticalPage({
    * siempre — es opcional a propósito, porque no todas tienen vídeo propio y
    * ninguna debe depender de tenerlo.
    */
-  readonly backgroundVideo?: { readonly src: string; readonly tone: VideoTone };
+  readonly backgroundVideo?: {
+    readonly src: string;
+    readonly tone: VideoTone;
+    /** Segundo por el que empieza el metraje. Ver `HeroVideo`. */
+    readonly start?: number;
+  };
 }) {
   if (!isLocale(localeRaw)) notFound();
 
@@ -87,7 +92,13 @@ export async function VerticalPage({
       />
 
       {/* Capa fija: permanece detrás de todo el recorrido de la vertical. */}
-      {backgroundVideo ? <HeroVideo src={backgroundVideo.src} tone={backgroundVideo.tone} /> : null}
+      {backgroundVideo ? (
+        <HeroVideo
+          src={backgroundVideo.src}
+          tone={backgroundVideo.tone}
+          start={backgroundVideo.start}
+        />
+      ) : null}
 
       {/*
         `dcm-over-video` redefine los tokens de superficie a versiones
@@ -244,7 +255,6 @@ export async function VerticalPage({
             </ul>
           )}
         </Section>
-
       </div>
     </>
   );
