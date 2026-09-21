@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Logo } from "@/components/brand/Logo";
-import { navHrefs, verticalNav, whatsappHref } from "@/content/shared";
+import { navHrefs, verticalNav } from "@/content/shared";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import type { Dictionary } from "@/content/types";
@@ -51,8 +51,15 @@ export function SiteHeader({
    * Vender abre una conversación, no un formulario. Si algún día falta el
    * número, el botón cae al contacto en vez de llevar a un error de WhatsApp.
    */
-  const sellHref = whatsappHref(dict.common.sellMessage) ?? to(navHrefs.contact);
-  const sellIsExternal = sellHref.startsWith("http");
+  /*
+    AQUÍ HABÍA UN BOTÓN DE «VENDER» que abría WhatsApp.
+    
+    Tenía sentido cuando la única forma de traer inventario era que alguien
+    escribiera por WhatsApp y lo publicáramos a mano. Ahora quien tiene algo
+    que ofrecer se registra como partner, pasa verificación y queda en la base
+    con su ficha; mandarlo a un chat era devolverlo al camino que la
+    plataforma acaba de sustituir, y encima perdía el dato.
+  */
 
   /**
    * La portada es la raíz del idioma y nada más: `/es`, `/en`. Se compara con
@@ -134,21 +141,33 @@ export function SiteHeader({
               cabecera necesita saber de la sesión: el rol decide el destino en
               el servidor, aquí solo llega una dirección ya resuelta.
             */}
-            <Link
-              href={cuenta ?? "/login"}
-              className="eyebrow text-fg-muted hover:text-fg hidden text-[0.75rem] transition-colors md:inline-flex"
-            >
-              {cuenta ? dict.common.account : dict.auth.loginHeading}
-            </Link>
+            {/*
+              «Crear cuenta» es texto y aparece solo cuando hay sitio: con las
+              cinco verticales, el selector de idioma y el botón, en una
+              pantalla mediana no cabe una palabra más sin que la barra empiece
+              a comerse la navegación.
+            */}
+            {cuenta ? null : (
+              <Link
+                href="/signup"
+                className="eyebrow text-fg-muted hover:text-fg hidden text-[0.8rem] font-bold transition-colors xl:inline-flex"
+              >
+                {dict.auth.signupHeading}
+              </Link>
+            )}
 
+            {/*
+              Entrar o ir a su panel. El enlace de texto es para quien ya tiene
+              cuenta —no necesita que le griten— y el botón dorado es la acción
+              que queremos: crear una.
+            */}
             <Button
-              href={sellHref}
-              target={sellIsExternal ? "_blank" : undefined}
+              href={cuenta ?? "/login"}
               variant="accent"
               size="sm"
               className="hidden sm:inline-flex"
             >
-              {dict.common.sell}
+              {cuenta ? dict.common.account : dict.auth.loginHeading}
             </Button>
 
             <button
@@ -171,8 +190,7 @@ export function SiteHeader({
         locale={locale}
         dict={dict}
         pathname={pathname}
-        sellHref={sellHref}
-        sellIsExternal={sellIsExternal}
+        cuenta={cuenta}
       />
     </header>
   );
@@ -216,8 +234,7 @@ function MobileDrawer({
   locale,
   dict,
   pathname,
-  sellHref,
-  sellIsExternal,
+  cuenta,
 }: {
   readonly open: boolean;
   readonly onClose: () => void;
@@ -225,8 +242,7 @@ function MobileDrawer({
   readonly dict: Dictionary;
   readonly pathname: string;
   /** Resuelto arriba para que la barra y el cajón no puedan divergir. */
-  readonly sellHref: string;
-  readonly sellIsExternal: boolean;
+  readonly cuenta: string | null;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
   const to = (href: string) => localizePath(href, locale);
@@ -308,17 +324,28 @@ function MobileDrawer({
                   ))}
                 </ul>
 
-                <div className="flex flex-col gap-6">
-                  <Button
-                    href={sellHref}
-                    target={sellIsExternal ? "_blank" : undefined}
-                    variant="accent"
-                    fullWidth
-                    onClick={onClose}
-                  >
-                    {dict.common.sell}
-                  </Button>
-                  <LocaleSwitcher locale={locale} dict={dict} />
+                <div className="flex flex-col gap-4">
+                  {/*
+                    En el teléfono la entrada TIENE que estar aquí: es la única
+                    superficie que queda cuando la barra se reduce a logo y
+                    menú. Estaba solo en escritorio, y por eso no se veía.
+                  */}
+                  {cuenta ? (
+                    <Button href={cuenta} variant="accent" fullWidth onClick={onClose}>
+                      {dict.common.account}
+                    </Button>
+                  ) : (
+                    <>
+                      <Button href="/signup" variant="accent" fullWidth onClick={onClose}>
+                        {dict.auth.signupHeading}
+                      </Button>
+                      <Button href="/login" variant="outline" fullWidth onClick={onClose}>
+                        {dict.auth.loginHeading}
+                      </Button>
+                    </>
+                  )}
+
+                  <LocaleSwitcher locale={locale} dict={dict} className="mt-2" />
                 </div>
               </nav>
             </Container>
