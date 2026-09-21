@@ -93,7 +93,20 @@ export function MediaGallery({
 
   return (
     <section aria-label={label} className={cn("relative", className)}>
-      <div className={cn("grid gap-2", mosaico && "grid-cols-2 sm:grid-cols-3 sm:grid-rows-2")}>
+      {/*
+        El realce es de TODO el mosaico, no de la pieza que hay debajo del
+        ratón. Pieza a pieza, mover el ratón por las tres fotos las encendía y
+        apagaba por turnos, y eso las hacía parecer tres botones distintos
+        —como si cada una llevara a otro sitio— cuando las tres abren lo mismo.
+        El grupo vive aquí, en la rejilla, y no en la sección entera: los
+        atajos de la esquina son otra cosa y no deben encender las fotos.
+      */}
+      <div
+        className={cn(
+          "group/galeria grid gap-2",
+          mosaico && "grid-cols-2 sm:grid-cols-3 sm:grid-rows-2",
+        )}
+      >
         <Placa
           item={portada}
           prioritaria
@@ -184,7 +197,7 @@ function Placa({
       onClick={onAbrir}
       aria-label={insignia ? `Ver las ${insignia} fotos restantes` : `Ampliar: ${item.alt}`}
       className={cn(
-        "group/placa focus-visible:outline-accent relative block w-full cursor-pointer",
+        "focus-visible:outline-accent relative block w-full cursor-pointer",
         "overflow-hidden rounded-(--radius-card) focus-visible:outline-2 focus-visible:outline-offset-2",
         className,
       )}
@@ -194,13 +207,13 @@ function Placa({
         ratio="fill"
         priority={prioritaria}
         sizes={sizes}
-        className="transition-transform duration-(--duration-slow) ease-(--ease-brand) group-hover/placa:scale-[1.04]"
+        className="transition-transform duration-(--duration-slow) ease-(--ease-brand) group-hover/galeria:scale-[1.04]"
       />
 
       {/* Velo de realce: oscurece apenas lo justo para que se note el paso del ratón. */}
       <span
         aria-hidden="true"
-        className="absolute inset-0 bg-black/0 transition-colors duration-(--duration-fast) group-hover/placa:bg-black/20"
+        className="absolute inset-0 bg-black/0 transition-colors duration-(--duration-fast) group-hover/galeria:bg-black/15"
       />
 
       {item.kind === "video" ? (

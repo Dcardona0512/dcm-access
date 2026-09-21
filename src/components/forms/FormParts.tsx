@@ -2,7 +2,7 @@
 
 import { useFormStatus } from "react-dom";
 
-import { Monograma } from "@/components/brand/Monograma";
+import { Logo } from "@/components/brand/Logo";
 import type { Dictionary } from "@/content/types";
 import type { FormState } from "@/lib/forms/state";
 import { cn } from "@/lib/utils";
@@ -80,7 +80,12 @@ export function FormSuccess({
         className,
       )}
     >
-      <Monograma className="text-accent text-2xl" />
+      {/*
+        El logotipo entero y no el monograma: esto es una confirmación, no un
+        hueco de 16 píxeles. Quien acaba de dejar sus datos tiene que ver la
+        marca completa —con ACCESS— y no unas iniciales sueltas.
+      */}
+      <Logo variant="stacked" className="text-accent text-[1.15rem]" />
       <h3 className="font-display text-2xl text-balance">{heading}</h3>
       <p className="text-fg-muted max-w-[52ch] text-pretty">{body}</p>
       {reference ? (

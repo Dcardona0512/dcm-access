@@ -455,7 +455,7 @@ export const es: Dictionary = {
     whatsappTemplate: "{message}\n\nSoy {name}.",
     successHeading: "Consulta enviada",
     successBody: "Un asesor revisa su consulta y le responde con el detalle disponible.",
-    successWhatsapp: "Abriendo WhatsApp con la ficha. Si no se abre solo, pulse aquí.",
+    successWhatsapp: "WhatsApp se abrió en otra pestaña. Si no la ve, pulse aquí.",
   },
 
   legal: {

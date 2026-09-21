@@ -42,8 +42,10 @@ export function Logo({ variant = "full", className, descriptor }: LogoProps) {
 
   if (variant === "stacked") {
     return (
-      <span className={cn("flex flex-col items-center gap-3 text-current", className)}>
-        <Wordmark className="text-[1.75rem]" />
+      <span
+        className={cn("flex flex-col items-center gap-3 text-[1.75rem] text-current", className)}
+      >
+        <Wordmark />
         {descriptor ? <Descriptor text={descriptor} /> : null}
         <span className="sr-only">{brand.name}</span>
       </span>
@@ -51,7 +53,13 @@ export function Logo({ variant = "full", className, descriptor }: LogoProps) {
   }
 
   return (
-    <span className={cn("flex flex-col gap-1.5 text-current", className)}>
+    /*
+      EL CUERPO VA EN EL ENVOLTORIO, no dentro del lockup. Así una llamada
+      puede cambiarlo con una clase —la confirmación del formulario lo necesita
+      más pequeño para caber en la columna— y todo lo demás, incluido el lema,
+      escala con él porque está medido en `em`.
+    */
+    <span className={cn("flex flex-col gap-1.5 text-[1.35rem] text-current", className)}>
       <Wordmark />
       {descriptor ? <Descriptor text={descriptor} /> : null}
       <span className="sr-only">{brand.name}</span>
@@ -73,7 +81,7 @@ function Wordmark({ className }: { readonly className?: string }) {
     <span
       aria-hidden="true"
       className={cn(
-        "font-(family-name:--font-logo) flex items-stretch text-[1.35rem] leading-none",
+        "font-(family-name:--font-logo) flex items-stretch leading-none",
         "whitespace-nowrap uppercase",
         className,
       )}
@@ -106,7 +114,7 @@ function Descriptor({ text }: { readonly text: string }) {
     */
     <span
       aria-hidden="true"
-      className="font-(family-name:--font-logo) text-fg-muted text-[0.6rem] tracking-[0.3em] uppercase"
+      className="font-(family-name:--font-logo) text-fg-muted text-[0.44em] tracking-[0.3em] uppercase"
     >
       {text}
     </span>

@@ -453,7 +453,7 @@ export const en: Dictionary = {
     whatsappTemplate: "{message}\n\nI'm {name}.",
     successHeading: "Enquiry sent",
     successBody: "A broker will review your enquiry and reply with the available detail.",
-    successWhatsapp: "Opening WhatsApp with this listing. If it does not open, tap here.",
+    successWhatsapp: "WhatsApp opened in another tab. If you cannot see it, tap here.",
   },
 
   legal: {

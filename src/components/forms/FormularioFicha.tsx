@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { useFormStatus } from "react-dom";
 
 import { CheckboxField, Honeypot, TextAreaField, TextField } from "@/components/ui/Field";
@@ -82,17 +82,49 @@ export function FormularioFicha({
   */
   const previo = state.values ?? {};
 
+  /**
+   * Pestaña reservada para WhatsApp.
+   *
+   * LA ABRE EL BOTÓN, en el mismo clic, y aquí solo se le pone la dirección
+   * cuando el servidor confirma que el lead quedó guardado. Ese rodeo es la
+   * única forma de tener las dos cosas a la vez: los datos guardados ANTES de
+   * salir, y WhatsApp en una pestaña aparte. Abrirla desde aquí, un segundo
+   * después y sin que nadie haya pulsado nada, es exactamente lo que los
+   * navegadores bloquean como ventana emergente.
+   */
+  const pestanaWa = useRef<Window | null>(null);
+
   /*
-    El salto a WhatsApp ocurre aquí y no en el botón: hasta que la acción no
-    responde no existe el enlace, porque el enlace es la señal de que el lead
-    quedó guardado. Es una navegación de la propia pestaña —no una ventana
-    nueva—, así que ningún bloqueador de emergentes la corta. Aun así debajo
-    queda el enlace a la vista, por si el navegador la ignora.
+    Antes esto hacía `window.location.href = …` y se llevaba la pestaña de la
+    ficha a WhatsApp. En el teléfono se notaba poco; en un ordenador, que es
+    donde no está la aplicación, dejaba a la persona en la página de WhatsApp
+    —«abrir la app / continuar en WhatsApp Web»— con la ficha perdida detrás y
+    sin manera evidente de volver. La ficha se queda donde estaba.
   */
   useEffect(() => {
-    if (state.status === "success" && state.whatsapp) {
-      window.location.href = state.whatsapp;
+    if (state.status !== "success") return;
+
+    const ventana = pestanaWa.current;
+    pestanaWa.current = null;
+
+    if (!state.whatsapp) {
+      // Se pidió por correo: la pestaña en blanco que abrió el botón sobra.
+      ventana?.close();
+      return;
     }
+
+    if (ventana && !ventana.closed) {
+      // La página de destino no tiene por qué poder tocar la nuestra.
+      ventana.opener = null;
+      ventana.location.replace(state.whatsapp);
+      return;
+    }
+
+    /*
+      Sin pestaña —la bloqueó el navegador, o la cerró alguien— no se fuerza
+      una navegación por sorpresa: abajo queda el botón para abrir WhatsApp,
+      que además llega ya con el lead guardado.
+    */
   }, [state]);
 
   if (state.status === "success") {
@@ -109,6 +141,8 @@ export function FormularioFicha({
         {state.whatsapp ? (
           <a
             href={state.whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
             className="eyebrow border-line text-fg hover:border-fg-muted inline-flex items-center justify-center gap-2.5 rounded-(--radius-card) border px-5 py-3 text-center text-[0.75rem] transition-colors"
           >
             <MarcaWhatsApp />
@@ -211,7 +245,35 @@ export function FormularioFicha({
         error={state.errors?.consent}
       />
 
-      <Botones dict={dict} />
+      <Botones
+        dict={dict}
+        onPedirWhatsapp={() => {
+          /*
+            `about:blank` con un aviso dentro: la pestaña se abre al instante y
+            durante el segundo que tarda el servidor en responder hay algo
+            escrito en ella. Una pestaña en blanco que aparece sola se lee como
+            un fallo, y lo primero que hace la gente es cerrarla.
+          */
+          /*
+            SIN `noopener`, y es obligatorio: esa opción corta la referencia y
+            `window.open` devuelve `null`, con lo que no habría pestaña que
+            rellenar después. Lo que sí se hace es anularle el `opener` justo
+            antes de mandarla a WhatsApp, que da la misma protección sin
+            perder el mando.
+          */
+          const ventana = window.open("about:blank", "_blank");
+          if (ventana) {
+            ventana.document.write(
+              `<!doctype html><meta charset="utf-8"><title>WhatsApp</title>` +
+                `<body style="margin:0;display:grid;place-items:center;height:100vh;` +
+                `background:#08090a;color:#c9a96a;font:600 14px/1.4 system-ui,sans-serif">` +
+                `Abriendo WhatsApp…</body>`,
+            );
+            ventana.document.close();
+          }
+          pestanaWa.current = ventana;
+        }}
+      />
     </form>
   );
 }
@@ -223,7 +285,13 @@ export function FormularioFicha({
  * así que la acción sabe por dónde quiere seguir la conversación sin que haga
  * falta estado en el cliente ni dos formularios distintos.
  */
-function Botones({ dict }: { readonly dict: Dictionary }) {
+function Botones({
+  dict,
+  onPedirWhatsapp,
+}: {
+  readonly dict: Dictionary;
+  readonly onPedirWhatsapp: () => void;
+}) {
   const { pending } = useFormStatus();
 
   const base =
@@ -253,6 +321,12 @@ function Botones({ dict }: { readonly dict: Dictionary }) {
         value="whatsapp"
         disabled={pending}
         aria-busy={pending}
+        /*
+          Se abre la pestaña AQUÍ, dentro del gesto de pulsar, y no cuando
+          vuelve la respuesta: es la diferencia entre una pestaña que el
+          navegador permite y una que bloquea. El envío sigue su camino.
+        */
+        onClick={onPedirWhatsapp}
         className={`${base} border-line text-fg hover:border-fg-muted border`}
       >
         <MarcaWhatsApp />
