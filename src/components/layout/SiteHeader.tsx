@@ -142,21 +142,6 @@ export function SiteHeader({
               el servidor, aquí solo llega una dirección ya resuelta.
             */}
             {/*
-              «Crear cuenta» es texto y aparece solo cuando hay sitio: con las
-              cinco verticales, el selector de idioma y el botón, en una
-              pantalla mediana no cabe una palabra más sin que la barra empiece
-              a comerse la navegación.
-            */}
-            {cuenta ? null : (
-              <Link
-                href="/signup"
-                className="eyebrow text-fg-muted hover:text-fg hidden text-[0.8rem] font-bold transition-colors xl:inline-flex"
-              >
-                {dict.auth.signupHeading}
-              </Link>
-            )}
-
-            {/*
               Entrar o ir a su panel. El enlace de texto es para quien ya tiene
               cuenta —no necesita que le griten— y el botón dorado es la acción
               que queremos: crear una.

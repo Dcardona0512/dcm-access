@@ -1,18 +1,24 @@
 import { AdminHeading } from "@/components/admin/AdminUI";
+import { invitaciones } from "@/lib/data/supabase/invites";
 import { partnersDelPanel, type PartnerStatus } from "@/lib/data/supabase/partners";
 import { formatDateShort } from "@/lib/format";
+import { siteUrl } from "@/lib/seo";
 
-import { setPartnerStatus } from "./actions";
+import { nuevoSocio, setPartnerStatus } from "./actions";
+import { Invitacion } from "./Invitacion";
 
 export const dynamic = "force-dynamic";
 
 /* ============================================================================
-   VERIFICACIÓN DE PARTNERS
+   SOCIOS
    ----------------------------------------------------------------------------
-   La pantalla que convierte una solicitud en un proveedor con permiso para
-   publicar. Es el cuello de botella del catálogo a propósito: si cualquiera
-   pudiera publicar, «verificado» dejaría de significar nada y con ello se cae
-   la razón por la que un cliente se fía de lo que ve aquí.
+   A DCM ACCESS no se entra: se entra INVITADO. Aquí se genera el código, se
+   manda el enlace y quien lo abre entra con su correo de Google convertido ya
+   en socio —porque el código se lo diste tú, y al dártelo ya confiaste—.
+
+   El código vive quince minutos. Es corto a propósito: el enlace se manda
+   cuando la persona está al otro lado esperando, no la víspera. Generar otro
+   cuesta un clic.
    ========================================================================== */
 
 const ETIQUETAS: Record<PartnerStatus, string> = {
@@ -33,7 +39,7 @@ const SIGUIENTES: Record<PartnerStatus, readonly PartnerStatus[]> = {
 };
 
 export default async function AdminPartnersPage() {
-  const partners = await partnersDelPanel();
+  const [partners, invites] = await Promise.all([partnersDelPanel(), invitaciones(8)]);
 
   const pendientes = partners.filter((p) => p.status === "pending" || p.status === "in_review");
   const resto = partners.filter((p) => p.status !== "pending" && p.status !== "in_review");
@@ -41,18 +47,61 @@ export default async function AdminPartnersPage() {
   return (
     <>
       <AdminHeading
-        title="Partners"
-        lede="Cada solicitud se revisa a mano. Verificar concede el rol y habilita la publicación; retirarlo lo quita."
+        title="Socios"
+        lede="Se entra por invitación. El código vive quince minutos y sirve una sola vez."
       />
+
+      <section className="border-line bg-surface-raised mb-10 flex flex-col gap-5 rounded-(--radius-card) border p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-base">Nuevo socio</h2>
+
+          <form action={nuevoSocio}>
+            <button
+              type="submit"
+              className="eyebrow border-accent/60 text-accent hover:bg-accent hover:text-surface cursor-pointer rounded-(--radius-card) border px-4 py-2 text-[0.7rem] transition-colors"
+            >
+              Crear código
+            </button>
+          </form>
+        </div>
+
+        {invites.length === 0 ? (
+          <p className="text-fg-muted/70 text-sm text-pretty">
+            Todavía no ha generado ninguna invitación.
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-3">
+            {invites.map((invite) => (
+              <li key={invite.id}>
+                {invite.usedAt ? (
+                  <p className="border-line-soft text-fg-muted/70 flex flex-wrap items-center justify-between gap-2 rounded-(--radius-card) border px-4 py-3 text-xs">
+                    <span data-numeric>{invite.code}</span>
+                    <span>
+                      Usado por {invite.usedByEmail ?? "una cuenta"} el{" "}
+                      {formatDateShort(invite.usedAt, "es")}
+                    </span>
+                  </p>
+                ) : (
+                  <Invitacion
+                    codigo={invite.code}
+                    caducaEn={invite.expiresAt}
+                    origen={siteUrl}
+                  />
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       {partners.length === 0 ? (
         <p className="border-line text-fg-muted rounded-(--radius-card) border border-dashed px-6 py-14 text-center text-sm">
-          Todavía no hay solicitudes de partner.
+          Todavía no hay socios. Genere un código y envíe el enlace.
         </p>
       ) : (
         <div className="flex flex-col gap-10">
           <Grupo titulo="Esperando revisión" partners={pendientes} />
-          <Grupo titulo="Resueltos" partners={resto} />
+          <Grupo titulo="Socios" partners={resto} />
         </div>
       )}
     </>

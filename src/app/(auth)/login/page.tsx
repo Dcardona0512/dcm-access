@@ -42,10 +42,18 @@ export default async function LoginPage({
       locale={locale}
       dict={dict}
       pie={
+        /*
+          Antes llevaba a registrarse, y ya no hay registro: a la cuenta se
+          entra invitado. Quien llega aquí sin cuenta es casi siempre alguien
+          que quiere publicar, así que el enlace lo lleva justo ahí.
+        */
         <>
-          {dict.auth.noAccount}{" "}
-          <Link href="/signup" className="text-accent font-medium underline-offset-2 hover:underline">
-            {dict.auth.toSignup}
+          ¿Quiere publicar con nosotros?{" "}
+          <Link
+            href={`/${locale}/sell`}
+            className="text-accent font-medium underline-offset-2 hover:underline"
+          >
+            Escríbanos
           </Link>
         </>
       }

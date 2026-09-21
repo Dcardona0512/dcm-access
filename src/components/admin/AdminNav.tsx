@@ -32,7 +32,7 @@ const ENTRIES: readonly { href: string; label: string; resource: Resource }[] = 
   { href: "/admin/publish", label: "Crear publicación", resource: "opportunities" },
   // Entra al menú porque ahora hay solicitudes de verdad esperando respuesta:
   // un partner sin revisar es un partner que no puede publicar.
-  { href: "/admin/partners", label: "Partners", resource: "providers" },
+  { href: "/admin/partners", label: "Socios", resource: "providers" },
   // Lo que hay que preguntarle a quien quiere vender. Entra al menú porque se
   // usa en cada conversación, no una vez al mes.
   { href: "/admin/questionnaires", label: "Cuestionarios", resource: "opportunities" },
