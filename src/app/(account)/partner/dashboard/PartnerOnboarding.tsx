@@ -3,7 +3,8 @@
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 
-import { createPartnerProfile, initialPartnerState } from "../actions";
+import { createPartnerProfile } from "../actions";
+import { initialPartnerState } from "../state";
 
 /* ============================================================================
    ALTA DE PARTNER

@@ -8,7 +8,8 @@ import { Logo } from "@/components/brand/Logo";
 import { Honeypot } from "@/components/ui/Field";
 import type { Dictionary } from "@/content/types";
 
-import { initialAuthState, sendMagicLink, signInWithGoogle } from "./actions";
+import { sendMagicLink, signInWithGoogle } from "./actions";
+import { initialAuthState } from "./state";
 
 /* ============================================================================
    LA PUERTA — ENTRAR Y REGISTRARSE

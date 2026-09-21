@@ -8,6 +8,8 @@ import { absoluteUrl } from "@/lib/seo";
 import { checkRateLimit, isHoneypotTripped } from "@/lib/security/rate-limit";
 import { createSessionClient, isSupabaseConfigured } from "@/lib/supabase/server";
 
+import type { AuthState } from "./state";
+
 /* ============================================================================
    ENTRAR Y REGISTRARSE
    ----------------------------------------------------------------------------
@@ -21,14 +23,6 @@ import { createSessionClient, isSupabaseConfigured } from "@/lib/supabase/server
    el rol, registrarse como partner sería ascenderse solo; y si decidiera el de
    administrador, bastaría con editar el HTML.
    ========================================================================== */
-
-export type AuthState = {
-  readonly status: "idle" | "sent" | "error";
-  readonly message?: string;
-  readonly email?: string;
-};
-
-export const initialAuthState: AuthState = { status: "idle" };
 
 const esquema = z.object({
   email: z.string().trim().min(1).email().max(254).toLowerCase(),

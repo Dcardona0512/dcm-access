@@ -6,6 +6,8 @@ import { z } from "zod";
 import { requireSession } from "@/lib/auth/session";
 import { createSessionClient } from "@/lib/supabase/server";
 
+import type { PartnerState } from "./state";
+
 /* ============================================================================
    ALTA DE PARTNER
    ----------------------------------------------------------------------------
@@ -15,13 +17,6 @@ import { createSessionClient } from "@/lib/supabase/server";
    escribe y el estado es pendiente. Este código podría equivocarse; la base no
    lo dejaría pasar.
    ========================================================================== */
-
-export type PartnerState = {
-  readonly status: "idle" | "error";
-  readonly message?: string;
-};
-
-export const initialPartnerState: PartnerState = { status: "idle" };
 
 const esquema = z.object({
   companyName: z.string().trim().min(2, "Escriba el nombre de la empresa.").max(160),
