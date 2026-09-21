@@ -18,14 +18,36 @@ import type { PartnerState } from "./state";
    lo dejaría pasar.
    ========================================================================== */
 
-const esquema = z.object({
-  companyName: z.string().trim().min(2, "Escriba el nombre de la empresa.").max(160),
-  website: z.string().trim().max(200).optional(),
-  country: z.string().trim().length(2).optional(),
-  city: z.string().trim().max(120).optional(),
-  category: z.string().trim().max(120).optional(),
-  description: z.string().trim().min(20, "Cuente en dos líneas a qué se dedica.").max(2000),
-});
+/**
+ * Las cinco categorías, con sus dos cajones que piden explicación.
+ *
+ * «Otro servicio» y «negocios» son demasiado grandes para clasificar a nadie:
+ * bajo el mismo rótulo caben un escolta, una constructora y un fondo. Cuando
+ * se eligen, el formulario pide que lo escriban.
+ */
+const CATEGORIAS = ["real-estate", "motors", "aviation", "services", "business"] as const;
+const PIDEN_DETALLE: readonly string[] = ["services", "business"];
+
+const esquema = z
+  .object({
+    companyName: z.string().trim().min(2, "Escriba el nombre de la empresa.").max(160),
+    country: z.string().trim().length(2).optional(),
+    region: z.string().trim().max(120).optional(),
+    city: z.string().trim().max(120).optional(),
+    category: z.enum(CATEGORIAS, { message: "Elija a qué se dedica." }),
+    categoryDetail: z.string().trim().max(160).optional(),
+    description: z.string().trim().min(20, "Cuente en dos líneas a qué se dedica.").max(2000),
+  })
+  /*
+    La comprobación va aquí y no solo en la pantalla: el campo de detalle
+    aparece y desaparece con JavaScript, y un formulario enviado sin él —o
+    reescrito a mano— llegaría con la categoría más vaga posible y sin nada
+    que la concrete.
+  */
+  .refine(
+    (datos) => !PIDEN_DETALLE.includes(datos.category) || Boolean(datos.categoryDetail),
+    { message: "Escriba a qué se dedica.", path: ["categoryDetail"] },
+  );
 
 export async function createPartnerProfile(
   _previo: PartnerState,
@@ -35,10 +57,11 @@ export async function createPartnerProfile(
 
   const parsed = esquema.safeParse({
     companyName: formData.get("companyName"),
-    website: formData.get("website") || undefined,
     country: formData.get("country") || undefined,
+    region: formData.get("region") || undefined,
     city: formData.get("city") || undefined,
     category: formData.get("category") || undefined,
+    categoryDetail: formData.get("categoryDetail") || undefined,
     description: formData.get("description"),
   });
 
@@ -53,10 +76,11 @@ export async function createPartnerProfile(
   const { error } = await supabase.from("partners").insert({
     owner_id: session.userId,
     company_name: parsed.data.companyName,
-    website: parsed.data.website ?? null,
     country: parsed.data.country?.toUpperCase() ?? null,
+    region: parsed.data.region ?? null,
     city: parsed.data.city ?? null,
-    category: parsed.data.category ?? null,
+    category: parsed.data.category,
+    category_detail: parsed.data.categoryDetail ?? null,
     description: parsed.data.description,
     status: "pending",
   });

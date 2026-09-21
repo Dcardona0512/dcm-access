@@ -21,6 +21,15 @@ export const dynamic = "force-dynamic";
    cuesta un clic.
    ========================================================================== */
 
+/** Lo que el socio eligió, en las mismas palabras que vio al elegirlo. */
+const CATEGORIAS: Record<string, string> = {
+  "real-estate": "Inmobiliaria",
+  motors: "Vehículos",
+  aviation: "Aviación",
+  services: "Otro servicio",
+  business: "Negocios",
+};
+
 const ETIQUETAS: Record<PartnerStatus, string> = {
   pending: "Pendiente",
   in_review: "En revisión",
@@ -152,7 +161,15 @@ function Grupo({
 
             <div className="text-fg-muted/60 flex flex-wrap gap-4 text-xs">
               {partner.website ? <span className="break-all">{partner.website}</span> : null}
-              {partner.category ? <span>{partner.category}</span> : null}
+              {/* La categoría se guarda como valor cerrado —«real-estate»— y
+                  aquí se lee en cristiano, con el detalle detrás cuando la
+                  opción elegida era uno de los dos cajones grandes. */}
+              {partner.category ? (
+                <span>
+                  {CATEGORIAS[partner.category] ?? partner.category}
+                  {partner.categoryDetail ? `: ${partner.categoryDetail}` : ""}
+                </span>
+              ) : null}
               <span data-numeric>Solicitado el {formatDateShort(partner.createdAt, "es")}</span>
             </div>
 

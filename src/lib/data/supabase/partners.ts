@@ -26,6 +26,7 @@ export type PartnerDelPanel = {
   readonly country: string | null;
   readonly city: string | null;
   readonly category: string | null;
+  readonly categoryDetail: string | null;
   readonly description: string | null;
   readonly status: PartnerStatus;
   readonly createdAt: string;
@@ -40,6 +41,7 @@ type Fila = {
   country: string | null;
   city: string | null;
   category: string | null;
+  category_detail: string | null;
   description: string | null;
   status: PartnerStatus;
   created_at: string;
@@ -48,7 +50,7 @@ type Fila = {
 };
 
 const COLUMNAS =
-  "id, owner_id, company_name, website, country, city, category, description, status, created_at, verified_at, profiles!partners_owner_id_fkey(email)";
+  "id, owner_id, company_name, website, country, city, category, category_detail, description, status, created_at, verified_at, profiles!partners_owner_id_fkey(email)";
 
 export async function partnersDelPanel(): Promise<readonly PartnerDelPanel[]> {
   if (!isSupabaseWritable()) return [];
@@ -70,6 +72,7 @@ export async function partnersDelPanel(): Promise<readonly PartnerDelPanel[]> {
     country: fila.country,
     city: fila.city,
     category: fila.category,
+    categoryDetail: fila.category_detail,
     description: fila.description,
     status: fila.status,
     createdAt: fila.created_at,

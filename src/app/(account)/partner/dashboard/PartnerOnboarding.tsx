@@ -1,7 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
+
+import { PlacePicker } from "@/components/admin/PlacePicker";
 
 import { createPartnerProfile } from "../actions";
 import { initialPartnerState } from "../state";
@@ -14,8 +16,37 @@ import { initialPartnerState } from "../state";
    la revisión los pida, no antes de saber si hay revisión.
    ========================================================================== */
 
-export function PartnerOnboarding({ nombre }: { readonly nombre: string }) {
+/**
+ * A qué se dedica el socio.
+ *
+ * Es una LISTA y no un campo libre: escrito a mano, lo mismo llega como
+ * «inmobiliaria», «finca raíz» o «bienes raíces», y entonces no sirve para
+ * agrupar ni para buscar. Con cinco opciones se responde en un toque.
+ *
+ * Dos de ellas piden que lo escriban. «Otro servicio» y «negocios» son
+ * cajones donde cabe cualquier cosa —un escolta, una constructora y un fondo
+ * caen en el mismo rótulo— así que la lista clasifica y el texto concreta.
+ */
+const CATEGORIAS: readonly { readonly valor: string; readonly texto: string }[] = [
+  { valor: "real-estate", texto: "Inmobiliaria" },
+  { valor: "motors", texto: "Vehículos" },
+  { valor: "aviation", texto: "Aviación" },
+  { valor: "services", texto: "Otro servicio" },
+  { valor: "business", texto: "Negocios" },
+];
+
+const PIDEN_DETALLE = new Set(["services", "business"]);
+
+export function PartnerOnboarding({
+  nombre,
+  countries,
+}: {
+  readonly nombre: string;
+  /** La lista de países, que la arma el servidor. */
+  readonly countries: readonly { readonly code: string; readonly name: string }[];
+}) {
   const [state, action] = useActionState(createPartnerProfile, initialPartnerState);
+  const [categoria, setCategoria] = useState("");
 
   const campo =
     "border-line text-fg placeholder:text-fg-muted/40 hover:border-fg-muted/40 focus-visible:border-accent w-full rounded-(--radius-card) border bg-transparent px-4 py-3 outline-none transition-colors";
@@ -44,32 +75,52 @@ export function PartnerOnboarding({ nombre }: { readonly nombre: string }) {
           <input name="companyName" required maxLength={160} className={campo} />
         </Campo>
 
-        <div className="grid gap-5 sm:grid-cols-2">
-          <Campo etiqueta="Sitio web" opcional>
-            <input name="website" placeholder="https://" maxLength={200} className={campo} />
-          </Campo>
-          <Campo etiqueta="A qué se dedica" opcional>
-            <input
+        <div className="grid gap-5">
+          <Campo etiqueta="A qué se dedica">
+            <select
               name="category"
-              placeholder="Inmobiliaria, vehículos, aviación…"
-              maxLength={120}
-              className={campo}
-            />
+              required
+              value={categoria}
+              onChange={(evento) => setCategoria(evento.target.value)}
+              className={`${campo} cursor-pointer`}
+            >
+              <option value="" disabled className="bg-surface-raised">
+                Elija una
+              </option>
+              {CATEGORIAS.map((opcion) => (
+                <option key={opcion.valor} value={opcion.valor} className="bg-surface-raised">
+                  {opcion.texto}
+                </option>
+              ))}
+            </select>
           </Campo>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-[8rem_minmax(0,1fr)]">
-          <Campo etiqueta="País" opcional>
+        {/* Solo cuando la categoría elegida no dice bastante por sí sola. */}
+        {PIDEN_DETALLE.has(categoria) ? (
+          <Campo etiqueta={categoria === "services" ? "¿Qué servicio?" : "¿Qué tipo de negocio?"}>
             <input
-              name="country"
-              placeholder="CO"
-              maxLength={2}
-              className={`${campo} uppercase`}
+              name="categoryDetail"
+              required
+              maxLength={160}
+              placeholder={
+                categoria === "services"
+                  ? "Escolta, conductor, logística, asesoría…"
+                  : "Maquinaria, participaciones, alianzas…"
+              }
+              className={campo}
             />
           </Campo>
-          <Campo etiqueta="Ciudad" opcional>
-            <input name="city" maxLength={120} className={campo} />
-          </Campo>
+        ) : null}
+
+        {/*
+          País, departamento y ciudad en cascada, el mismo componente que usa
+          el formulario de publicar. Escritos a mano, la misma ciudad llega de
+          cinco formas distintas y deja de servir para agrupar ni para buscar.
+        */}
+        <div className="flex flex-col gap-2">
+          <span className="eyebrow text-fg-muted text-[0.8rem]">Dónde está</span>
+          <PlacePicker countries={countries} onChange={() => {}} />
         </div>
 
         <Campo etiqueta="Descripción">

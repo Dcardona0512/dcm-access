@@ -11,8 +11,16 @@ import { getSession } from "@/lib/auth/session";
  * elegida, en vez de obligar a buscarla a mano desde Medellín.
  */
 export async function GET(request: Request) {
+  /*
+    Equipo Y SOCIOS. El socio también elige dónde está su empresa y dónde está
+    lo que publica, así que necesita la misma cascada; dejarla solo para el
+    equipo obligaría a escribir la ciudad a mano justo donde más importa que
+    esté normalizada.
+  */
   const sesion = await getSession();
-  if (!sesion || !TEAM_ROLES.includes(sesion.role)) {
+  const permitido = sesion && (TEAM_ROLES.includes(sesion.role) || sesion.role === "partner");
+
+  if (!permitido) {
     return NextResponse.json({ error: "Sin sesión." }, { status: 401 });
   }
 

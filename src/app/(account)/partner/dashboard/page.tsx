@@ -1,8 +1,9 @@
+import { Country } from "country-state-city";
 import { redirect } from "next/navigation";
 
 import { getSession, panelDe } from "@/lib/auth/session";
 import { miPartner, misFichas } from "@/lib/data/supabase/account";
-import { formatDateShort } from "@/lib/format";
+import { formatCountry, formatDateShort } from "@/lib/format";
 import { localeDeCookie } from "@/lib/i18n/cookie";
 
 import { PartnerOnboarding } from "./PartnerOnboarding";
@@ -61,7 +62,21 @@ export default async function PartnerDashboard() {
   const partner = await miPartner();
 
   if (!partner) {
-    return <PartnerOnboarding nombre={session.fullName ?? session.email} />;
+    /*
+      La lista entera de países va en el HTML —son unos pocos kilobytes— y lo
+      que no cabe, las divisiones y las ciudades, se pide al servidor cuando
+      hace falta. Mismo criterio que en el formulario de publicar.
+    */
+    const countries = Country.getAllCountries()
+      .map((pais) => ({
+        code: pais.isoCode,
+        name: formatCountry(pais.isoCode, "es") || pais.name,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name, "es"));
+
+    return (
+      <PartnerOnboarding nombre={session.fullName ?? session.email} countries={countries} />
+    );
   }
 
   const estado = ESTADOS[partner.status] ?? ESTADOS.pending;
