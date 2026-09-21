@@ -16,8 +16,8 @@ export type NavKey =
   | "real-estate"
   | "motors"
   | "aviation"
-  | "servicios"
-  | "negocios"
+  | "services"
+  | "business"
   | "contact";
 
 export type RegionKey = "latam" | "north-america" | "europe" | "middle-east" | "other";
@@ -178,8 +178,8 @@ export type Dictionary = {
     readonly "real-estate": VerticalCopy;
     readonly motors: VerticalCopy;
     readonly aviation: VerticalCopy;
-    readonly servicios: VerticalCopy;
-    readonly negocios: VerticalCopy;
+    readonly services: VerticalCopy;
+    readonly business: VerticalCopy;
   };
 
   /**

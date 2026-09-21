@@ -28,8 +28,8 @@ import { cn } from "@/lib/utils";
  */
 const ENTRIES: readonly { href: string; label: string; resource: Resource }[] = [
   { href: "/admin", label: "Resumen", resource: "opportunities" },
-  { href: "/admin/catalogo", label: "Catálogo", resource: "opportunities" },
-  { href: "/admin/publicar", label: "Crear publicación", resource: "opportunities" },
+  { href: "/admin/catalog", label: "Catálogo", resource: "opportunities" },
+  { href: "/admin/publish", label: "Crear publicación", resource: "opportunities" },
 ];
 
 export function AdminNav({ role }: { readonly role: Role }) {

@@ -6,7 +6,7 @@ import {
   opportunityStaticParams,
 } from "@/components/pages/OpportunityDetail";
 
-const VERTICAL = "negocios" as const;
+const VERTICAL = "services" as const;
 
 export async function generateStaticParams() {
   return opportunityStaticParams(VERTICAL);

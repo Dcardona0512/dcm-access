@@ -52,8 +52,8 @@ export const navHrefs: Record<NavKey, string> = {
   "real-estate": "/real-estate",
   motors: "/motors",
   aviation: "/aviation",
-  servicios: "/servicios",
-  negocios: "/negocios",
+  services: "/services",
+  business: "/business",
   contact: "/contact",
 };
 
@@ -62,8 +62,8 @@ export const verticalNav: readonly { readonly key: NavKey; readonly vertical: Ve
   { key: "real-estate", vertical: "real-estate" },
   { key: "motors", vertical: "motors" },
   { key: "aviation", vertical: "aviation" },
-  { key: "servicios", vertical: "servicios" },
-  { key: "negocios", vertical: "negocios" },
+  { key: "services", vertical: "services" },
+  { key: "business", vertical: "business" },
 ];
 
 /**

@@ -25,7 +25,51 @@ if (!supabaseUrl) {
   );
 }
 
+/**
+ * Rutas que cambiaron de nombre al pasar el sitio a inglés.
+ *
+ * Van aquí y no en el proxy porque Next comprueba las redirecciones ANTES del
+ * proxy: con la variante que ya lleva idioma, un enlace indexado como
+ * `/es/servicios` resuelve en UN salto en lugar de encadenar la redirección de
+ * idioma detrás.
+ *
+ * `permanent: true` responde 308, no 301: es el equivalente moderno, conserva
+ * el método de la petición y los buscadores lo tratan igual. Permanente es lo
+ * que toca —estas direcciones no van a volver— y es lo que hace que el enlace
+ * indexado acabe sustituido por el nuevo.
+ */
+const RENOMBRADAS: readonly { readonly de: string; readonly a: string }[] = [
+  { de: "servicios", a: "services" },
+  { de: "negocios", a: "business" },
+];
+
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      ...RENOMBRADAS.flatMap(({ de, a }) => [
+        { source: `/:locale(es|en)/${de}`, destination: `/:locale/${a}`, permanent: true },
+        {
+          source: `/:locale(es|en)/${de}/:path*`,
+          destination: `/:locale/${a}/:path*`,
+          permanent: true,
+        },
+        // Sin idioma: el proxy le pondrá el suyo después de esta.
+        { source: `/${de}`, destination: `/${a}`, permanent: true },
+        { source: `/${de}/:path*`, destination: `/${a}/:path*`, permanent: true },
+      ]),
+
+      // El panel también pasa a inglés. No está indexado, pero la barra de
+      // direcciones de quien lo usa a diario sí guarda las viejas.
+      { source: "/admin/catalogo", destination: "/admin/catalog", permanent: true },
+      { source: "/admin/publicar", destination: "/admin/publish", permanent: true },
+      {
+        source: "/admin/opportunities/:id/editar",
+        destination: "/admin/opportunities/:id/edit",
+        permanent: true,
+      },
+    ];
+  },
+
   /*
     La fuente del logotipo viaja con las funciones que dibujan el favicon, el
     icono de pantalla de inicio y la tarjeta social. Se lee del disco con

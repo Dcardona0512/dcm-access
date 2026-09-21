@@ -21,8 +21,8 @@ export const en: Dictionary = {
     "real-estate": "Real Estate",
     motors: "Motors",
     aviation: "Aviation",
-    servicios: "Services",
-    negocios: "Business",
+    services: "Services",
+    business: "Business",
     contact: "Contact",
   },
 
@@ -199,7 +199,7 @@ export const en: Dictionary = {
       compliance:
         "DCM ACCESS does not operate aircraft and does not provide air services. All flight operations are carried out by duly certified operators under the applicable aviation regulations.",
     },
-    servicios: {
+    services: {
       eyebrow: "Services",
       title: "Private services and executive logistics",
       lede: "We connect clients with professional providers of transport, concierge, logistics and protection services.",
@@ -216,7 +216,7 @@ export const en: Dictionary = {
       compliance:
         "Security and protection services are provided exclusively by legally licensed companies holding current authorisation in their jurisdiction. DCM ACCESS acts as an intermediary, not as the service provider.",
     },
-    negocios: {
+    business: {
       eyebrow: "Business",
       title: "Business assets and commercial opportunities",
       lede: "The open category: machinery, equipment, holdings, suppliers and partnerships that do not fit the others.",

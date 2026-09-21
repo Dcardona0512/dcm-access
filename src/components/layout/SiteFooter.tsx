@@ -8,7 +8,7 @@ import type { Dictionary } from "@/content/types";
 import { localizePath, type Locale } from "@/lib/i18n/config";
 
 /** Solo claves: las etiquetas salen de `dict.navLabels` en el idioma activo. */
-const EXPLORE_KEYS = ["real-estate", "motors", "aviation", "servicios", "negocios"] as const;
+const EXPLORE_KEYS = ["real-estate", "motors", "aviation", "services", "business"] as const;
 
 export function SiteFooter({
   locale,

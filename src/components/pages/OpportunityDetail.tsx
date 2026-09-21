@@ -393,8 +393,8 @@ function listingSchema(opportunity: Opportunity, locale: Locale) {
     "real-estate": "RealEstateListing",
     motors: "Product",
     aviation: "Service",
-    servicios: "Service",
-    negocios: "Product",
+    services: "Service",
+    business: "Product",
   };
 
   const offers =

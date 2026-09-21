@@ -35,8 +35,8 @@ const tones = {
   "real-estate": "architecture",
   motors: "motors",
   aviation: "aviation",
-  servicios: "services",
-  negocios: "business",
+  services: "services",
+  business: "business",
 } as const;
 
 export default async function AdminCatalogoPage({
@@ -63,14 +63,14 @@ export default async function AdminCatalogoPage({
       />
 
       <div className="mb-8 flex flex-wrap items-center gap-2">
-        <Pestana href="/admin/catalogo" activa={seccion === null}>
+        <Pestana href="/admin/catalog" activa={seccion === null}>
           Todas <Cuenta n={todo.length} />
         </Pestana>
 
         {verticals.map((vertical) => (
           <Pestana
             key={vertical}
-            href={`/admin/catalogo?seccion=${vertical}`}
+            href={`/admin/catalog?seccion=${vertical}`}
             activa={seccion === vertical}
           >
             {localized(verticalLabels[vertical], "es")} <Cuenta n={cuenta(vertical)} />
@@ -83,7 +83,7 @@ export default async function AdminCatalogoPage({
           {seccion
             ? `Todavía no hay nada publicado en ${localized(verticalLabels[seccion], "es")}.`
             : "Todavía no hay nada publicado."}{" "}
-          <Link href="/admin/publicar" className="text-accent underline">
+          <Link href="/admin/publish" className="text-accent underline">
             Crear publicación
           </Link>
           .
@@ -153,7 +153,7 @@ export default async function AdminCatalogoPage({
 
                   <div className="mt-1.5 flex flex-wrap gap-2">
                     <Link
-                      href={`/admin/opportunities/${opportunity.id}/editar`}
+                      href={`/admin/opportunities/${opportunity.id}/edit`}
                       className="eyebrow border-accent/50 text-accent hover:bg-accent/10 rounded-(--radius-card) border px-2.5 py-1.5 text-[0.75rem] transition-colors"
                     >
                       Editar

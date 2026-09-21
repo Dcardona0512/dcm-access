@@ -22,8 +22,8 @@ const hints: Record<Vertical, string> = {
   "real-estate": "Casas, apartamentos, fincas, locales y lotes.",
   motors: "Autos, motos, embarcaciones, remolques y maquinaria rodante.",
   aviation: "Aeronaves, chárter y operación ejecutiva.",
-  servicios: "Transporte, concierge, logística y protección.",
-  negocios: "Maquinaria, activos, participaciones y alianzas.",
+  services: "Transporte, concierge, logística y protección.",
+  business: "Maquinaria, activos, participaciones y alianzas.",
 };
 
 export default function AdminHomePage() {

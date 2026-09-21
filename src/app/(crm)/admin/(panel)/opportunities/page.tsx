@@ -89,7 +89,7 @@ export default async function AdminOpportunitiesPage({
         })}
 
         <Link
-          href="/admin/publicar"
+          href="/admin/publish"
           className="eyebrow border-line text-fg-muted hover:text-fg ml-auto rounded-(--radius-card) border px-3 py-2 text-[0.75rem] transition-colors"
         >
           Crear publicación
@@ -172,7 +172,7 @@ export default async function AdminOpportunitiesPage({
                 <Cell className="whitespace-nowrap">
                   <div className="flex items-center gap-2">
                     <Link
-                      href={`/admin/opportunities/${opportunity.id}/editar`}
+                      href={`/admin/opportunities/${opportunity.id}/edit`}
                       className="eyebrow border-accent/50 text-accent hover:bg-accent/10 rounded-(--radius-card) border px-2.5 py-1.5 text-[0.75rem] transition-colors"
                     >
                       Editar

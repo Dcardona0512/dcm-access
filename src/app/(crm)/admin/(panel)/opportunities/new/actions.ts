@@ -412,7 +412,7 @@ export async function updateListing(
     }
 
     revalidatePath("/admin/opportunities");
-    revalidatePath("/admin/catalogo");
+    revalidatePath("/admin/catalog");
     for (const locale of locales) {
       revalidatePath(`/${locale}/${actual.vertical}`);
       revalidatePath(`/${locale}/${actual.vertical}/${actual.slug}`);

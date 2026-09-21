@@ -54,6 +54,12 @@ export const config = {
      * Todo excepto: rutas internas de Next, el CRM en /admin, los archivos de
      * SEO servidos en la raíz y cualquier ruta con extensión (assets).
      *
+     * Las rutas de cuenta —`login`, `signup`, `auth`, `dashboard`, `partner`—
+     * NO llevan idioma: una sesión no es contenido traducible y duplicarla en
+     * `/es` y `/en` daría dos direcciones para la misma pantalla, dos destinos
+     * de vuelta de OAuth y dos sitios donde equivocarse. Sin esta excepción el
+     * proxy mandaría `/login` a `/es/login`, que no existe.
+     *
      * `icon$` y `apple-icon$` LLEVAN ANCLA, y no es cosmético. Los iconos ya
      * no son archivos con extensión —los genera `icon.tsx` con la fuente del
      * logotipo empotrada—, así que sin excepción el proxy los mandaba a
@@ -61,6 +67,6 @@ export const config = {
      * marca. El ancla evita que la excepción se lleve por delante cualquier
      * ruta futura que empiece por esas letras.
      */
-    "/((?!_next|admin|api|favicon.ico|icon$|apple-icon$|robots.txt|sitemap.xml|manifest.webmanifest|media|.*\\.).*)",
+    "/((?!_next|admin|api|favicon.ico|icon$|apple-icon$|login|signup|auth|dashboard|partner|robots.txt|sitemap.xml|manifest.webmanifest|media|.*\\.).*)",
   ],
 };

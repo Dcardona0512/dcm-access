@@ -207,7 +207,7 @@ export function PublishForm({
             Ver la ficha
           </Link>
           <Link
-            href={editando ? "/admin/catalogo" : "/admin/opportunities/new"}
+            href={editando ? "/admin/catalog" : "/admin/opportunities/new"}
             className="eyebrow border-line text-fg-muted hover:text-fg rounded-(--radius-card) border px-3 py-2 text-[0.75rem] transition-colors"
           >
             {editando ? "Volver al catálogo" : "Publicar otra"}

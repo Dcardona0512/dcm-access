@@ -102,7 +102,7 @@ export default async function EditarFichaPage({
           Ver la ficha publicada
         </Link>
         <Link
-          href="/admin/catalogo"
+          href="/admin/catalog"
           className="eyebrow border-line text-fg-muted hover:text-fg rounded-(--radius-card) border px-3 py-2 text-[0.75rem] transition-colors"
         >
           Volver al catálogo

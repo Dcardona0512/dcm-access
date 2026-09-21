@@ -93,7 +93,7 @@ export default async function AdminHomePage() {
 
       <div className="border-line-soft mt-10 border-t pt-8">
         <Link
-          href="/admin/publicar"
+          href="/admin/publish"
           className="eyebrow border-accent/50 text-accent hover:bg-accent/10 inline-flex rounded-(--radius-card) border px-4 py-2.5 text-[0.75rem] transition-colors"
         >
           Crear publicación
