@@ -37,9 +37,16 @@ export async function GET(request: Request) {
 
   const entrada = new URL("/login", url.origin);
 
+  /*
+    Sin código ni token en la dirección, la sesión puede venir en el FRAGMENTO
+    —`#access_token=…`—, que el navegador nunca envía al servidor. Desde aquí
+    es invisible, así que se pasa la pelota a una página que sí puede leerlo.
+    El fragmento sobrevive a la redirección: lo reaplica el propio navegador.
+  */
   if (!code && !(tokenHash && tipo)) {
-    entrada.searchParams.set("error", "link");
-    return NextResponse.redirect(entrada);
+    const remate = new URL("/auth/finish", url.origin);
+    if (siguiente) remate.searchParams.set("next", siguiente);
+    return NextResponse.redirect(remate);
   }
 
   const supabase = await createSessionClient();
