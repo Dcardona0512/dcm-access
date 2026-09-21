@@ -45,17 +45,31 @@ const SPACE_INDEX = TARGET.indexOf(" ");
  */
 const POOL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-/** Milisegundos entre sustituciones. Rápido, pero legible. */
-const TICK_MS = 50;
+/**
+ * Milisegundos entre sustituciones.
+ *
+ * Sube de 50 a 66: a cincuenta el cambio de glifo era casi un parpadeo y la
+ * palabra se leía como ruido. A sesenta y seis se distingue cada sustitución,
+ * que es lo que hace que parezca un sistema resolviendo y no una pantalla
+ * temblando.
+ */
+const TICK_MS = 66;
 
 const TIMELINE = {
+  /*
+    Toda la coreografía va una vez y media más lenta que la primera versión.
+    Lo que se gana no es espectáculo: a la velocidad anterior las tres
+    iniciales se fijaban antes de que el ojo llegara a mirarlas, y ACCESS
+    entero se resolvía en menos de lo que dura leerlo. Se sigue pudiendo
+    saltar con cualquier gesto.
+  */
   /** Todo aleatorio hasta aquí. */
-  chaos: 380,
-  dcmFrom: 380,
-  dcmTo: 1000,
-  spaceAt: 1030,
-  accessFrom: 1060,
-  accessTo: 1740,
+  chaos: 520,
+  dcmFrom: 520,
+  dcmTo: 1500,
+  spaceAt: 1560,
+  accessFrom: 1600,
+  accessTo: 2620,
   /**
    * Tiempo que la composición permanece quieta DESPUÉS de resolverse la
    * palabra, contado desde `accessTo`.
