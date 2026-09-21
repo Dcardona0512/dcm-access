@@ -26,6 +26,8 @@ import type { AuthState } from "./state";
 
 const esquema = z.object({
   email: z.string().trim().min(1).email().max(254).toLowerCase(),
+  /** De qué pantalla viene. Decide si se puede crear cuenta o no. */
+  mode: z.enum(["login", "signup"]).default("login"),
   /* Solo estas dos. `admin` no está, y no por olvido. */
   requestedRole: z.enum(["client", "partner"]).optional(),
   next: z
@@ -65,6 +67,7 @@ export async function sendMagicLink(_previo: AuthState, formData: FormData): Pro
 
   const parsed = esquema.safeParse({
     email: formData.get("email"),
+    mode: formData.get("mode") ?? undefined,
     requestedRole: formData.get("requestedRole") ?? undefined,
     next: formData.get("next") || undefined,
   });
@@ -77,6 +80,12 @@ export async function sendMagicLink(_previo: AuthState, formData: FormData): Pro
   const { error } = await supabase.auth.signInWithOtp({
     email: parsed.data.email,
     options: {
+      /*
+        ENTRAR NO CREA CUENTAS. Quien se equivoca de letra al escribir su
+        correo acabaría con una cuenta nueva y vacía, y sin entender por qué
+        no ve nada de lo suyo. Registrarse sí la crea: es lo que se pidió.
+      */
+      shouldCreateUser: parsed.data.mode === "signup",
       emailRedirectTo: destinoDeVuelta(parsed.data.next),
       /*
         Viaja en los metadatos del usuario y lo lee el disparador que crea el
@@ -89,14 +98,21 @@ export async function sendMagicLink(_previo: AuthState, formData: FormData): Pro
 
   if (error) {
     /*
-      No se distingue «no existe» de «no se pudo enviar», y es a propósito: si
-      el mensaje cambiara según si el correo está registrado, cualquiera podría
-      averiguar quién tiene cuenta probando direcciones.
+      Que el correo no tenga cuenta NO es un error que enseñar: sale la misma
+      pantalla de «enviado». Si el mensaje cambiara según si la dirección está
+      registrada, el formulario se convertiría en un detector de clientes —se
+      prueban direcciones y se mira cuál responde distinto—.
     */
-    return {
-      status: "error",
-      message: "No se pudo enviar el enlace. Inténtelo de nuevo en un momento.",
-    };
+    if (esDeCuentaInexistente(error.message)) {
+      return { status: "sent", email: parsed.data.email };
+    }
+
+    /*
+      Lo demás sí se distingue, porque la causa cambia el consejo. Decir
+      «inténtelo de nuevo» a quien acaba de agotar el límite de envíos es
+      recomendarle exactamente lo contrario de lo que le conviene.
+    */
+    return { status: "error", message: describe(error.message) };
   }
 
   return { status: "sent", email: parsed.data.email };
@@ -122,6 +138,27 @@ export async function signInWithGoogle(formData: FormData): Promise<void> {
   }
 
   redirect(data.url);
+}
+
+/**
+ * Supabase avisa cuando el correo no tiene cuenta y no se permite crearla.
+ * Llega por dos redacciones distintas según la versión.
+ */
+function esDeCuentaInexistente(mensaje: string): boolean {
+  const m = mensaje.toLowerCase();
+  return m.includes("signups not allowed") || m.includes("user not found");
+}
+
+function describe(mensaje: string): string {
+  const m = mensaje.toLowerCase();
+
+  if (m.includes("rate limit") || m.includes("too many") || m.includes("over_email")) {
+    return "Se pidieron varios enlaces seguidos y el proveedor de correo cerró el envío por un rato. Espere unos minutos y pida uno solo.";
+  }
+  if (m.includes("invalid") && m.includes("email")) {
+    return "El proveedor de correo rechazó esa dirección.";
+  }
+  return "No se pudo enviar el enlace. Inténtelo de nuevo en un momento.";
 }
 
 /**

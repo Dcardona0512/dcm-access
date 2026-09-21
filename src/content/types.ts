@@ -407,6 +407,10 @@ export type Dictionary = {
     readonly sentHeading: string;
     readonly sentBody: string;
     readonly sentHint: string;
+    readonly sentOpenInbox: string;
+    readonly sentResend: string;
+    readonly sentOtherEmail: string;
+    readonly noAccountHint: string;
     readonly noAccount: string;
     readonly toSignup: string;
     readonly haveAccount: string;

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { getDictionary } from "@/content";
@@ -5,6 +6,7 @@ import { getSession, panelDe } from "@/lib/auth/session";
 import { localeDeCookie } from "@/lib/i18n/cookie";
 
 import { AccessForm } from "../AccessForm";
+import { MarcoDeAcceso } from "../MarcoDeAcceso";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +24,8 @@ export default async function LoginPage({
   const sesion = await getSession();
   if (sesion) redirect(panelDe(sesion.role));
 
-  const dict = getDictionary(await localeDeCookie());
+  const locale = await localeDeCookie();
+  const dict = getDictionary(locale);
   const sp = await searchParams;
 
   const error = uno(sp.error);
@@ -34,13 +37,26 @@ export default async function LoginPage({
   };
 
   return (
-    <AccessForm
+    <MarcoDeAcceso
+      locale={locale}
       dict={dict}
-      modo="login"
-      conGoogle={process.env.NEXT_PUBLIC_GOOGLE_AUTH === "on"}
-      next={rutaInterna(uno(sp.next))}
-      aviso={error ? avisos[error] : undefined}
-    />
+      pie={
+        <>
+          {dict.auth.noAccount}{" "}
+          <Link href="/signup" className="text-accent font-medium underline-offset-2 hover:underline">
+            {dict.auth.toSignup}
+          </Link>
+        </>
+      }
+    >
+      <AccessForm
+        dict={dict}
+        modo="login"
+        conGoogle={process.env.NEXT_PUBLIC_GOOGLE_AUTH === "on"}
+        next={rutaInterna(uno(sp.next))}
+        aviso={error ? avisos[error] : undefined}
+      />
+    </MarcoDeAcceso>
   );
 }
 

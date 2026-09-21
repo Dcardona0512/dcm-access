@@ -1,10 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 
-import { Logo } from "@/components/brand/Logo";
 import { Honeypot } from "@/components/ui/Field";
 import type { Dictionary } from "@/content/types";
 
@@ -19,8 +17,8 @@ import { initialAuthState } from "./state";
    dos componentes garantizaría que dentro de un mes se parezcan solo a medias.
 
    Sin contraseña, y no por moda: una contraseña es algo que se olvida, se
-   reutiliza y se filtra, y que obliga a guardar un secreto de cada persona.
-   Un enlace de un solo uso no deja nada guardado que robar.
+   reutiliza y se filtra, y que obliga a guardar un secreto de cada persona. Un
+   enlace de un solo uso no deja nada guardado que robar.
 
    La elección de cliente o partner SOLO aparece al registrarse, y es una
    declaración de intención: el rol de partner lo concede el administrador al
@@ -51,56 +49,38 @@ export function AccessForm({
 }) {
   const [state, action] = useActionState(sendMagicLink, initialAuthState);
   const [rol, setRol] = useState<"client" | "partner">("client");
+  /*
+    «Usar otro correo» vuelve al formulario sin recargar. El estado de la
+    acción no se puede reiniciar, así que se tapa: mientras esto esté puesto,
+    manda el formulario aunque el envío anterior saliera bien.
+  */
+  const [reescribiendo, setReescribiendo] = useState(false);
 
   const t = dict.auth;
   const registro = modo === "signup";
 
-  if (state.status === "sent") {
+  if (state.status === "sent" && !reescribiendo) {
     return (
-      <section className="flex w-full max-w-md flex-col items-center gap-6 text-center">
-        <Logo variant="stacked" descriptor={dict.brand.logoTagline} />
-
-        <div className="border-accent/30 bg-accent/[0.04] flex flex-col gap-3 rounded-(--radius-card) border px-6 py-10">
-          <h1 className="font-display text-2xl">{t.sentHeading}</h1>
-          <p className="text-fg-muted text-pretty">{t.sentBody}</p>
-          {state.email ? (
-            <p className="text-accent text-sm break-all">{state.email}</p>
-          ) : null}
-          <p className="text-fg-muted/60 text-xs text-pretty">{t.sentHint}</p>
-        </div>
-      </section>
+      <CorreoEnviado
+        dict={dict}
+        correo={state.email ?? ""}
+        modo={modo}
+        onOtroCorreo={() => setReescribiendo(true)}
+      />
     );
   }
 
   return (
-    <section className="flex w-full max-w-md flex-col gap-8">
-      <div className="flex flex-col items-center gap-6 text-center">
-        <Logo variant="stacked" descriptor={dict.brand.logoTagline} />
-        <div className="flex flex-col gap-2">
-          <h1 className="font-display text-3xl">
-            {registro ? t.signupHeading : t.loginHeading}
-          </h1>
-          <p className="text-fg-muted text-pretty">{registro ? t.signupLede : t.loginLede}</p>
-        </div>
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-2 text-center">
+        <h1 className="font-display text-3xl">{registro ? t.signupHeading : t.loginHeading}</h1>
+        <p className="text-fg-muted text-sm text-pretty">
+          {registro ? t.signupLede : t.loginLede}
+        </p>
       </div>
 
-      {aviso ? (
-        <p
-          role="alert"
-          className="border-danger/40 bg-danger/5 text-danger rounded-(--radius-card) border px-4 py-3 text-sm text-pretty"
-        >
-          {aviso}
-        </p>
-      ) : null}
-
-      {state.status === "error" && state.message ? (
-        <p
-          role="alert"
-          className="border-danger/40 bg-danger/5 text-danger rounded-(--radius-card) border px-4 py-3 text-sm text-pretty"
-        >
-          {state.message}
-        </p>
-      ) : null}
+      {aviso ? <Aviso texto={aviso} /> : null}
+      {state.status === "error" && state.message ? <Aviso texto={state.message} /> : null}
 
       {/*
         Google va PRIMERO y fuera del formulario del correo. Es un envío
@@ -124,7 +104,8 @@ export function AccessForm({
         </>
       ) : null}
 
-      <form action={action} className="flex flex-col gap-5">
+      <form action={action} className="flex flex-col gap-6">
+        <input type="hidden" name="mode" value={modo} />
         {next ? <input type="hidden" name="next" value={next} /> : null}
         <Honeypot />
 
@@ -133,7 +114,6 @@ export function AccessForm({
             <legend className="eyebrow text-fg-muted mb-3 text-[0.8rem]">{t.roleQuestion}</legend>
 
             <Eleccion
-              nombre="requestedRole"
               valor="client"
               elegido={rol}
               onElegir={setRol}
@@ -141,7 +121,6 @@ export function AccessForm({
               pista={t.roleClientHint}
             />
             <Eleccion
-              nombre="requestedRole"
               valor="partner"
               elegido={rol}
               onElegir={setRol}
@@ -155,8 +134,8 @@ export function AccessForm({
           </fieldset>
         ) : null}
 
-        <div className="flex flex-col gap-2">
-          <label htmlFor="dcm-email" className="eyebrow text-fg-muted text-[0.8rem]">
+        <div className="flex flex-col gap-3">
+          <label htmlFor="dcm-email" className="text-center text-sm font-semibold">
             {t.emailLabel}
           </label>
           <input
@@ -165,41 +144,149 @@ export function AccessForm({
             type="email"
             inputMode="email"
             autoComplete="email"
+            autoCapitalize="none"
+            spellCheck={false}
             required
             autoFocus
             placeholder={t.emailPlaceholder}
-            className="border-line text-fg placeholder:text-fg-muted/40 hover:border-fg-muted/40 focus-visible:border-accent h-12 w-full rounded-(--radius-card) border bg-transparent px-4 outline-none transition-colors"
+            className="border-line text-fg placeholder:text-fg-muted/40 hover:border-fg-muted/40 focus-visible:border-accent w-full rounded-(--radius-card) border bg-transparent px-4 py-4 text-center outline-none transition-colors"
           />
         </div>
 
-        <BotonCorreo texto={t.continueEmail} />
+        <BotonEnviar texto={t.continueEmail} />
       </form>
 
       <p className="text-fg-muted/60 text-center text-xs text-pretty">{t.legal}</p>
+    </div>
+  );
+}
 
-      <p className="text-fg-muted text-center text-sm">
-        {registro ? t.haveAccount : t.noAccount}{" "}
-        <Link
-          href={registro ? "/login" : "/signup"}
-          className="text-accent underline-offset-2 hover:underline"
-        >
-          {registro ? t.toLogin : t.toSignup}
-        </Link>
+/* --- «Correo enviado» ------------------------------------------------------ */
+
+/**
+ * La misma pantalla para entrar y para registrarse, porque lo que ha pasado es
+ * exactamente lo mismo: hay un correo en camino y aquí no queda nada que hacer.
+ *
+ * DICE A QUÉ DIRECCIÓN SE MANDÓ, y no es un adorno: es el único momento en que
+ * se puede pillar un correo mal escrito. Sin enseñarlo, quien puso una letra de
+ * más se queda esperando un correo que llegó a otra parte y no tiene forma de
+ * saberlo.
+ *
+ * Y nombra la carpeta de no deseado por el mismo motivo: ahí acaban los correos
+ * automáticos de un dominio joven, y quien no lo sepa da por hecho que esto
+ * está roto.
+ */
+function CorreoEnviado({
+  dict,
+  correo,
+  modo,
+  onOtroCorreo,
+}: {
+  readonly dict: Dictionary;
+  readonly correo: string;
+  readonly modo: "login" | "signup";
+  readonly onOtroCorreo: () => void;
+}) {
+  const [, reenviar] = useActionState(sendMagicLink, initialAuthState);
+  const t = dict.auth;
+  const buzon = buzonDe(correo);
+
+  return (
+    <div className="flex flex-col gap-6 text-center">
+      <h1 className="font-display text-3xl">{t.sentHeading}</h1>
+
+      <p className="text-fg-muted text-sm leading-relaxed text-pretty">
+        {t.sentBody} <strong className="text-fg font-semibold break-all">{correo}</strong>
       </p>
-    </section>
+
+      <p className="text-fg-muted/70 text-sm leading-relaxed text-pretty">{t.sentHint}</p>
+
+      {/*
+        El botón lleva al buzón de su proveedor, y solo aparece si sabemos cuál
+        es. Un «ir a mi correo» que no lleva a ninguna parte es peor que no
+        ponerlo: quien lo pulsa cree que algo se rompió.
+      */}
+      {buzon ? (
+        <a
+          href={buzon.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="eyebrow bg-accent text-surface border-accent inline-flex h-12 items-center justify-center rounded-(--radius-card) border text-[0.75rem] transition-opacity hover:opacity-90"
+        >
+          {t.sentOpenInbox} {buzon.nombre}
+        </a>
+      ) : null}
+
+      <div className="flex flex-col gap-3">
+        <form action={reenviar}>
+          <input type="hidden" name="email" value={correo} />
+          <input type="hidden" name="mode" value={modo} />
+          <BotonReenviar texto={t.sentResend} />
+        </form>
+
+        <button
+          type="button"
+          onClick={onOtroCorreo}
+          className="text-fg-muted hover:text-fg text-sm font-medium transition-colors"
+        >
+          {t.sentOtherEmail}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * A qué buzón lleva un correo, por su dominio.
+ *
+ * Solo los que se pueden acertar. Para el resto no se enseña botón: adivinar
+ * `https://<dominio>` acierta con los grandes y falla con el correo de una
+ * empresa, que es justo donde el fallo se nota.
+ */
+function buzonDe(correo: string): { readonly nombre: string; readonly url: string } | null {
+  const dominio = correo.split("@")[1]?.toLowerCase();
+  if (!dominio) return null;
+
+  const buzones: Record<string, { nombre: string; url: string }> = {
+    "gmail.com": { nombre: "Gmail", url: "https://mail.google.com" },
+    "googlemail.com": { nombre: "Gmail", url: "https://mail.google.com" },
+    "hotmail.com": { nombre: "Outlook", url: "https://outlook.live.com/mail" },
+    "hotmail.es": { nombre: "Outlook", url: "https://outlook.live.com/mail" },
+    "outlook.com": { nombre: "Outlook", url: "https://outlook.live.com/mail" },
+    "outlook.es": { nombre: "Outlook", url: "https://outlook.live.com/mail" },
+    "live.com": { nombre: "Outlook", url: "https://outlook.live.com/mail" },
+    "yahoo.com": { nombre: "Yahoo", url: "https://mail.yahoo.com" },
+    "yahoo.es": { nombre: "Yahoo", url: "https://mail.yahoo.com" },
+    "icloud.com": { nombre: "iCloud", url: "https://www.icloud.com/mail" },
+    "me.com": { nombre: "iCloud", url: "https://www.icloud.com/mail" },
+    "proton.me": { nombre: "Proton", url: "https://mail.proton.me" },
+    "protonmail.com": { nombre: "Proton", url: "https://mail.proton.me" },
+  };
+
+  return buzones[dominio] ?? null;
+}
+
+/* --- Piezas ---------------------------------------------------------------- */
+
+function Aviso({ texto }: { readonly texto: string }) {
+  return (
+    <p
+      role="alert"
+      className="border-danger/40 bg-danger/5 text-danger rounded-(--radius-card) border px-4 py-3 text-center text-sm text-pretty"
+    >
+      {texto}
+    </p>
   );
 }
 
 /** Tarjeta de elección. Es un radio de verdad: funciona con teclado y sin JS. */
 function Eleccion({
-  nombre,
   valor,
   elegido,
   onElegir,
   titulo,
   pista,
 }: {
-  readonly nombre: string;
   readonly valor: "client" | "partner";
   readonly elegido: string;
   readonly onElegir: (valor: "client" | "partner") => void;
@@ -216,7 +303,7 @@ function Eleccion({
     >
       <input
         type="radio"
-        name={nombre}
+        name="requestedRole"
         value={valor}
         checked={activo}
         onChange={() => onElegir(valor)}
@@ -230,7 +317,7 @@ function Eleccion({
   );
 }
 
-function BotonCorreo({ texto }: { readonly texto: string }) {
+function BotonEnviar({ texto }: { readonly texto: string }) {
   const { pending } = useFormStatus();
 
   return (
@@ -240,7 +327,23 @@ function BotonCorreo({ texto }: { readonly texto: string }) {
       aria-busy={pending}
       className="eyebrow bg-accent text-surface border-accent inline-flex h-12 w-full items-center justify-center rounded-(--radius-card) border text-[0.75rem] transition-opacity hover:opacity-90 disabled:pointer-events-none disabled:opacity-50"
     >
-      {pending ? "…" : texto}
+      {/* Mientras espera no cambia de tamaño, solo de contenido. */}
+      {pending ? "···" : texto}
+    </button>
+  );
+}
+
+function BotonReenviar({ texto }: { readonly texto: string }) {
+  const { pending } = useFormStatus();
+
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      aria-busy={pending}
+      className="eyebrow border-line text-fg-muted hover:border-fg-muted/60 hover:text-fg inline-flex h-11 w-full items-center justify-center rounded-(--radius-card) border text-[0.75rem] transition-colors disabled:opacity-50"
+    >
+      {pending ? "···" : texto}
     </button>
   );
 }

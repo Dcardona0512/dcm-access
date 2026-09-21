@@ -476,8 +476,14 @@ export const en: Dictionary = {
     partnerNotice:
       "Partner accounts go through verification before they can publish. We'll write as soon as we review your details.",
     sentHeading: "Check your email",
-    sentBody: "If the address is valid, we've just sent you a link to sign in.",
-    sentHint: "It expires in an hour and works once. Check your spam folder too.",
+    sentBody: "We sent a sign-in link to",
+    sentHint:
+      "Open it on this same device and you're in. It expires in an hour and works once; check your spam folder too.",
+    sentOpenInbox: "Go to",
+    sentResend: "Send another email",
+    sentOtherEmail: "Use another email",
+    noAccountHint:
+      "If that address has no account, none is created: use «create account».",
     noAccount: "No account yet?",
     toSignup: "Create one",
     haveAccount: "Already have an account?",

@@ -18,7 +18,10 @@ import "@/app/globals.css";
    escribe al visitar `/es` o `/en`, no de la URL.
 
    Tiene su propio `<html>` porque con varias raíces —el sitio, el panel y
-   esto— ninguna hereda de otra.
+   esto— ninguna hereda de otra. El marco de la pantalla —la mitad del
+   formulario y la mitad de la marca— lo pone `MarcoDeAcceso`, no este layout:
+   así el paso de «escribe tu correo» a «correo enviado» no vuelve a montar
+   nada de lo que rodea al formulario.
    ========================================================================== */
 
 export const metadata: Metadata = {
@@ -32,7 +35,7 @@ export default async function AuthLayout({ children }: { readonly children: Reac
   return (
     <html lang={localeMeta[locale].hreflang} className={fontVariables}>
       <body className="bg-surface text-fg font-sans antialiased">
-        <main className="grid min-h-dvh place-items-center px-6 py-16">{children}</main>
+        <main>{children}</main>
       </body>
     </html>
   );

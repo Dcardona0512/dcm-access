@@ -478,8 +478,14 @@ export const es: Dictionary = {
     partnerNotice:
       "Las cuentas de partner pasan por verificación antes de poder publicar. Le escribimos en cuanto revisemos sus datos.",
     sentHeading: "Revise su correo",
-    sentBody: "Si la dirección es válida, acabamos de enviarle un enlace para entrar.",
-    sentHint: "Caduca en una hora y solo sirve una vez. Mire también en no deseados.",
+    sentBody: "Le mandamos un enlace de acceso a",
+    sentHint:
+      "Ábralo en este mismo aparato y entra directo. Caduca en una hora y solo sirve una vez; mire también en la carpeta de no deseados.",
+    sentOpenInbox: "Ir a",
+    sentResend: "Enviar otro correo",
+    sentOtherEmail: "Usar otro correo",
+    noAccountHint:
+      "Si esa dirección no tiene cuenta, no se crea ninguna: use «crear cuenta».",
     noAccount: "¿Todavía no tiene cuenta?",
     toSignup: "Crear una",
     haveAccount: "¿Ya tiene cuenta?",
