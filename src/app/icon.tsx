@@ -1,36 +1,34 @@
 import { ImageResponse } from "next/og";
 
-import { fuenteLogo, ORO, TINTA } from "@/lib/brand/og-font";
+import { CREMA, fuenteLogo, ORO, TINTA } from "@/lib/brand/og-font";
 
 /* ============================================================================
-   FAVICON
+   FAVICON — EL MONOGRAMA COMPLETO
    ----------------------------------------------------------------------------
-   Antes era un SVG dibujado a mano. Ya no puede serlo: la marca es tipográfica
-   y un SVG de favicon no carga fuentes —los navegadores no le sirven recursos
-   externos—, así que el texto saldría en la serif que cada sistema tuviera a
-   mano, o en ninguna. Se genera como PNG con la letra empotrada.
+   Antes era una «D» sola. La decisión de marca es que sea el monograma entero,
+   D | C | M, y eso obliga a apurar el cuadro: tres letras y dos filetes ocupan
+   unas dos coma cuatro veces el cuerpo, así que la letra baja y el aire
+   desaparece.
 
-   ES UNA SOLA LETRA, y no el monograma. Se probó: «D | C | M» en el cuadro de
-   64 px obliga a bajar el cuerpo a unos 18 px para que quepan las tres con sus
-   filetes, y al reducirlo el navegador a 16 px cada letra queda en menos de
-   cuatro píxeles. En una Didone eso es fatal: el contraste entre astas y
-   perfiles es justamente lo que define la letra, y los perfiles —que miden una
-   fracción de píxel— desaparecen. Lo que quedaba era una mancha con dos rayas.
+   Lo que se hace para que aguante a dieciséis píxeles:
 
-   Con una sola inicial la letra ocupa el cuadro entero y sobrevive al
-   reescalado: se reconocen el remate, el ojo de la D y el contraste. Se pierde
-   el nombre completo, que a ese tamaño no se leía de todos modos.
+   · SE DIBUJA A 128 y no a 64. Cuanta más resolución tiene el original, más
+     sobrevive al reescalado del navegador; cuatro píxeles de origen por cada
+     uno de destino dan un promedio mucho más limpio que dos.
+   · LOS FILETES VAN EN DORADO Y A PLENA OPACIDAD. En pantalla son crema al
+     30 %, pero eso aquí se convierte en un gris que desaparece: a este tamaño
+     un filete atenuado no es sutil, es invisible.
+   · MÁRGENES MÍNIMOS. El cuadro se llena de lado a lado, porque cada píxel de
+     margen es un píxel que no está dibujando la marca.
 
-   Dorado sobre tinta: en una barra de pestañas clara el cuadro oscuro recorta
-   la silueta, y en una oscura el dorado sigue siendo lo más claro de la pieza.
-   Funciona en los dos temas sin tener que elegir.
-
-   Se dibuja a 64 px y el navegador lo baja a 16: al cuádruple de resolución
-   los remates sobreviven al reescalado, cosa que no ocurre generando
-   directamente a 16.
+   Aun así, a dieciséis píxeles cada letra vive en unos cuatro, y en una Didone
+   los perfiles finos caen por debajo del píxel. Se lee como un bloque con dos
+   rayas doradas — que es, al menos, un bloque reconocible y con el color de la
+   casa. Queda escrito para quien vuelva a preguntarse por qué no se distingue
+   la C.
    ========================================================================== */
 
-export const size = { width: 64, height: 64 };
+export const size = { width: 128, height: 128 };
 export const contentType = "image/png";
 
 export default async function Icon() {
@@ -48,18 +46,29 @@ export default async function Icon() {
           background: TINTA,
           fontFamily: "Playfair",
           /*
-            56 y no 64: la caja de texto incluye el espacio de las minúsculas
-            con descendente, que aquí no hay. A cuerpo completo la mayúscula
-            quedaría descentrada hacia arriba dentro del cuadro.
+            42 sale de la cuenta, no del ojo: el monograma avanza unas 2,37
+            veces el cuerpo, más los dos filetes con su aire. Con 120 píxeles
+            útiles, cualquier cosa por encima se sale por los lados.
           */
-          fontSize: 56,
+          fontSize: 42,
           lineHeight: 1,
-          color: ORO,
+          color: CREMA,
         }}
       >
-        D
+        <span style={{ display: "flex" }}>D</span>
+        <Filete />
+        <span style={{ display: "flex" }}>C</span>
+        <Filete />
+        <span style={{ display: "flex" }}>M</span>
       </div>
     ),
     { ...size, fonts: [{ name: "Playfair", data, style: "normal", weight: 600 }] },
+  );
+}
+
+/** El filete, en dorado macizo: atenuado desaparecería al reducir. */
+function Filete() {
+  return (
+    <div style={{ display: "flex", width: 3, height: 40, margin: "0 6px", background: ORO }} />
   );
 }
