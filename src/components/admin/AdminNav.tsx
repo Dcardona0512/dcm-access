@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
  * política de autorización no es decorativa, decide de verdad lo que se ve.
  */
 /**
- * Tres entradas, y en este orden.
+ * Pocas entradas, y en este orden.
  *
  * El panel tenía siete —leads, operaciones, oportunidades, solicitudes,
  * proveedores, comisiones— y ninguna resolvía el trabajo real de este
@@ -23,8 +23,9 @@ import { cn } from "@/lib/utils";
  *
  * El resumen abre el panel porque responde a lo único que se pregunta al
  * entrar: qué hay publicado y qué lleva tiempo parado. Después el catálogo,
- * para mirar lo subido. Publicar va al final, porque es una decisión que ya
- * se trae tomada de casa.
+ * para mirar lo subido. Publicar va al final de la parte de contenido, porque
+ * es una decisión que ya se trae tomada de casa. Y cierran las dos bandejas
+ * que llegan de fuera y esperan respuesta: socios y solicitudes.
  */
 const ENTRIES: readonly { href: string; label: string; resource: Resource }[] = [
   { href: "/admin", label: "Resumen", resource: "opportunities" },
@@ -33,9 +34,10 @@ const ENTRIES: readonly { href: string; label: string; resource: Resource }[] = 
   // Entra al menú porque ahora hay solicitudes de verdad esperando respuesta:
   // un partner sin revisar es un partner que no puede publicar.
   { href: "/admin/partners", label: "Socios", resource: "providers" },
-  // Lo que hay que preguntarle a quien quiere vender. Entra al menú porque se
-  // usa en cada conversación, no una vez al mes.
-  { href: "/admin/questionnaires", label: "Cuestionarios", resource: "opportunities" },
+  // Lo que deja quien pulsa «Contactar» en una ficha. Es la única entrada del
+  // menú que se llena sola, sin que nadie del equipo haga nada: por eso está,
+  // y por eso lo pendiente se cuenta dentro.
+  { href: "/admin/requests", label: "Solicitudes", resource: "leads" },
 ];
 
 export function AdminNav({ role }: { readonly role: Role }) {

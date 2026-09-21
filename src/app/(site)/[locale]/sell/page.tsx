@@ -16,11 +16,11 @@ import { buildMetadata } from "@/lib/seo";
    Sin formulario, y es la decisión que define la página: quien vende un carro
    o un apartamento no rellena veinte campos desde el móvil. Elige la categoría,
    se abre WhatsApp con el mensaje escrito, y a partir de ahí la conversación
-   la lleva alguien —pronto, un bot que hace las preguntas de esa categoría—.
+   la lleva alguien.
 
    El mensaje sale con la CATEGORÍA YA DENTRO. No es un detalle de cortesía:
-   es lo que permite que quien recibe —persona o bot— sepa desde el primer
-   segundo qué cuestionario toca, sin preguntar nada.
+   es lo que permite que quien recibe sepa desde el primer segundo de qué se
+   está hablando, sin preguntar nada.
    ========================================================================== */
 
 export function generateStaticParams() {

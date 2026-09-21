@@ -32,6 +32,9 @@ export async function advanceLead(formData: FormData) {
   await leads.updateStatus(id, status as LeadStatus, `Actualizado por ${user.email}`);
 
   revalidatePath("/admin/leads");
+  // La bandeja de solicitudes es la misma tabla vista de otra manera: si no se
+  // revalida, marcar una como atendida la deja ahí hasta el siguiente paseo.
+  revalidatePath("/admin/requests");
   revalidatePath("/admin");
 }
 
