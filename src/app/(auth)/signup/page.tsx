@@ -15,5 +15,11 @@ export default async function SignupPage() {
 
   const dict = getDictionary(await localeDeCookie());
 
-  return <AccessForm dict={dict} modo="signup" />;
+  return (
+    <AccessForm
+      dict={dict}
+      modo="signup"
+      conGoogle={process.env.NEXT_PUBLIC_GOOGLE_AUTH === "on"}
+    />
+  );
 }

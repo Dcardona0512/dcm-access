@@ -37,6 +37,7 @@ export default async function LoginPage({
     <AccessForm
       dict={dict}
       modo="login"
+      conGoogle={process.env.NEXT_PUBLIC_GOOGLE_AUTH === "on"}
       next={rutaInterna(uno(sp.next))}
       aviso={error ? avisos[error] : undefined}
     />

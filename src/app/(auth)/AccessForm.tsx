@@ -29,11 +29,20 @@ import { initialAuthState, sendMagicLink, signInWithGoogle } from "./actions";
 export function AccessForm({
   dict,
   modo,
+  conGoogle,
   next,
   aviso,
 }: {
   readonly dict: Dictionary;
   readonly modo: "login" | "signup";
+  /**
+   * Si Google está conectado de verdad.
+   *
+   * El botón aparece solo cuando hay credenciales puestas. Un «Continuar con
+   * Google» que lleva a una pantalla de error no es una función a medias: es
+   * una promesa rota en la primera pantalla que ve alguien.
+   */
+  readonly conGoogle: boolean;
   /** A dónde volver tras entrar. Ya viene validado desde el servidor. */
   readonly next?: string;
   /** Mensaje de error traducido, cuando se llega desde un enlace fallido. */
@@ -98,17 +107,21 @@ export function AccessForm({
         del mismo formulario no enviara el formulario, que es la clase de cosa
         que funciona hasta que alguien pulsa Intro en el campo del correo.
       */}
-      <form action={signInWithGoogle}>
-        {next ? <input type="hidden" name="next" value={next} /> : null}
-        {registro ? <input type="hidden" name="requestedRole" value={rol} /> : null}
-        <BotonGoogle texto={t.continueGoogle} />
-      </form>
+      {conGoogle ? (
+        <>
+          <form action={signInWithGoogle}>
+            {next ? <input type="hidden" name="next" value={next} /> : null}
+            {registro ? <input type="hidden" name="requestedRole" value={rol} /> : null}
+            <BotonGoogle texto={t.continueGoogle} />
+          </form>
 
-      <div className="flex items-center gap-4">
-        <span className="bg-line h-px flex-1" />
-        <span className="eyebrow text-fg-muted/60 text-[0.7rem]">{t.separator}</span>
-        <span className="bg-line h-px flex-1" />
-      </div>
+          <div className="flex items-center gap-4">
+            <span className="bg-line h-px flex-1" />
+            <span className="eyebrow text-fg-muted/60 text-[0.7rem]">{t.separator}</span>
+            <span className="bg-line h-px flex-1" />
+          </div>
+        </>
+      ) : null}
 
       <form action={action} className="flex flex-col gap-5">
         {next ? <input type="hidden" name="next" value={next} /> : null}
