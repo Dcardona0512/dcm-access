@@ -17,19 +17,17 @@ import type { AuthState } from "./state";
    dos usa contraseña, así que no hay nada que recordar, que rotar ni que se
    pueda filtrar de nuestra base.
 
-   EL ROL NO VIAJA EN EL FORMULARIO. Lo que la persona elige al registrarse
-   —cliente o partner— se guarda como INTENCIÓN (`requested_role`), y el rol de
-   partner lo concede el administrador al verificar. Si el formulario decidiera
-   el rol, registrarse como partner sería ascenderse solo; y si decidiera el de
-   administrador, bastaría con editar el HTML.
+   EL ROL NO VIAJA EN EL FORMULARIO, y ahora tampoco se pregunta: todas las
+   cuentas nacen iguales. El disparador de la base les pone el rol de entrada y
+   los distintivos —partner verificado, equipo— los concede el administrador.
+   Si el formulario decidiera el rol, bastaría con editar el HTML para
+   ascenderse.
    ========================================================================== */
 
 const esquema = z.object({
   email: z.string().trim().min(1).email().max(254).toLowerCase(),
   /** De qué pantalla viene. Decide si se puede crear cuenta o no. */
   mode: z.enum(["login", "signup"]).default("login"),
-  /* Solo estas dos. `admin` no está, y no por olvido. */
-  requestedRole: z.enum(["client", "partner"]).optional(),
   next: z
     .string()
     .trim()
@@ -68,7 +66,6 @@ export async function sendMagicLink(_previo: AuthState, formData: FormData): Pro
   const parsed = esquema.safeParse({
     email: formData.get("email"),
     mode: formData.get("mode") ?? undefined,
-    requestedRole: formData.get("requestedRole") ?? undefined,
     next: formData.get("next") || undefined,
   });
 
@@ -87,12 +84,6 @@ export async function sendMagicLink(_previo: AuthState, formData: FormData): Pro
       */
       shouldCreateUser: parsed.data.mode === "signup",
       emailRedirectTo: destinoDeVuelta(parsed.data.next),
-      /*
-        Viaja en los metadatos del usuario y lo lee el disparador que crea el
-        perfil. Es una DECLARACIÓN DE INTENCIÓN, no un permiso: el disparador
-        la guarda en `requested_role` y el rol sigue siendo `client`.
-      */
-      data: parsed.data.requestedRole ? { requested_role: parsed.data.requestedRole } : undefined,
     },
   });
 
@@ -121,15 +112,12 @@ export async function sendMagicLink(_previo: AuthState, formData: FormData): Pro
 /** Entrada con Google. Devuelve la redirección que abre el consentimiento. */
 export async function signInWithGoogle(formData: FormData): Promise<void> {
   const siguiente = formData.get("next");
-  const rol = formData.get("requestedRole");
 
   const supabase = await createSessionClient();
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
       redirectTo: destinoDeVuelta(typeof siguiente === "string" ? siguiente : undefined),
-      queryParams:
-        rol === "partner" || rol === "client" ? { requested_role: rol } : undefined,
     },
   });
 

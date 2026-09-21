@@ -20,9 +20,17 @@ import { initialAuthState } from "./state";
    reutiliza y se filtra, y que obliga a guardar un secreto de cada persona. Un
    enlace de un solo uso no deja nada guardado que robar.
 
-   La elección de cliente o partner SOLO aparece al registrarse, y es una
-   declaración de intención: el rol de partner lo concede el administrador al
-   verificar. Al entrar no se pregunta nada, porque el rol ya está en la base.
+   UNA SOLA CUENTA PARA TODOS, y no se pregunta nada más.
+
+   Aquí había una elección —«busco algo» o «tengo algo que ofrecer»— y sobraba,
+   porque parte a la gente en dos antes de conocerla: quien entra a mirar puede
+   tener mañana algo que vender, y quien viene a vender acaba comprando. Una
+   cuenta sirve para las dos cosas.
+
+   Lo que DCM ACCESS controla no es quién se registra: es el CONTACTO. Quien
+   publica no recibe el teléfono de quien pregunta, ni al revés; la conversación
+   la abre el broker. Ese control vive en el servidor y en las políticas de la
+   base, que es donde no se puede rodear, no en una pregunta del formulario.
    ========================================================================== */
 
 export function AccessForm({
@@ -48,7 +56,6 @@ export function AccessForm({
   readonly aviso?: string;
 }) {
   const [state, action] = useActionState(sendMagicLink, initialAuthState);
-  const [rol, setRol] = useState<"client" | "partner">("client");
   /*
     «Usar otro correo» vuelve al formulario sin recargar. El estado de la
     acción no se puede reiniciar, así que se tapa: mientras esto esté puesto,
@@ -92,7 +99,6 @@ export function AccessForm({
         <>
           <form action={signInWithGoogle}>
             {next ? <input type="hidden" name="next" value={next} /> : null}
-            {registro ? <input type="hidden" name="requestedRole" value={rol} /> : null}
             <BotonGoogle texto={t.continueGoogle} />
           </form>
 
@@ -108,31 +114,6 @@ export function AccessForm({
         <input type="hidden" name="mode" value={modo} />
         {next ? <input type="hidden" name="next" value={next} /> : null}
         <Honeypot />
-
-        {registro ? (
-          <fieldset className="flex flex-col gap-3">
-            <legend className="eyebrow text-fg-muted mb-3 text-[0.8rem]">{t.roleQuestion}</legend>
-
-            <Eleccion
-              valor="client"
-              elegido={rol}
-              onElegir={setRol}
-              titulo={t.roleClient}
-              pista={t.roleClientHint}
-            />
-            <Eleccion
-              valor="partner"
-              elegido={rol}
-              onElegir={setRol}
-              titulo={t.rolePartner}
-              pista={t.rolePartnerHint}
-            />
-
-            {rol === "partner" ? (
-              <p className="text-fg-muted/70 text-xs text-pretty">{t.partnerNotice}</p>
-            ) : null}
-          </fieldset>
-        ) : null}
 
         <div className="flex flex-col gap-3">
           <label htmlFor="dcm-email" className="text-center text-sm font-semibold">
@@ -276,44 +257,6 @@ function Aviso({ texto }: { readonly texto: string }) {
     >
       {texto}
     </p>
-  );
-}
-
-/** Tarjeta de elección. Es un radio de verdad: funciona con teclado y sin JS. */
-function Eleccion({
-  valor,
-  elegido,
-  onElegir,
-  titulo,
-  pista,
-}: {
-  readonly valor: "client" | "partner";
-  readonly elegido: string;
-  readonly onElegir: (valor: "client" | "partner") => void;
-  readonly titulo: string;
-  readonly pista: string;
-}) {
-  const activo = elegido === valor;
-
-  return (
-    <label
-      className={`flex cursor-pointer gap-3 rounded-(--radius-card) border p-4 transition-colors ${
-        activo ? "border-accent/60 bg-accent/[0.04]" : "border-line hover:border-fg-muted/40"
-      }`}
-    >
-      <input
-        type="radio"
-        name="requestedRole"
-        value={valor}
-        checked={activo}
-        onChange={() => onElegir(valor)}
-        className="accent-accent mt-1 h-4 w-4 shrink-0"
-      />
-      <span className="flex flex-col gap-1">
-        <span className="text-sm">{titulo}</span>
-        <span className="text-fg-muted/70 text-xs text-pretty">{pista}</span>
-      </span>
-    </label>
   );
 }
 

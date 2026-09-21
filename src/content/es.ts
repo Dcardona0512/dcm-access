@@ -470,13 +470,6 @@ export const es: Dictionary = {
     continueEmail: "Continuar con correo",
     continueGoogle: "Continuar con Google",
     separator: "o",
-    roleQuestion: "¿Cómo va a usar DCM ACCESS?",
-    roleClient: "Busco algo",
-    roleClientHint: "Un inmueble, un vehículo, una aeronave, un servicio o un negocio.",
-    rolePartner: "Tengo algo que ofrecer",
-    rolePartnerHint: "Soy proveedor, agente o dueño y quiero publicar oportunidades.",
-    partnerNotice:
-      "Las cuentas de partner pasan por verificación antes de poder publicar. Le escribimos en cuanto revisemos sus datos.",
     sentHeading: "Revise su correo",
     sentBody: "Le mandamos un enlace de acceso a",
     sentHint:

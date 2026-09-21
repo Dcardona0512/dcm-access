@@ -468,13 +468,6 @@ export const en: Dictionary = {
     continueEmail: "Continue with email",
     continueGoogle: "Continue with Google",
     separator: "or",
-    roleQuestion: "How will you use DCM ACCESS?",
-    roleClient: "I'm looking for something",
-    roleClientHint: "A property, a vehicle, an aircraft, a service or a business.",
-    rolePartner: "I have something to offer",
-    rolePartnerHint: "I'm a supplier, agent or owner and I want to list opportunities.",
-    partnerNotice:
-      "Partner accounts go through verification before they can publish. We'll write as soon as we review your details.",
     sentHeading: "Check your email",
     sentBody: "We sent a sign-in link to",
     sentHint:

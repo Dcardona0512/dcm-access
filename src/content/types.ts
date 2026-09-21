@@ -398,12 +398,6 @@ export type Dictionary = {
     readonly continueEmail: string;
     readonly continueGoogle: string;
     readonly separator: string;
-    readonly roleQuestion: string;
-    readonly roleClient: string;
-    readonly roleClientHint: string;
-    readonly rolePartner: string;
-    readonly rolePartnerHint: string;
-    readonly partnerNotice: string;
     readonly sentHeading: string;
     readonly sentBody: string;
     readonly sentHint: string;
