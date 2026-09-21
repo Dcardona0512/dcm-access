@@ -593,24 +593,49 @@ body:has(.dcm-video-layer) .dcm-intro__cell {
     más larga de las dos, «CONECTANDO OPORTUNIDADES», todavía entra holgada en
     un teléfono.
   */
+  display: flex;
+  justify-content: center;
+  margin: 0;
   font-size: clamp(0.875rem, 2.2vw, 1.5rem);
   font-weight: 600;
-  letter-spacing: 0.3em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: var(--c-fg-muted);
-  opacity: 0;
-  transform: translateY(4px);
-  transition:
-    opacity var(--duration-slow) var(--ease-brand),
-    transform var(--duration-slow) var(--ease-brand);
+  /*
+    Ya no entra con un fundido: se RESUELVE, como la palabra. Por eso está
+    visible desde el primer fotograma de su parte y lo que cambia es cada
+    letra. La única concesión es el arranque, cuando todavía no ha empezado.
+  */
+  opacity: 1;
 }
 
-.dcm-intro[data-phase="resolved"] .dcm-intro__descriptor,
-.dcm-intro[data-phase="out"] .dcm-intro__descriptor {
-  /* 0.85 y no 0.7: a 9 px con tracking amplio, la línea tiene que poder
-     leerse de verdad, no solo insinuarse. */
-  opacity: 0.85;
-  transform: none;
+/* El tracking se consigue con el ANCHO DE CELDA, no con `letter-spacing`: es
+   lo que impide que la línea se mueva al cambiar de glifo. Mismo truco que en
+   la palabra, a menor escala. */
+.dcm-intro__lema-cell {
+  display: inline-block;
+  /* 1,05 y no 1,25: con veinticuatro letras, un cuarto de cuadratín de más por
+     celda saca la línea de la pantalla de un teléfono. Medido con la frase
+     larga de las dos, «CONECTANDO OPORTUNIDADES». */
+  width: 1.05em;
+  text-align: center;
+  color: var(--c-fg-muted);
+  opacity: 0.5;
+  transition: opacity var(--duration-fast) var(--ease-brand);
+}
+
+.dcm-intro__lema-cell[data-space] {
+  width: 0.6em;
+}
+
+.dcm-intro__lema-cell[data-resolved] {
+  opacity: 1;
+}
+
+/* Antes de arrancar, invisible: igual que la palabra, para que no haya un
+   destello del texto final antes de que empiece a revolverse. */
+.dcm-intro[data-phase="armed"] .dcm-intro__descriptor {
+  opacity: 0;
 }
 
 /* --- Revelado del sitio -----------------------------------------------------
@@ -695,6 +720,7 @@ html[data-intro="out"] body > footer {
 
   .dcm-intro__rule,
   .dcm-intro__descriptor,
+  .dcm-intro__lema-cell,
   .dcm-intro__cell,
   .dcm-intro__hair {
     transition: none;

@@ -53,42 +53,47 @@ const POOL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
  * seis el revuelto se hacía largo. Aquí se distingue cada sustitución sin que
  * la espera se note.
  */
-const TICK_MS = 55;
+const TICK_MS = 45;
 
 const TIMELINE = {
   /*
     EL TIEMPO ESTÁ DONDE SE LEE, NO DONDE SE REVUELVE.
 
-    La primera versión resolvía la palabra en 1,7 s y la sostenía 1,4. Luego se
-    alargó todo por igual a 2,6 s de revuelto, y quedó al revés de lo que hace
-    falta: mirar caracteres girando cansa enseguida, y lo que de verdad hay que
-    dar tiempo a leer —la marca resuelta y su lema— pasaba de largo.
+    Mirar caracteres girando cansa enseguida; lo que merece tiempo es la marca
+    ya formada con su lema. Así que el revuelto va rápido —la palabra en 1,5 s,
+    el lema pisándole el final— y el sostenido se lleva casi la mitad de la
+    pieza.
 
-    Ahora el revuelto vuelve a acortarse (2,1 s) y el sostenido se duplica
-    (2,8 s). De esos 2,8 hay que descontar los 480 ms que tardan en entrar el
-    filete y el lema, así que quedan más de dos segundos de lectura limpia.
-    Sigue saltándose con cualquier gesto.
+    EL LEMA TAMBIÉN SE RESUELVE. Antes entraba con un fundido mientras la
+    palabra ya estaba quieta, y se leía como dos animaciones distintas pegadas.
+    Resolviéndose encadena con lo anterior: primero se ordena el nombre, luego
+    lo que la marca promete. Arranca ANTES de que ACCESS termine —se solapan
+    150 ms— porque si esperase a que acabara habría un hueco en el que no pasa
+    nada, y ese hueco se lee como que la cosa terminó.
   */
   /** Todo aleatorio hasta aquí. */
-  chaos: 440,
-  dcmFrom: 440,
-  dcmTo: 1200,
-  spaceAt: 1250,
-  accessFrom: 1290,
-  accessTo: 2100,
+  chaos: 380,
+  dcmFrom: 380,
+  dcmTo: 950,
+  spaceAt: 1000,
+  accessFrom: 1030,
+  accessTo: 1550,
+  /** El lema, encadenado con el final de la palabra. */
+  lemaFrom: 1400,
+  lemaTo: 2150,
   /**
-   * Tiempo que la composición permanece quieta DESPUÉS de resolverse la
-   * palabra, contado desde `accessTo`.
+   * Tiempo que la composición permanece quieta DESPUÉS de resolverse el LEMA
+   * —no la palabra—, que es lo último que se ordena.
    *
-   * No es un adorno: el filete y el descriptor tardan 480 ms en entrar, así
-   * que de esta cifra hay que descontarlos. Lo que sobra es el tiempo real de
-   * lectura de "Global Assets • Premium Services • Exclusive Opportunities".
+   * Son dos segundos y medio de lectura limpia: el filete ya está puesto y no
+   * queda nada moviéndose, así que este número es tiempo de leer, no de
+   * esperar a que algo termine de entrar.
    *
    * Deliberadamente NO se escala en móvil: leer cuesta lo mismo en un teléfono
    * que en un portátil. Lo que se acorta en pantallas pequeñas es la
    * animación, no la lectura.
    */
-  holdAfterResolve: 2800,
+  holdAfterResolve: 2500,
   /**
    * Duración total de la salida, que ahora es SECUENCIAL:
    *   0–320 ms    se retira el wordmark
@@ -177,6 +182,22 @@ function revealSchedule(scale: number): readonly number[] {
   });
 }
 
+/**
+ * Momento en que cada letra del lema deja de rotar.
+ *
+ * De izquierda a derecha, como se lee. Los espacios no rotan: separan
+ * palabras, y una palabra que se separa a mitad del revuelto se lee como un
+ * error de maquetación.
+ */
+function lemaSchedule(lema: string, scale: number): readonly number[] {
+  const t = (value: number) => value * scale;
+  const total = Math.max(1, lema.length - 1);
+
+  return [...lema].map((_, index) =>
+    t(TIMELINE.lemaFrom + (index / total) * (TIMELINE.lemaTo - TIMELINE.lemaFrom)),
+  );
+}
+
 type Phase = "armed" | "running" | "resolved" | "out" | "done";
 
 export function AccessIntro({ lema }: { readonly lema: string }) {
@@ -185,6 +206,10 @@ export function AccessIntro({ lema }: { readonly lema: string }) {
   // de hidratación, porque no hay nada aleatorio en el render inicial.
   const [chars, setChars] = useState<readonly string[]>(() => [...TARGET]);
   const [resolved, setResolved] = useState<readonly boolean[]>(() => TARGET.split("").map(() => true));
+  const [charsLema, setCharsLema] = useState<readonly string[]>(() => [...lema]);
+  const [resueltoLema, setResueltoLema] = useState<readonly boolean[]>(() =>
+    [...lema].map(() => true),
+  );
   const [phase, setPhase] = useState<Phase>("armed");
 
   const frame = useRef<number>(0);
@@ -290,8 +315,10 @@ export function AccessIntro({ lema }: { readonly lema: string }) {
 
     const scale = window.innerWidth < 768 ? MOBILE_SCALE : 1;
     const schedule = revealSchedule(scale);
-    // El sostenido se suma al final del scramble; no se escala (ver TIMELINE).
-    const holdAt = TIMELINE.accessTo * scale + TIMELINE.holdAfterResolve;
+    const scheduleLema = lemaSchedule(lema, scale);
+    // El sostenido cuenta desde que termina el LEMA, que es lo último que se
+    // ordena; no se escala en móvil (ver TIMELINE).
+    const holdAt = TIMELINE.lemaTo * scale + TIMELINE.holdAfterResolve;
 
     const started = performance.now();
     // Fuerza que el primer fotograma ya sustituya: así el paso de "armed" a
@@ -310,12 +337,24 @@ export function AccessIntro({ lema }: { readonly lema: string }) {
         lastTick = elapsed;
 
         const nextResolved = schedule.map((at) => elapsed >= at);
+        const nextLema = scheduleLema.map((at) => elapsed >= at);
 
-        setPhase(nextResolved.every(Boolean) ? "resolved" : "running");
+        // «Resuelto» es cuando lo está TODO, palabra y lema: es lo que enciende
+        // el filete y lo que marca el comienzo del tiempo de lectura.
+        const todoHecho = nextResolved.every(Boolean) && nextLema.every(Boolean);
+        setPhase(todoHecho ? "resolved" : "running");
+
         setResolved(nextResolved);
         setChars(
           [...TARGET].map((char, index) =>
             char === " " ? " " : nextResolved[index] ? char : randomChar(),
+          ),
+        );
+
+        setResueltoLema(nextLema);
+        setCharsLema(
+          [...lema].map((char, index) =>
+            char === " " ? " " : nextLema[index] ? char : randomChar(),
           ),
         );
       }
@@ -340,7 +379,13 @@ export function AccessIntro({ lema }: { readonly lema: string }) {
       clearTimeout(exitTimer.current);
       clearTimeout(failsafe.current);
     };
-  }, [dismiss, finish]);
+    /*
+      `lema` entra en la lista porque el bucle lo lee, aunque en la práctica no
+      cambia: el idioma se decide en el servidor y una intro que se remontara a
+      mitad de camino volvería a empezar. Está aquí para que el día que eso deje
+      de ser cierto, el aviso no haya que buscarlo.
+    */
+  }, [dismiss, finish, lema]);
 
   // Cualquier intención de avanzar la salta: nadie debería tener que esperar
   // una animación para usar la página.
@@ -383,7 +428,18 @@ export function AccessIntro({ lema }: { readonly lema: string }) {
         </p>
 
         <span className="dcm-intro__rule" />
-        <span className="dcm-intro__descriptor">{lema}</span>
+        <p className="dcm-intro__descriptor">
+          {charsLema.map((char, index) => (
+            <span
+              key={index}
+              className="dcm-intro__lema-cell"
+              data-space={char === " " || undefined}
+              data-resolved={resueltoLema[index] || undefined}
+            >
+              {char === " " ? " " : char}
+            </span>
+          ))}
+        </p>
       </div>
     </div>
   );
