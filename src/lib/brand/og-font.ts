@@ -15,6 +15,14 @@ import { join } from "node:path";
 
    Se lee del disco y no de la red: una imagen que se genera en el despliegue
    no puede depender de que un servidor de fuentes conteste.
+
+   EFECTO LATERAL QUE CONVIENE CONOCER. Como el subconjunto solo tiene
+   mayúsculas, Satori la usa para las mayúsculas de CUALQUIER texto de la
+   tarjeta y cae a su fuente de reserva para el resto. En la práctica sale
+   bien —el nombre de la marca dentro del párrafo aparece en su propia letra,
+   y las líneas en versales quedan todas iguales—, pero no es casualidad ni
+   diseño: es la consecuencia de subconjuntar. Si algún día se escribe texto
+   corrido en versales en esta tarjeta, saldrá en serif.
    ========================================================================== */
 
 const RUTA = join(process.cwd(), "src/assets/fonts/PlayfairDisplay-Logo.ttf");
