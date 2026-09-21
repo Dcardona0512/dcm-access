@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import type { EmailOtpType } from "@supabase/supabase-js";
 
 import { panelDe } from "@/lib/auth/session";
 import { roles, type Role } from "@/lib/domain/types";
@@ -8,8 +9,19 @@ import { createSessionClient } from "@/lib/supabase/server";
    RETORNO DE LA AUTENTICACIÓN
    ----------------------------------------------------------------------------
    Aquí aterrizan las dos vías: el enlace del correo y la vuelta de Google.
-   Supabase manda un `code` de un solo uso y canjearlo es lo que crea la
-   sesión.
+
+   Y ACEPTA LAS DOS FORMAS EN QUE PUEDE LLEGAR, que no es capricho:
+
+   · `code` — el canje estándar. Lleva detrás un secreto que se guardó en una
+     cookie del navegador que PIDIÓ el enlace, así que solo funciona si se
+     abre en ese mismo navegador. Quien pide el acceso en el ordenador y abre
+     el correo en el teléfono se encuentra con un error incomprensible.
+
+   · `token_hash` + `type` — la verificación directa. No depende de ninguna
+     cookie previa, así que el enlace funciona en cualquier aparato.
+
+   Soportar solo la primera es lo que hace que un acceso por correo «no
+   funcione» sin que nada esté roto.
 
    Después decide a dónde va cada quien. No hay una pantalla intermedia de
    «elige tu panel»: el rol ya está en la base, así que la plataforma sabe
@@ -19,17 +31,22 @@ import { createSessionClient } from "@/lib/supabase/server";
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
+  const tokenHash = url.searchParams.get("token_hash");
+  const tipo = url.searchParams.get("type") as EmailOtpType | null;
   const siguiente = url.searchParams.get("next");
 
   const entrada = new URL("/login", url.origin);
 
-  if (!code) {
+  if (!code && !(tokenHash && tipo)) {
     entrada.searchParams.set("error", "link");
     return NextResponse.redirect(entrada);
   }
 
   const supabase = await createSessionClient();
-  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+  const { data, error } = code
+    ? await supabase.auth.exchangeCodeForSession(code)
+    : await supabase.auth.verifyOtp({ token_hash: tokenHash!, type: tipo! });
 
   if (error || !data.user) {
     // Caducado, ya usado o manipulado. Los tres se ven igual desde fuera.
