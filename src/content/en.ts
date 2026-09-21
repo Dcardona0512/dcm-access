@@ -461,7 +461,7 @@ export const en: Dictionary = {
   auth: {
     loginHeading: "Sign in",
     loginLede: "We send a secure link to your email. No password to remember.",
-    signupHeading: "Create account",
+    signupHeading: "Sign up",
     signupLede: "Start with your email. The rest of the profile comes after.",
     emailLabel: "Email",
     emailPlaceholder: "name@example.com",
@@ -485,7 +485,7 @@ export const en: Dictionary = {
     noAccountHint:
       "If that address has no account, none is created: use «create account».",
     noAccount: "No account yet?",
-    toSignup: "Create one",
+    toSignup: "Sign up",
     haveAccount: "Already have an account?",
     toLogin: "Sign in",
     legal: "By continuing you accept the terms and the privacy policy.",
