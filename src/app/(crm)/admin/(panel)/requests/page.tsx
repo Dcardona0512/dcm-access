@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { AdminButton, AdminHeading } from "@/components/admin/AdminUI";
 import { getRepositories } from "@/lib/data";
+import { catalogoDelPanel } from "@/lib/data/supabase/panel";
 import { leadSourceLabels, leadStatusLabels } from "@/lib/domain/labels";
 import { localized, type Lead, type Opportunity } from "@/lib/domain/types";
 import { formatDateShort } from "@/lib/format";
@@ -29,23 +30,21 @@ import { advanceLead } from "../actions";
 export const dynamic = "force-dynamic";
 
 export default async function AdminRequestsPage() {
-  const { leads, opportunities } = getRepositories();
-  const todas = await leads.list();
+  const { leads } = getRepositories();
+
+  /*
+    El catálogo se pide POR EL PANEL y no por el repositorio público, aunque
+    aquí solo se usen los títulos. La lectura pública ve lo publicado y nada
+    más: una solicitud sobre una ficha reservada —o ya vendida— aparecería sin
+    decir de qué habla, que es justo cuando más falta hace saberlo. Y es una
+    sola consulta, frente a una por solicitud.
+  */
+  const [todas, catalogo] = await Promise.all([leads.list(), catalogoDelPanel()]);
 
   const pendientes = todas.filter((lead) => lead.status === "new");
   const atendidas = todas.filter((lead) => lead.status !== "new");
 
-  /*
-    Las fichas por las que preguntan, en una sola tanda y sin repetir: una
-    misma publicación suele tener varias solicitudes, y pedirla una vez por
-    tarjeta multiplicaría las consultas sin cambiar el resultado.
-  */
-  const ids = [...new Set(todas.map((lead) => lead.opportunityId).filter(Boolean))] as string[];
-  const fichas = new Map<string, Opportunity>();
-
-  for (const encontrada of await Promise.all(ids.map((id) => opportunities.byId(id)))) {
-    if (encontrada) fichas.set(encontrada.id, encontrada);
-  }
+  const fichas = new Map<string, Opportunity>(catalogo.map((ficha) => [ficha.id, ficha]));
 
   return (
     <>
