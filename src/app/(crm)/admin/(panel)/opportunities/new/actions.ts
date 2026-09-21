@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { getAdminSession } from "@/lib/auth/admin";
-import { can, getDemoUser } from "@/lib/auth/roles";
+import { can, TEAM_ROLES } from "@/lib/auth/roles";
+import { requireRole } from "@/lib/auth/session";
 import { categoriesById } from "@/lib/data/demo/seed/categories";
 import { createAdminOpportunities } from "@/lib/data/supabase";
 import { createUploadSlots, verifyUploads, type UploadSlot } from "@/lib/media/storage";
@@ -34,12 +34,19 @@ import { slugify } from "@/lib/utils";
 
 const RESERVED_SLUGS = new Set(["sell"]);
 
+/**
+ * Sesión con permiso para publicar.
+ *
+ * Dos capas, y las dos hacen falta: `requireRole` comprueba QUIÉN entra —el
+ * layout ya lo hizo, pero una server action es una URL a la que se puede
+ * llamar directamente— y `can()` comprueba QUÉ puede hacer ese rol. Un gestor
+ * de contenido entra al panel y no publica; el segundo filtro es el que lo
+ * distingue.
+ */
 async function requireAdmin() {
-  const session = await getAdminSession();
-  if (!session) throw new Error("Sin sesión.");
+  const session = await requireRole(TEAM_ROLES);
 
-  const user = getDemoUser();
-  if (!can(user.role, "create", "opportunities")) {
+  if (!can(session.role, "create", "opportunities")) {
     throw new Error("Sin permiso para publicar oportunidades.");
   }
 

@@ -9,6 +9,7 @@ import type { LeadInput } from "@/lib/data/repositories";
 import { track } from "@/lib/analytics";
 import { isVertical } from "@/lib/domain/types";
 import { defaultLocale, isLocale, type Locale } from "@/lib/i18n/config";
+import { getSession } from "@/lib/auth/session";
 import { checkRateLimit, isHoneypotTripped } from "@/lib/security/rate-limit";
 import { absoluteUrl } from "@/lib/seo";
 
@@ -129,6 +130,14 @@ export async function submitInquiry(
   const porWhatsapp = formData.get("intent") === "whatsapp";
   const telefono = `${parsed.data.phoneCode} ${parsed.data.phone}`;
 
+  /*
+    Si quien pregunta tiene sesión, la consulta queda atada a su cuenta y
+    aparece luego en su panel. Si no la tiene, se guarda igual: preguntar por
+    una ficha no puede exigir registrarse, eso es perder al interesado en la
+    puerta.
+  */
+  const sesion = await getSession();
+
   try {
     const lead = await createLead({
       source: "inquiry",
@@ -141,6 +150,7 @@ export async function submitInquiry(
       },
       vertical,
       opportunityId: parsed.data.opportunityId,
+      clientId: sesion?.userId,
       message: parsed.data.message,
     });
 

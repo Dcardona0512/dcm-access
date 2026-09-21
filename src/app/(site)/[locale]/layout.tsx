@@ -8,6 +8,7 @@ import { AccessIntro } from "@/components/intro/AccessIntro";
 import { AccessIntroGate } from "@/components/intro/AccessIntroGate";
 import { getDictionary } from "@/content";
 import { brand } from "@/content/shared";
+import { getSession, panelDe } from "@/lib/auth/session";
 import { getRepositories, isDemoData } from "@/lib/data";
 import { fontVariables } from "@/lib/fonts";
 import { isLocale, localeMeta, locales, type Locale } from "@/lib/i18n/config";
@@ -76,6 +77,14 @@ export default async function LocaleLayout({
    * no quedara ninguna. La pregunta correcta se la hace a los datos, y el
    * adaptador que aún no sepa responderla cae al comportamiento de antes.
    */
+  /*
+    La sesión, solo para saber si la cabecera dice «Entrar» o «Mi cuenta». El
+    sitio público NO depende de ella para nada más: si Supabase no contestara,
+    la cabecera enseña «Entrar» y el catálogo sigue entero.
+  */
+  const sesion = await getSession();
+  const cuenta = sesion ? panelDe(sesion.role) : null;
+
   const { opportunities } = getRepositories();
   const showDemoNotice = opportunities.hasDemoPublished
     ? await opportunities.hasDemoPublished()
@@ -110,7 +119,7 @@ export default async function LocaleLayout({
           {dict.common.skipToContent}
         </a>
 
-        <SiteHeader locale={locale} dict={dict} />
+        <SiteHeader locale={locale} dict={dict} cuenta={cuenta} />
 
         {/* Compensa la cabecera fija sin empujar el hero, que sangra bajo ella. */}
         <main id="main" className="min-h-dvh">

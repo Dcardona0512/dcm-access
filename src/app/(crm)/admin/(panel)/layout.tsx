@@ -1,35 +1,31 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 import { AdminNav } from "@/components/admin/AdminNav";
 import { Logo } from "@/components/brand/Logo";
-import { getAdminSession } from "@/lib/auth/admin";
-import { getDemoUser, roleLabels } from "@/lib/auth/roles";
-
-import { signOutAdmin } from "../login/actions";
+import { signOut } from "@/lib/auth/actions";
+import { roleLabels, TEAM_ROLES } from "@/lib/auth/roles";
+import { requireRole } from "@/lib/auth/session";
 
 /**
- * Todo lo que hay dentro exige sesión —cuando hay puerta.
+ * Todo lo que hay dentro exige sesión Y ROL DE EQUIPO.
  *
  * La comprobación va en el LAYOUT y no en cada página: una ruta nueva queda
  * protegida por existir, no por acordarse de protegerla. Y `force-dynamic`
  * porque una página del panel prerenderizada serviría datos a quien no ha
  * iniciado sesión.
  *
- * Con `ADMIN_GATE` sin poner, `getAdminSession()` devuelve una sesión de
- * cortesía y esto deja pasar a todo el mundo. Es deliberado y está avisado en
- * la barra lateral.
+ * Aquí se acabó la puerta abierta. Durante un tiempo `ADMIN_GATE` dejaba
+ * entrar a cualquiera que escribiera la dirección —con el catálogo vacío el
+ * riesgo era menor que la fricción— y esa concesión desaparece con la
+ * identidad real: ahora el rol vive en una fila de la base y lo comprueba el
+ * servidor, no una lista de correos en una variable de entorno.
  */
 export const dynamic = "force-dynamic";
 
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
-  const session = await getAdminSession();
-  if (!session) redirect("/admin/login?error=required");
-
-
-  // La matriz de permisos sigue decidiendo el menú; lo que cambia es que ahora
-  // hay una identidad real detrás en lugar de una sesión de demostración.
-  const user = getDemoUser();
+  // Quien no ha entrado va a la puerta; quien ha entrado pero es cliente o
+  // partner va a SU panel. La matriz de permisos sigue decidiendo el menú.
+  const session = await requireRole(TEAM_ROLES, "/admin");
 
   return (
     <div className="flex min-h-dvh flex-col lg:flex-row">
@@ -38,33 +34,22 @@ export default async function PanelLayout({ children }: { children: React.ReactN
           <Logo />
         </Link>
 
-        <AdminNav role={user.role} />
+        <AdminNav role={session.role} />
 
         <div className="border-line mt-auto flex flex-col gap-2 border-t pt-5">
-          <span className="eyebrow text-fg-muted text-[0.75rem]">{roleLabels[user.role].es}</span>
+          <span className="eyebrow text-fg-muted text-[0.75rem]">
+            {roleLabels[session.role].es}
+          </span>
+          <span className="text-fg-muted/70 text-xs break-all">{session.email}</span>
 
-          {session.open ? (
-            // Que se vea. Un panel sin puerta del que uno se olvida es peor
-            // que uno sin puerta del que se acuerda cada vez que lo abre.
-            <p className="border-danger/40 bg-danger/5 text-danger mt-1 rounded-(--radius-card) border px-2.5 py-2 text-[0.8rem] leading-snug text-pretty">
-              Acceso abierto: cualquiera con esta dirección puede publicar.
-              Ponga <code>ADMIN_GATE=on</code> en Vercel para volver a exigir el
-              enlace por correo.
-            </p>
-          ) : (
-            <>
-              <span className="text-fg-muted/70 text-xs break-all">{session.email}</span>
-
-              <form action={signOutAdmin} className="mt-2">
-                <button
-                  type="submit"
-                  className="eyebrow border-line text-fg-muted hover:border-fg-muted/60 hover:text-fg rounded-(--radius-card) border px-2.5 py-1.5 text-[0.75rem] transition-colors"
-                >
-                  Cerrar sesión
-                </button>
-              </form>
-            </>
-          )}
+          <form action={signOut} className="mt-2">
+            <button
+              type="submit"
+              className="eyebrow border-line text-fg-muted hover:border-fg-muted/60 hover:text-fg rounded-(--radius-card) border px-2.5 py-1.5 text-[0.75rem] transition-colors"
+            >
+              Cerrar sesión
+            </button>
+          </form>
         </div>
       </aside>
 

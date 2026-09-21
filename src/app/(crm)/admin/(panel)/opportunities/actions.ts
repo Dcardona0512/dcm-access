@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { getAdminSession } from "@/lib/auth/admin";
+import { TEAM_ROLES } from "@/lib/auth/roles";
+import { requireRole } from "@/lib/auth/session";
 import { cambiarEstado } from "@/lib/data/supabase/panel";
 
 /* ============================================================================
@@ -16,7 +17,7 @@ async function exigirSesion(): Promise<void> {
   // El layout ya guarda el panel, pero una server action es una URL a la que
   // se puede llamar directamente: la comprobación se repite aquí porque este
   // es el sitio donde de verdad se escribe.
-  if (!(await getAdminSession())) throw new Error("Sin sesión.");
+  await requireRole(TEAM_ROLES);
 }
 
 function refrescar(vertical: string, slug: string): void {

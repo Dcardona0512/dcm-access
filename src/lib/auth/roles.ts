@@ -1,14 +1,15 @@
-import type { Role, User } from "@/lib/domain/types";
+import type { Role } from "@/lib/domain/types";
 
 /* ============================================================================
    ROLES Y POLÍTICA DE ACCESO (§22, §40)
    ----------------------------------------------------------------------------
-   La autenticación real todavía no está conectada, pero la AUTORIZACIÓN sí
-   está modelada: una matriz explícita de permisos y una única función `can()`
-   que el CRM consulta de verdad para decidir qué menú y qué acciones muestra.
+   La matriz decide qué PUEDE PEDIR cada rol: qué menú se pinta y qué acciones
+   se aceptan. Es la primera de dos capas.
 
-   Está escrita para traducirse casi literalmente a políticas RLS de Supabase
-   cuando llegue el momento: cada fila de la matriz es una política.
+   La segunda vive en la base, en las políticas de RLS, y es la que de verdad
+   protege: esta se puede rodear llamando a una server action a mano, aquella
+   no se puede rodear de ninguna manera porque decide lo que la base devuelve.
+   Cada fila de esta matriz tiene su política al otro lado.
    ========================================================================== */
 
 export const resources = [
@@ -30,7 +31,7 @@ type Matrix = Readonly<Record<Role, Readonly<Partial<Record<Resource, readonly A
 const ALL: readonly Action[] = ["read", "create", "update", "delete", "approve"];
 
 const permissions: Matrix = {
-  super_admin: {
+  admin: {
     opportunities: ALL,
     providers: ALL,
     leads: ALL,
@@ -57,16 +58,25 @@ const permissions: Matrix = {
     providers: ["read"],
     content: ["read", "create", "update", "delete"],
   },
-  /** El proveedor solo ve lo suyo; el filtrado por `providerId` lo aplica quien consulta. */
-  provider: {
+  /** El partner solo ve lo suyo; el filtrado lo aplica RLS en la base. */
+  partner: {
     opportunities: ["read", "create", "update"],
     leads: ["read"],
   },
-  customer: {
+  client: {
     opportunities: ["read"],
     leads: ["create"],
   },
 };
+
+/**
+ * Los roles que trabajan DENTRO de la plataforma.
+ *
+ * Es la lista que guarda la puerta del CRM. Cliente y partner quedan fuera a
+ * propósito: tienen sus propios paneles y no pintan nada aquí, por mucho que
+ * acierten la dirección.
+ */
+export const TEAM_ROLES: readonly Role[] = ["admin", "broker", "sales", "content_manager"];
 
 export function can(role: Role, action: Action, resource: Resource): boolean {
   return permissions[role][resource]?.includes(action) ?? false;
@@ -78,28 +88,10 @@ export function readableResources(role: Role): readonly Resource[] {
 }
 
 export const roleLabels: Record<Role, { es: string; en: string }> = {
-  super_admin: { es: "Super Admin", en: "Super Admin" },
+  admin: { es: "Administrador", en: "Admin" },
   broker: { es: "Broker", en: "Broker" },
   sales: { es: "Comercial", en: "Sales" },
   content_manager: { es: "Gestor de contenido", en: "Content Manager" },
-  provider: { es: "Proveedor", en: "Provider" },
-  customer: { es: "Cliente", en: "Customer" },
+  partner: { es: "Partner", en: "Partner" },
+  client: { es: "Cliente", en: "Client" },
 };
-
-/**
- * Sesión de demostración.
- *
- * NO es autenticación y no pretende serlo: es un usuario fijo para poder
- * recorrer el CRM. Toda la interfaz que lo usa lo declara abiertamente (§48).
- * Cuando entre Supabase Auth, esta función se sustituye por la lectura de la
- * sesión real y `can()` sigue funcionando sin cambios.
- */
-export function getDemoUser(): User {
-  return {
-    id: "usr-demo-admin",
-    name: "Sesión de demostración",
-    email: "demo@dcm-access.local",
-    role: "super_admin",
-    isDemo: true,
-  };
-}

@@ -32,11 +32,14 @@ import { LocaleSwitcher } from "./LocaleSwitcher";
 const VERTICAL_KEYS = verticalNav.map((item) => item.key);
 
 export function SiteHeader({
+  cuenta,
   locale,
   dict,
 }: {
   readonly locale: Locale;
   readonly dict: Dictionary;
+  /** A dónde lleva el enlace de cuenta, o `null` si nadie ha entrado. */
+  readonly cuenta: string | null;
 }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
@@ -125,6 +128,18 @@ export function SiteHeader({
 
           <div className="flex items-center gap-2 md:gap-4">
             <LocaleSwitcher locale={locale} dict={dict} className="hidden md:flex" />
+
+            {/*
+              Entrar o ir a su panel, según quién mire. Es lo único que la
+              cabecera necesita saber de la sesión: el rol decide el destino en
+              el servidor, aquí solo llega una dirección ya resuelta.
+            */}
+            <Link
+              href={cuenta ?? "/login"}
+              className="eyebrow text-fg-muted hover:text-fg hidden text-[0.75rem] transition-colors md:inline-flex"
+            >
+              {cuenta ? dict.common.account : dict.auth.loginHeading}
+            </Link>
 
             <Button
               href={sellHref}

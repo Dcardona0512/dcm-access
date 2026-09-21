@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 
 import { getRepositories } from "@/lib/data";
-import { can, getDemoUser } from "@/lib/auth/roles";
+import { can, TEAM_ROLES } from "@/lib/auth/roles";
+import { requireRole } from "@/lib/auth/session";
 import { dealStages, leadStatuses, type DealStage, type LeadStatus } from "@/lib/domain/types";
 import { locales } from "@/lib/i18n/config";
 
@@ -20,7 +21,7 @@ function assert(condition: boolean, message: string) {
 }
 
 export async function advanceLead(formData: FormData) {
-  const user = getDemoUser();
+  const user = await requireRole(TEAM_ROLES);
   assert(can(user.role, "update", "leads"), "Sin permiso para actualizar leads.");
 
   const id = String(formData.get("id") ?? "");
@@ -28,14 +29,14 @@ export async function advanceLead(formData: FormData) {
   assert(leadStatuses.includes(status as LeadStatus), "Estado de lead no válido.");
 
   const { leads } = getRepositories();
-  await leads.updateStatus(id, status as LeadStatus, `Actualizado por ${user.name}`);
+  await leads.updateStatus(id, status as LeadStatus, `Actualizado por ${user.email}`);
 
   revalidatePath("/admin/leads");
   revalidatePath("/admin");
 }
 
 export async function moveDeal(formData: FormData) {
-  const user = getDemoUser();
+  const user = await requireRole(TEAM_ROLES);
   assert(can(user.role, "update", "deals"), "Sin permiso para actualizar operaciones.");
 
   const id = String(formData.get("id") ?? "");
@@ -58,7 +59,7 @@ export async function moveDeal(formData: FormData) {
  * partir de lo que mandó un tercero.
  */
 export async function approveSubmission(formData: FormData) {
-  const user = getDemoUser();
+  const user = await requireRole(TEAM_ROLES);
   assert(can(user.role, "create", "opportunities"), "Sin permiso para publicar oportunidades.");
 
   const id = String(formData.get("id") ?? "");
@@ -83,7 +84,7 @@ export async function approveSubmission(formData: FormData) {
 }
 
 export async function rejectSubmission(formData: FormData) {
-  const user = getDemoUser();
+  const user = await requireRole(TEAM_ROLES);
   assert(can(user.role, "create", "opportunities"), "Sin permiso para gestionar solicitudes.");
 
   const id = String(formData.get("id") ?? "");
@@ -96,7 +97,7 @@ export async function rejectSubmission(formData: FormData) {
 }
 
 export async function decideProvider(formData: FormData) {
-  const user = getDemoUser();
+  const user = await requireRole(TEAM_ROLES);
   assert(can(user.role, "approve", "providers"), "Sin permiso para aprobar proveedores.");
 
   const id = String(formData.get("id") ?? "");

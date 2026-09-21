@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { City } from "country-state-city";
 
-import { getAdminSession } from "@/lib/auth/admin";
+import { TEAM_ROLES } from "@/lib/auth/roles";
+import { getSession } from "@/lib/auth/session";
 
 /**
  * Ciudades de una división administrativa.
@@ -10,7 +11,8 @@ import { getAdminSession } from "@/lib/auth/admin";
  * elegida, en vez de obligar a buscarla a mano desde Medellín.
  */
 export async function GET(request: Request) {
-  if (!(await getAdminSession())) {
+  const sesion = await getSession();
+  if (!sesion || !TEAM_ROLES.includes(sesion.role)) {
     return NextResponse.json({ error: "Sin sesión." }, { status: 401 });
   }
 

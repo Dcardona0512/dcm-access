@@ -114,6 +114,7 @@ export function createSupabaseLeads(client: SupabaseClient): LeadRepository {
           message: input.message ?? null,
           vertical: input.vertical ?? null,
           opportunity_id: input.opportunityId ?? null,
+          client_id: input.clientId ?? null,
           timeline_events: [{ at, status: "new" }],
         })
         .select(COLUMNAS)

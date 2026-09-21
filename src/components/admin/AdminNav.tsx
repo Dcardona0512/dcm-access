@@ -30,6 +30,9 @@ const ENTRIES: readonly { href: string; label: string; resource: Resource }[] = 
   { href: "/admin", label: "Resumen", resource: "opportunities" },
   { href: "/admin/catalog", label: "Catálogo", resource: "opportunities" },
   { href: "/admin/publish", label: "Crear publicación", resource: "opportunities" },
+  // Entra al menú porque ahora hay solicitudes de verdad esperando respuesta:
+  // un partner sin revisar es un partner que no puede publicar.
+  { href: "/admin/partners", label: "Partners", resource: "providers" },
 ];
 
 export function AdminNav({ role }: { readonly role: Role }) {

@@ -64,7 +64,7 @@ export function createSupabaseRepositories(): Partial<Repositories> {
 /**
  * Catálogo con la clave secreta: ve TODAS las visibilidades y puede escribir.
  *
- * Solo lo usa el panel, y siempre después de que `getAdminSession()` haya
+ * Solo lo usa el panel, y siempre después de que `requireRole()` haya
  * comprobado quién entra. La clave se salta RLS por completo, así que la
  * autorización tiene que estar resuelta antes de llegar aquí.
  */

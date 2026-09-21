@@ -119,6 +119,8 @@ export type Dictionary = {
     readonly learnMore: string;
     readonly back: string;
     readonly submit: string;
+    readonly signOut: string;
+    readonly account: string;
     readonly submitting: string;
     readonly continue: string;
     readonly previous: string;
@@ -377,6 +379,43 @@ export type Dictionary = {
     readonly successHeading: string;
     readonly successBody: string;
     readonly successWhatsapp: string;
+  };
+
+  /**
+   * Entrar y registrarse.
+   *
+   * Estas pantallas viven fuera de `/[locale]` —una sesión no es contenido
+   * traducible— pero el texto sí se traduce: el idioma sale de la cookie que
+   * el propio sitio ya escribe al visitar `/es` o `/en`.
+   */
+  readonly auth: {
+    readonly loginHeading: string;
+    readonly loginLede: string;
+    readonly signupHeading: string;
+    readonly signupLede: string;
+    readonly emailLabel: string;
+    readonly emailPlaceholder: string;
+    readonly continueEmail: string;
+    readonly continueGoogle: string;
+    readonly separator: string;
+    readonly roleQuestion: string;
+    readonly roleClient: string;
+    readonly roleClientHint: string;
+    readonly rolePartner: string;
+    readonly rolePartnerHint: string;
+    readonly partnerNotice: string;
+    readonly sentHeading: string;
+    readonly sentBody: string;
+    readonly sentHint: string;
+    readonly noAccount: string;
+    readonly toSignup: string;
+    readonly haveAccount: string;
+    readonly toLogin: string;
+    readonly legal: string;
+    readonly errorLink: string;
+    readonly errorDenied: string;
+    readonly errorGoogle: string;
+    readonly errorRequired: string;
   };
 
   readonly legal: {

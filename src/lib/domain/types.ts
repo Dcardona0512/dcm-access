@@ -333,13 +333,25 @@ export type Deal = {
 
 /* --- Roles (§22) ----------------------------------------------------------- */
 
+/**
+ * Los roles de la plataforma.
+ *
+ * Tres están en uso —`admin`, `partner`, `client`— y los otros tres esperan
+ * escritos: cuando haya equipo, `broker`, `sales` y `content_manager` ya
+ * tienen sus permisos definidos en `roles.ts` y su política en la base.
+ *
+ * Se llamaban `super_admin`, `provider` y `customer`. Cambian de nombre para
+ * hablar el mismo idioma que el negocio y que la columna `role` de la base: un
+ * rol que se llama distinto en el código y en la base es un rol que alguien va
+ * a comparar mal.
+ */
 export const roles = [
-  "super_admin",
+  "admin",
   "broker",
   "sales",
   "content_manager",
-  "provider",
-  "customer",
+  "partner",
+  "client",
 ] as const;
 
 export type Role = (typeof roles)[number];

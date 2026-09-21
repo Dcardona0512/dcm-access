@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { getAdminSession } from "@/lib/auth/admin";
+import { TEAM_ROLES } from "@/lib/auth/roles";
+import { getSession } from "@/lib/auth/session";
 
 /* ============================================================================
    BUSCAR UNA DIRECCIÓN
@@ -173,7 +174,8 @@ const CADUCIDAD = 30 * 60 * 1000;
 const cache = new Map<string, { readonly at: number; readonly datos: Resultado[] }>();
 
 export async function GET(request: Request) {
-  if (!(await getAdminSession())) {
+  const sesion = await getSession();
+  if (!sesion || !TEAM_ROLES.includes(sesion.role)) {
     return NextResponse.json({ error: "Sin sesión." }, { status: 401 });
   }
 

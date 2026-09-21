@@ -143,6 +143,14 @@ export type ProviderApplicationInput = {
 
 export type LeadInput = {
   readonly source: LeadSource;
+  /**
+   * Cuenta que hizo la consulta, cuando la persona había iniciado sesión.
+   *
+   * Es lo que hace que una consulta aparezca después en SU panel. Sin ella el
+   * lead sigue siendo válido —preguntar no exige cuenta— pero se queda
+   * huérfano: nadie puede volver a verlo salvo el equipo.
+   */
+  readonly clientId?: string;
   readonly locale: Locale;
   readonly contact: Lead["contact"];
   readonly vertical?: Vertical;
