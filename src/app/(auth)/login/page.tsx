@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { getDictionary } from "@/content";
+import { googleHabilitado } from "@/lib/auth/providers";
 import { getSession, panelDe } from "@/lib/auth/session";
 import { localeDeCookie } from "@/lib/i18n/cookie";
 
@@ -52,7 +53,7 @@ export default async function LoginPage({
       <AccessForm
         dict={dict}
         modo="login"
-        conGoogle={process.env.NEXT_PUBLIC_GOOGLE_AUTH === "on"}
+        conGoogle={await googleHabilitado()}
         next={rutaInterna(uno(sp.next))}
         aviso={error ? avisos[error] : undefined}
       />

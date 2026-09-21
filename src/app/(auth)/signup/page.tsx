@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { getDictionary } from "@/content";
+import { googleHabilitado } from "@/lib/auth/providers";
 import { getSession, panelDe } from "@/lib/auth/session";
 import { localeDeCookie } from "@/lib/i18n/cookie";
 
@@ -34,7 +35,7 @@ export default async function SignupPage() {
       <AccessForm
         dict={dict}
         modo="signup"
-        conGoogle={process.env.NEXT_PUBLIC_GOOGLE_AUTH === "on"}
+        conGoogle={await googleHabilitado()}
       />
     </MarcoDeAcceso>
   );
