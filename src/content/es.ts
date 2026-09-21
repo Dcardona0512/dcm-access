@@ -15,6 +15,7 @@ export const es: Dictionary = {
   brand: {
     taglineLines: ["ACCESO A OPORTUNIDADES", "EXCLUSIVAS"],
     signature: "Activos globales • Servicios premium • Intermediación privada",
+    logoTagline: "Conectando oportunidades",
   },
 
   navLabels: {

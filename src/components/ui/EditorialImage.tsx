@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { AccessMark } from "@/components/brand/AccessMark";
+import { Monograma } from "@/components/brand/Monograma";
 import type { MediaItem, MediaTone } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
 
@@ -110,10 +110,15 @@ function Placeholder({ angle }: { readonly angle: string }) {
 
       {/* Filigrana de la marca, apenas insinuada. */}
       <div className="absolute inset-0 grid place-items-center">
-        <AccessMark
-          className="text-fg h-1/3 max-h-24 w-auto"
+        {/*
+          Medida fija y no una fracción de la placa: el monograma es texto, así
+          que su tamaño sale del cuerpo y no de la altura del contenedor. La
+          horquilla cubre desde la tarjeta pequeña hasta el héroe sin que en
+          ninguno de los dos se lea como un sello pegado encima.
+        */}
+        <Monograma
+          className="text-fg text-[clamp(1.5rem,5vw,2.75rem)]"
           style={{ opacity: "var(--c-plate-mark)" }}
-          weight={6}
         />
       </div>
 

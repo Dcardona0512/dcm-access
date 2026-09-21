@@ -26,6 +26,18 @@ if (!supabaseUrl) {
 }
 
 const nextConfig: NextConfig = {
+  /*
+    La fuente del logotipo viaja con las funciones que dibujan el favicon, el
+    icono de pantalla de inicio y la tarjeta social. Se lee del disco con
+    `readFile`, y el rastreador de dependencias solo incluye lo que ve
+    importado: sin esta línea el archivo se queda fuera del paquete y las tres
+    imágenes fallan en producción aunque funcionen en local.
+  */
+  outputFileTracingIncludes: {
+    "/icon": ["./src/assets/fonts/**"],
+    "/apple-icon": ["./src/assets/fonts/**"],
+    "/[locale]/opengraph-image": ["./src/assets/fonts/**"],
+  },
   images: {
     remotePatterns: supabaseUrl
       ? [

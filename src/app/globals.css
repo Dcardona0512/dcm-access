@@ -467,20 +467,6 @@ body:has(.dcm-video-layer) .dcm-intro__cell {
   padding-inline: var(--spacing-gutter);
 }
 
-.dcm-intro__mark {
-  /* Escala con la ventana, como el wordmark: en pantallas grandes la marca
-     tiene que sostener la composición, no quedar de guarnición. */
-  width: clamp(3rem, 7vw, 5.5rem);
-  height: clamp(3rem, 7vw, 5.5rem);
-  color: var(--c-accent);
-  opacity: 0;
-  transition: opacity var(--duration-slow) var(--ease-brand);
-}
-
-.dcm-intro:not([data-phase="armed"]) .dcm-intro__mark {
-  opacity: 0.5;
-}
-
 /* --- El wordmark ------------------------------------------------------------
    Inter en versalitas, el mismo lenguaje del wordmark del logo. El tracking se
    consigue con el ANCHO DE CELDA en vez de con `letter-spacing`: así cada
@@ -488,11 +474,14 @@ body:has(.dcm-video-layer) .dcm-intro__cell {
 
 .dcm-intro__word {
   display: flex;
+  align-items: stretch;
   justify-content: center;
   margin: 0;
-  font-family: var(--font-sans);
+  /* La serif del logotipo, no la de interfaz: lo que se está resolviendo en
+     pantalla es la marca, y tiene que resolverse con su letra. */
+  font-family: var(--font-logo);
   font-size: clamp(1.5rem, 7vw, 3.5rem);
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1;
   text-transform: uppercase;
   /* Cifras y letras de caja alta con el mismo avance: cero temblor. */
@@ -501,8 +490,14 @@ body:has(.dcm-video-layer) .dcm-intro__cell {
 }
 
 .dcm-intro__cell {
-  display: inline-block;
-  width: 0.92em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Ancho de celda, no `letter-spacing`: cada glifo cae siempre en el mismo
+     sitio y la sustitución no desplaza nada. Sube de 0,92 a 1,02 em porque en
+     una Didone la M y la W avanzan casi un cuadratín entero y a 0,92 se
+     tocaban con la casilla vecina. */
+  width: 1.02em;
   text-align: center;
   /* Lo aún no resuelto vive apagado; al fijarse, se enciende. */
   color: var(--c-fg-muted);
@@ -513,7 +508,41 @@ body:has(.dcm-video-layer) .dcm-intro__cell {
 }
 
 .dcm-intro__cell[data-space] {
-  width: 0.5em;
+  width: 1.1em;
+}
+
+/* Lo que enciende el dorado: ACCESS solo cambia de color cuando se ha fijado,
+   así que el acento marca el final de la resolución y no acompaña al ruido. */
+.dcm-intro__cell[data-part="access"][data-resolved] {
+  color: var(--c-accent);
+}
+
+/* --- Los filetes del logotipo -----------------------------------------------
+   Ocupan su sitio desde el primer fotograma y solo se encienden al resolverse.
+   Si aparecieran al final empujarían las letras, que es justo lo que toda esta
+   pieza evita. */
+
+.dcm-intro__hair {
+  width: 1px;
+  align-self: stretch;
+  margin: 0 0.16em;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity var(--duration-slow) var(--ease-brand);
+}
+
+.dcm-intro__hair[data-resolved] {
+  opacity: 0.3;
+}
+
+.dcm-intro__hair--gold {
+  margin: 0;
+  height: 100%;
+  background: var(--c-accent);
+}
+
+.dcm-intro__hair--gold[data-resolved] {
+  opacity: 1;
 }
 
 .dcm-intro__cell[data-resolved] {
@@ -543,10 +572,10 @@ body:has(.dcm-video-layer) .dcm-intro__cell {
 }
 
 .dcm-intro__descriptor {
-  font-family: var(--font-sans);
-  font-size: 0.5625rem;
-  font-weight: 500;
-  letter-spacing: 0.18em;
+  font-family: var(--font-logo);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
   color: var(--c-fg-muted);
   opacity: 0;
@@ -647,7 +676,7 @@ html[data-intro="out"] body > footer {
   .dcm-intro__rule,
   .dcm-intro__descriptor,
   .dcm-intro__cell,
-  .dcm-intro__mark {
+  .dcm-intro__hair {
     transition: none;
   }
 }

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { AccessMark } from "@/components/brand/AccessMark";
+import { Monograma } from "@/components/brand/Monograma";
 import { cn } from "@/lib/utils";
 
 /**
@@ -26,7 +26,7 @@ export function EmptyState({
         className,
       )}
     >
-      <AccessMark className="text-fg-muted h-8 w-8 opacity-30" weight={7} />
+      <Monograma className="text-fg-muted text-2xl opacity-30" />
       <div className="flex flex-col gap-3">
         <h3 className="font-display text-2xl text-balance">{heading}</h3>
         {body ? <p className="text-fg-muted max-w-[48ch] text-pretty">{body}</p> : null}

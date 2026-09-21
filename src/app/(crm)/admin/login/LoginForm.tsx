@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 
-import { AccessMark } from "@/components/brand/AccessMark";
+import { Monograma } from "@/components/brand/Monograma";
 import { requestMagicLink, type LoginState } from "./actions";
 
 const initial: LoginState = { status: "idle" };
@@ -17,7 +17,7 @@ export function LoginForm({ notice }: { readonly notice?: string }) {
         role="status"
         className="border-accent/30 bg-accent/[0.04] flex flex-col items-center gap-4 rounded-(--radius-card) border px-6 py-12 text-center"
       >
-        <AccessMark className="text-accent h-8 w-8" weight={7} />
+        <Monograma className="text-accent text-2xl" />
         <h2 className="font-display text-xl">Revise su correo</h2>
         <p className="text-fg-muted max-w-[40ch] text-sm text-pretty">
           Si la dirección tiene acceso, le acabamos de enviar un enlace para entrar. Caduca en una

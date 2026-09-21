@@ -53,7 +53,14 @@ export const config = {
     /**
      * Todo excepto: rutas internas de Next, el CRM en /admin, los archivos de
      * SEO servidos en la raíz y cualquier ruta con extensión (assets).
+     *
+     * `icon$` y `apple-icon$` LLEVAN ANCLA, y no es cosmético. Los iconos ya
+     * no son archivos con extensión —los genera `icon.tsx` con la fuente del
+     * logotipo empotrada—, así que sin excepción el proxy los mandaba a
+     * `/es/icon`, que no existe: 307 y detrás un 404, con la pestaña sin
+     * marca. El ancla evita que la excepción se lleve por delante cualquier
+     * ruta futura que empiece por esas letras.
      */
-    "/((?!_next|admin|api|favicon.ico|icon.svg|apple-icon.png|robots.txt|sitemap.xml|manifest.webmanifest|media|.*\\.).*)",
+    "/((?!_next|admin|api|favicon.ico|icon$|apple-icon$|robots.txt|sitemap.xml|manifest.webmanifest|media|.*\\.).*)",
   ],
 };

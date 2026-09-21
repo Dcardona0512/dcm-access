@@ -1,4 +1,4 @@
-import { AccessMark } from "@/components/brand/AccessMark";
+import { Monograma } from "@/components/brand/Monograma";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { getDictionary } from "@/content";
@@ -17,7 +17,7 @@ export default function NotFound() {
   return (
     <Container width="narrow">
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-8 py-40 text-center">
-        <AccessMark className="text-accent h-10 w-10 opacity-50" weight={6} />
+        <Monograma className="text-accent text-3xl opacity-50" />
 
         <div className="flex flex-col gap-4">
           <h1 className="font-display text-display-3 text-balance">

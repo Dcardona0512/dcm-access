@@ -155,7 +155,12 @@ export function organizationSchema(description: string, slogan: string) {
     name: brand.name,
     alternateName: "DCM",
     url: siteUrl,
-    logo: absoluteUrl("/icon.svg"),
+    /*
+      El favicon dejó de ser un SVG estático y pasa a generarse: la marca es
+      tipográfica y un SVG de favicon no carga fuentes. La ruta la sirve
+      `src/app/icon.tsx`.
+    */
+    logo: absoluteUrl("/icon"),
     description,
     slogan,
     foundingLocation: { "@type": "Place", name: "Colombia" },

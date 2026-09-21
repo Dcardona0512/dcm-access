@@ -2,14 +2,18 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { AccessMark } from "@/components/brand/AccessMark";
-
 /* ============================================================================
    EXPERIENCIA DE ENTRADA — TEXT SCRAMBLE
    ----------------------------------------------------------------------------
    Revela DCM ACCESS resolviendo caracteres aleatorios. Nada del sitio cambia:
    el overlay usa los mismos tokens, la misma marca y la misma tipografía que
    ya existen, y desaparece dejando la página exactamente como estaba.
+
+   LA PALABRA NO SOLO SE ORDENA: SE CONVIERTE EN EL LOGOTIPO. Los caracteres
+   giran en la serif de la marca, y al fijarse aparecen los filetes entre las
+   iniciales, el filete dorado ocupa el hueco del espacio y ACCESS se enciende
+   en dorado. Lo que queda en pantalla el último segundo no es el nombre
+   escrito: es el logo, el mismo que está en la cabecera.
 
    Tres decisiones que sostienen todo lo demás:
 
@@ -28,11 +32,18 @@ const TARGET = "DCM ACCESS";
 const SPACE_INDEX = TARGET.indexOf(" ");
 
 /**
- * Repertorio de sustitución. Mayúsculas y dígitos, más unos pocos signos
- * tipográficos del ejemplo del brief. Deliberadamente sin katakana, binario ni
- * símbolos de terminal: eso empujaría la pieza al registro que hay que evitar.
+ * Repertorio de sustitución. Mayúsculas y dígitos, y NADA MÁS.
+ *
+ * Antes llevaba cuatro signos tipográficos. Ya no puede: la fuente del
+ * logotipo viene subconjuntada a las veintiséis mayúsculas, los diez dígitos y
+ * el espacio —es lo que la deja en 9 KB—, así que cualquier otro signo saldría
+ * como un cuadrado vacío. Las mayúsculas van dos veces para que pesen más que
+ * las cifras en el sorteo.
+ *
+ * Deliberadamente sin katakana, binario ni símbolos de terminal: eso empujaría
+ * la pieza al registro que hay que evitar.
  */
-const POOL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ·/#—";
+const POOL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 /** Milisegundos entre sustituciones. Rápido, pero legible. */
 const TICK_MS = 50;
@@ -71,6 +82,56 @@ const TIMELINE = {
 /** En móvil se acorta la parte ANIMADA: la misma coreografía, menos espera. */
 const MOBILE_SCALE = 0.72;
 
+/**
+ * Una casilla del scramble.
+ *
+ * Los filetes se pintan DESDE EL PRIMER FOTOGRAMA, transparentes, y solo se
+ * encienden al resolverse la palabra. Si aparecieran al final ocuparían sitio
+ * de golpe y empujarían las letras: toda la pieza está construida para que
+ * nada se mueva mientras los caracteres giran.
+ */
+function Celda({
+  char,
+  index,
+  resuelta,
+}: {
+  readonly char: string;
+  readonly index: number;
+  readonly resuelta: boolean;
+}) {
+  const esEspacio = char === " ";
+  // Las tres primeras son las iniciales; tras el espacio empieza ACCESS, que
+  // se enciende en dorado.
+  const parte = esEspacio ? "rule" : index < SPACE_INDEX ? "initials" : "access";
+
+  return (
+    <>
+      {/* Filete entre iniciales: va antes de la C y antes de la M. */}
+      {parte === "initials" && index > 0 ? (
+        <span className="dcm-intro__hair" data-resolved={resuelta || undefined} />
+      ) : null}
+
+      <span
+        className="dcm-intro__cell"
+        data-space={esEspacio || undefined}
+        data-part={parte}
+        data-resolved={resuelta || undefined}
+      >
+        {esEspacio ? (
+          /* El hueco entre las dos mitades del nombre es, al resolverse, el
+             filete dorado que las articula en el logotipo. */
+          <span
+            className="dcm-intro__hair dcm-intro__hair--gold"
+            data-resolved={resuelta || undefined}
+          />
+        ) : (
+          char
+        )}
+      </span>
+    </>
+  );
+}
+
 function randomChar(): string {
   return POOL[Math.floor(Math.random() * POOL.length)];
 }
@@ -98,7 +159,7 @@ function revealSchedule(scale: number): readonly number[] {
 
 type Phase = "armed" | "running" | "resolved" | "out" | "done";
 
-export function AccessIntro() {
+export function AccessIntro({ lema }: { readonly lema: string }) {
   // El servidor y el primer render del cliente coinciden: la palabra final,
   // oculta por CSS mientras la fase es "armed". Sin parpadeo y sin desajuste
   // de hidratación, porque no hay nada aleatorio en el render inicial.
@@ -295,22 +356,14 @@ export function AccessIntro() {
       <div className="dcm-intro__glow" />
 
       <div className="dcm-intro__stack">
-        <AccessMark className="dcm-intro__mark" weight={7} />
-
         <p className="dcm-intro__word">
           {chars.map((char, index) => (
-            <span
-              key={index}
-              className="dcm-intro__cell"
-              data-space={char === " " || undefined}
-              data-resolved={resolved[index] || undefined}
-            >
-              {char === " " ? " " : char}
-            </span>
+            <Celda key={index} char={char} index={index} resuelta={resolved[index] ?? false} />
           ))}
         </p>
 
         <span className="dcm-intro__rule" />
+        <span className="dcm-intro__descriptor">{lema}</span>
       </div>
     </div>
   );

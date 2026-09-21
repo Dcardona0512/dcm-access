@@ -1,104 +1,113 @@
 import { brand } from "@/content/shared";
 import { cn } from "@/lib/utils";
 
-import { AccessMark } from "./AccessMark";
+import { Filete, Monograma } from "./Monograma";
 
 /* ============================================================================
-   LOCKUP DE MARCA
+   LOCKUP DE MARCA — D | C | M  ▏ ACCESS
    ----------------------------------------------------------------------------
-   El wordmark se compone con texto real, no con trazados: se selecciona, se
-   lee con lector de pantalla y se ajusta al ancho disponible sin escalar mal.
+   Se compone con TEXTO REAL, no con trazados: se selecciona, lo lee un lector
+   de pantalla, se ajusta al ancho disponible y pesa 9 KB en lugar de los
+   cuarenta o cincuenta que costaría el mismo dibujo en curvas.
 
-   Deliberadamente monocromo. El dorado está reservado para el eyebrow, el
-   filete y el único CTA de la vista (§8); un logo dorado permanente en la
-   cabecera gastaría el acento en el elemento que menos lo necesita.
+   EL DORADO ES PARTE DE LA MARCA, y conviene dejarlo escrito porque la versión
+   anterior de este archivo decía justo lo contrario. El lockup antiguo era
+   monocromo a propósito: la regla de marca reserva el dorado para el eyebrow,
+   el filete y el único CTA de la vista (§8), y un logo dorado gastaba el
+   acento en el elemento que menos lo necesita. El logotipo nuevo trae el
+   filete y ACCESS en dorado de origen, así que esa regla gana una excepción
+   —la marca— y sigue rigiendo para todo lo demás. No es un descuido: es el
+   logotipo.
+
+   Las proporciones salen del original: ACCESS al 45 % del cuerpo de las
+   iniciales, con tracking amplio, y el filete dorado respirando medio cuadratín
+   a cada lado. Van en `em` y no en píxeles, de modo que el lockup entero se
+   escala cambiando una sola medida.
    ========================================================================== */
 
 type LogoProps = {
   readonly variant?: "full" | "mark" | "stacked";
   readonly className?: string;
   /**
-   * Descriptor traducido a mostrar bajo el nombre. Se pasa desde fuera porque
-   * el logo no debe conocer el idioma: solo el footer y las portadas lo usan.
+   * Lema traducido, bajo el lockup. Se pasa desde fuera porque el logo no debe
+   * conocer el idioma: lo usan el pie, la entrada y el acceso al panel.
    */
   readonly descriptor?: string;
 };
 
 export function Logo({ variant = "full", className, descriptor }: LogoProps) {
   if (variant === "mark") {
-    return <AccessMark className={cn("h-7 w-7", className)} title={brand.name} />;
+    return <Monograma className={cn("text-xl", className)} title={brand.name} />;
   }
 
   if (variant === "stacked") {
     return (
-      <span className={cn("flex flex-col items-center gap-4 text-current", className)}>
-        <AccessMark className="h-12 w-12" />
-        <span className="flex flex-col items-center gap-2">
-          <Wordmark />
-          {descriptor ? <Descriptor text={descriptor} /> : null}
-        </span>
+      <span className={cn("flex flex-col items-center gap-3 text-current", className)}>
+        <Wordmark className="text-[1.75rem]" />
+        {descriptor ? <Descriptor text={descriptor} /> : null}
         <span className="sr-only">{brand.name}</span>
       </span>
     );
   }
 
   return (
-    <span className={cn("flex items-center gap-3 text-current", className)}>
-      <AccessMark className="h-9 w-9 shrink-0" />
-      <span className="flex flex-col gap-1">
-        <Wordmark />
-        {descriptor ? <Descriptor text={descriptor} /> : null}
-      </span>
+    <span className={cn("flex flex-col gap-1.5 text-current", className)}>
+      <Wordmark />
+      {descriptor ? <Descriptor text={descriptor} /> : null}
       <span className="sr-only">{brand.name}</span>
     </span>
   );
 }
 
 /**
- * El lockup: DCM ✕ ACCESS.
+ * El lockup.
  *
- * La X sustituye al filete vertical que había antes, y de ahí sale también el
- * correo oficial (`dcmxaccess@`). Tres decisiones la sostienen:
- *
- * 1. NO ES UNA SEXTA LETRA. A tamaño completo se leería "DCMXACCESS". Va al
- *    76 % del cuerpo y a media opacidad, así que el ojo la lee como lo que es:
- *    la articulación entre las dos mitades del nombre.
- *
- * 2. RESPIRA MÁS QUE EL FILETE. Un glifo necesita más aire que una línea de un
- *    píxel, de ahí que el margen suba de 0,35 a 0,44 em. Sin eso la X se pega
- *    a la M y a la A y el conjunto se apelmaza.
- *
- * 3. SE ASIENTA ÓPTICAMENTE. Las mayúsculas de este cuerpo tienen la X algo
- *    alta respecto a su centro visual; el desplazamiento la baja hasta que
- *    descansa en el eje de las otras letras. Es la diferencia entre parecer
- *    puesta a mano y parecer dibujada con el logotipo.
- *
- * Sigue siendo `aria-hidden`: el nombre accesible lo da el `sr-only` de
- * `Logo`, y ahí se pronuncia "DCM ACCESS" sin deletrear el separador.
+ * `items-stretch` reparte a los filetes la altura de la caja de texto, que con
+ * `leading-none` es el cuerpo exacto: quedan un poco más altos que las
+ * mayúsculas, como en el original. ACCESS se centra ópticamente con `self-center`
+ * en lugar de apoyarse en la línea base — a la mitad de cuerpo, alineado abajo
+ * se hundiría.
  */
-function Wordmark() {
+function Wordmark({ className }: { readonly className?: string }) {
   return (
     <span
       aria-hidden="true"
-      /*
-        Más cuerpo y en negrita. El tracking baja de 0.22em a 0.16em: a este
-        tamaño la misma separación desparramaba el lockup y lo sacaba de la
-        cabecera. Las versales necesitan menos aire cuanto más grandes son.
-      */
-      className="text-[1.25rem] leading-none font-bold tracking-[0.16em] whitespace-nowrap uppercase"
+      className={cn(
+        "font-(family-name:--font-logo) flex items-stretch text-[1.35rem] leading-none",
+        "whitespace-nowrap uppercase",
+        className,
+      )}
     >
-      {brand.initials}
-      <span className="mx-[0.44em] inline-block translate-y-[0.045em] align-baseline text-[0.76em] font-normal tracking-normal opacity-55">
-        X
-      </span>
-      Access
+      {[...brand.initials].map((letra, indice) => (
+        <span key={letra} className="flex items-stretch">
+          {indice > 0 ? <Filete /> : null}
+          {letra}
+        </span>
+      ))}
+
+      {/*
+        El filete dorado es el que articula el nombre, y por eso es distinto de
+        los otros dos: va en el acento, a plena opacidad y con el doble de aire
+        a cada lado. Separa las iniciales del sustantivo en vez de separar una
+        letra de otra.
+      */}
+      <Filete className="bg-accent mx-[0.55em] opacity-100" />
+
+      <span className="text-accent self-center text-[0.45em] tracking-[0.34em]">Access</span>
     </span>
   );
 }
 
 function Descriptor({ text }: { readonly text: string }) {
   return (
-    <span aria-hidden="true" className="eyebrow text-fg-muted text-[0.75rem] tracking-[0.2em]">
+    /*
+      En mayúsculas por CSS y no en el diccionario: escrito en mayúsculas de
+      verdad, un lector de pantalla puede deletrearlo letra a letra.
+    */
+    <span
+      aria-hidden="true"
+      className="font-(family-name:--font-logo) text-fg-muted text-[0.6rem] tracking-[0.3em] uppercase"
+    >
       {text}
     </span>
   );

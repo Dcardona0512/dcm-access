@@ -2,7 +2,7 @@
 
 import { useFormStatus } from "react-dom";
 
-import { AccessMark } from "@/components/brand/AccessMark";
+import { Monograma } from "@/components/brand/Monograma";
 import type { Dictionary } from "@/content/types";
 import type { FormState } from "@/lib/forms/state";
 import { cn } from "@/lib/utils";
@@ -80,7 +80,7 @@ export function FormSuccess({
         className,
       )}
     >
-      <AccessMark className="text-accent h-8 w-8" weight={7} />
+      <Monograma className="text-accent text-2xl" />
       <h3 className="font-display text-2xl text-balance">{heading}</h3>
       <p className="text-fg-muted max-w-[52ch] text-pretty">{body}</p>
       {reference ? (

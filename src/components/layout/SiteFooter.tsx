@@ -26,7 +26,12 @@ export function SiteFooter({
         <div className="grid gap-14 py-20 lg:grid-cols-[1.6fr_1fr_1fr] lg:gap-12">
           <div className="flex flex-col gap-6">
             <Link href={to("/")} className="text-fg hover:text-accent w-fit transition-colors">
-              <Logo />
+              {/*
+                Aquí el logotipo SÍ lleva su lema: en el pie hay sitio, y es
+                donde la marca se firma. En la cabecera iría apretando la
+                navegación a cambio de repetir lo que ya dice la página.
+              */}
+              <Logo descriptor={dict.brand.logoTagline} />
             </Link>
             <p className="text-fg-muted max-w-[34ch] text-sm text-pretty">{dict.footer.tagline}</p>
 

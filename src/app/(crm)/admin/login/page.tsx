@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
 
 import { Logo } from "@/components/brand/Logo";
+import { getDictionary } from "@/content";
 import { getAdminSession } from "@/lib/auth/admin";
+import { defaultLocale } from "@/lib/i18n/config";
 import { isSupabaseConfigured } from "@/lib/supabase/server";
 
 import { LoginForm } from "./LoginForm";
@@ -30,7 +32,10 @@ export default async function AdminLoginPage({
     <div className="grid min-h-dvh place-items-center p-6">
       <div className="flex w-full max-w-sm flex-col gap-10">
         <div className="flex flex-col gap-6">
-          <Logo />
+          {/* El panel es una herramienta interna y está en español; el lema
+              sale del diccionario igual que en el sitio para no tener dos
+              versiones del mismo texto. */}
+          <Logo descriptor={getDictionary(defaultLocale).brand.logoTagline} />
           <div className="flex flex-col gap-2">
             <h1 className="font-display text-2xl">Panel de DCM ACCESS</h1>
             <p className="text-fg-muted text-sm text-pretty">

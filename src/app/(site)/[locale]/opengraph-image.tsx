@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og";
 
 import { getDictionary } from "@/content";
 import { brand } from "@/content/shared";
+import { CREMA, fuenteLogo, ORO } from "@/lib/brand/og-font";
 import { isLocale, locales } from "@/lib/i18n/config";
 
 export const alt = "DCM ACCESS — Access to exclusive opportunities";
@@ -15,14 +16,19 @@ export function generateStaticParams() {
 /**
  * Imagen social (§27).
  *
- * Se dibuja con primitivas, sin fuentes externas ni imágenes: así no depende
- * de la red al generarse y no hay ningún activo que pueda faltar. El símbolo
- * se reconstruye con dos rombos recortados, que es la misma geometría del
- * logo expresada con lo que `next/og` sabe pintar.
+ * No depende de la red al generarse: lo único que se carga es la fuente del
+ * logotipo, y se lee del disco. Ningún activo que pueda faltar.
+ *
+ * El lockup se compone aquí a mano —iniciales, filetes, filete dorado y
+ * ACCESS— en lugar de reutilizar el componente de pantalla, porque Satori no
+ * es un navegador: no hereda `font-size` en línea, no conoce las variables CSS
+ * ni las clases de Tailwind, y solo entiende flex. Es el mismo dibujo escrito
+ * en el único lenguaje que sabe leer.
  */
 export default async function OpengraphImage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const dict = getDictionary(isLocale(locale) ? locale : "es");
+  const data = await fuenteLogo();
 
   return new ImageResponse(
     <div
@@ -42,24 +48,30 @@ export default async function OpengraphImage({ params }: { params: Promise<{ loc
 
       <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
         {/*
-            El lockup, no el nombre a secas: la X va reducida y atenuada igual
-            que en la cabecera, para que quien comparta el enlace vea la misma
-            marca que hay en el sitio. Satori no hereda `font-size` en línea
-            como el navegador, así que cada tramo lleva el suyo explícito.
+            El lockup entero, no el nombre a secas: quien comparta el enlace ve
+            la misma marca que hay en la cabecera, con sus filetes y su dorado.
           */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            fontSize: 20,
-            letterSpacing: 8,
-            color: "#A8ABB0",
-            textTransform: "uppercase",
+            fontFamily: "Playfair",
+            fontSize: 44,
+            lineHeight: 1,
+            color: CREMA,
           }}
         >
-          {brand.initials}
-          <span style={{ fontSize: 15, opacity: 0.6, padding: "0 6px" }}>X</span>
-          Access
+          <span style={{ display: "flex" }}>{brand.initials[0]}</span>
+          <Filete />
+          <span style={{ display: "flex" }}>{brand.initials[1]}</span>
+          <Filete />
+          <span style={{ display: "flex" }}>{brand.initials[2]}</span>
+          <div
+            style={{ display: "flex", width: 2, height: 40, margin: "0 22px", background: ORO }}
+          />
+          <span style={{ display: "flex", fontSize: 21, letterSpacing: 7, color: ORO }}>
+            ACCESS
+          </span>
         </div>
 
         <div
@@ -101,29 +113,36 @@ export default async function OpengraphImage({ params }: { params: Promise<{ loc
           {dict.brand.signature}
         </div>
 
-        {/* Las dos hojas del portal, con el vano entre ellas. */}
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <div
-            style={{
-              width: 34,
-              height: 34,
-              borderLeft: "5px solid #C9A96A",
-              borderBottom: "5px solid #C9A96A",
-              transform: "rotate(45deg)",
-            }}
-          />
-          <div
-            style={{
-              width: 34,
-              height: 34,
-              borderRight: "5px solid #C9A96A",
-              borderTop: "5px solid #C9A96A",
-              transform: "rotate(45deg)",
-            }}
-          />
+        {/* El lema, que es lo que cierra el logotipo. Va traducido. */}
+        <div
+          style={{
+            display: "flex",
+            fontFamily: "Playfair",
+            fontSize: 19,
+            letterSpacing: 6,
+            color: "#A8ABB0",
+            textTransform: "uppercase",
+          }}
+        >
+          {dict.brand.logoTagline}
         </div>
       </div>
     </div>,
-    size,
+    { ...size, fonts: [{ name: "Playfair", data, style: "normal", weight: 600 }] },
+  );
+}
+
+/** El filete entre iniciales, en crema atenuada como en pantalla. */
+function Filete() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        width: 2,
+        height: 38,
+        margin: "0 11px",
+        background: "rgba(245,243,239,0.3)",
+      }}
+    />
   );
 }

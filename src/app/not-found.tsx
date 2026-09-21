@@ -1,3 +1,4 @@
+import { Monograma } from "@/components/brand/Monograma";
 import { fontVariables } from "@/lib/fonts";
 import { defaultLocale } from "@/lib/i18n/config";
 
@@ -16,10 +17,13 @@ export default function GlobalNotFound() {
     <html lang={defaultLocale} className={fontVariables}>
       <body className="bg-surface text-fg font-sans antialiased">
         <main className="mx-auto flex min-h-dvh max-w-2xl flex-col items-center justify-center gap-8 px-6 text-center">
-          <svg viewBox="0 0 100 100" className="text-accent h-10 w-10 opacity-60" fill="none">
-            <path d="M45 8 L7 50 L45 92" stroke="currentColor" strokeWidth="8" />
-            <path d="M55 8 L93 50 L55 92" stroke="currentColor" strokeWidth="8" />
-          </svg>
+          {/*
+            Aquí había dos hojas dibujadas a mano: el resto del símbolo viejo,
+            que sobrevivió al cambio de marca porque esta página no pasa por
+            ningún layout y nadie la mira. Ahora lleva el monograma, que es lo
+            que llevan los demás sitios donde solo cabe la marca pequeña.
+          */}
+          <Monograma className="text-accent text-3xl opacity-60" />
 
           <h1 className="font-display text-4xl">Esta página no existe</h1>
           <p className="text-fg-muted">This page does not exist.</p>

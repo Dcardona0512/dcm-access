@@ -78,6 +78,13 @@ export type Dictionary = {
     readonly taglineLines: readonly string[];
     /** Variante para el pie y las imágenes sociales. */
     readonly signature: string;
+    /**
+     * El lema del logotipo, bajo el lockup.
+     *
+     * Se guarda en minúsculas y lo pone en versales el CSS: escrito en
+     * mayúsculas de verdad, un lector de pantalla puede deletrearlo.
+     */
+    readonly logoTagline: string;
   };
 
   /** Etiquetas de navegación, indexadas por la misma clave que las rutas. */
