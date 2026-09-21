@@ -57,8 +57,30 @@ export function createSupabaseRepositories(): Partial<Repositories> {
       —se pierden al reiniciar— pero el formulario no se rompe, y el aviso de
       arriba ya dice que falta configuración.
     */
-    ...(isSupabaseWritable() ? { leads: createSupabaseLeads(createAdminClient()) } : {}),
+    ...(isSupabaseWritable()
+      ? { leads: createSupabaseLeads(createAdminClient()) }
+      : avisoDeLeadsEnMemoria()),
   };
+}
+
+/**
+ * El aviso que faltaba.
+ *
+ * Sin clave secreta los leads caen al adaptador de memoria, y esa caída era
+ * MUDA: el formulario decía «consulta enviada», devolvía su referencia y la
+ * consulta no existía en ninguna parte en cuanto el proceso se reiniciara.
+ * Pasó de verdad, y desde fuera no había ni un solo indicio de por qué.
+ *
+ * Sigue sin romper el sitio —preferimos un formulario que funcione a medias
+ * que una ficha que no se puede abrir— pero ahora lo dice cada vez, en el
+ * registro del servidor, que es donde se mira cuando algo no llega.
+ */
+function avisoDeLeadsEnMemoria(): Record<string, never> {
+  console.warn(
+    "[supabase] Falta SUPABASE_SECRET_KEY: los contactos se guardan EN MEMORIA y " +
+      "desaparecen al reiniciar. No llegarán al panel de solicitudes.",
+  );
+  return {};
 }
 
 /**

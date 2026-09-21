@@ -67,8 +67,14 @@ export function checkRateLimit(
 /**
  * Campo trampa. Un bot rellena todo lo que encuentra; una persona no ve este
  * campo porque está oculto para la vista y para los lectores de pantalla.
+ *
+ * EL NOMBRE NO DICE NADA A PROPÓSITO. Se llamaba `dcm_company_website` y el
+ * autocompletar lo reconoció como lo que su nombre prometía: lo rellenó solo
+ * y tiró una consulta de verdad. Un nombre mudo no se parece a ningún campo
+ * conocido, y por eso no hay nada que autocompletar. La ocultación del
+ * elemento está explicada en `Honeypot`, en `components/ui/Field.tsx`.
  */
-export const HONEYPOT_FIELD = "dcm_company_website";
+export const HONEYPOT_FIELD = "dcm_ref_b";
 
 export function isHoneypotTripped(formData: FormData): boolean {
   const value = formData.get(HONEYPOT_FIELD);

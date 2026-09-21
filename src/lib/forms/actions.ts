@@ -75,9 +75,22 @@ type Guard = { readonly ok: true } | { readonly ok: false; readonly state: FormS
 async function guard(formData: FormData, scope: string, locale: Locale): Promise<Guard> {
   const dict = getDictionary(locale);
 
-  // El bot que rellena el campo trampa recibe un éxito silencioso: no se le
-  // informa de que ha sido detectado, y no se crea ningún lead.
+  /*
+    El bot que rellena el campo trampa recibe un éxito silencioso: no se le
+    informa de que ha sido detectado, y no se crea ningún lead.
+
+    PERO QUEDA ESCRITO EN EL REGISTRO. Esta rama descartó una consulta real
+    —el autocompletar rellenó la trampa por la persona— y no hubo forma de
+    saberlo desde fuera: la pantalla decía «enviada» y la base estaba vacía.
+    El aviso no cambia lo que ve quien envía, que es justo lo que se quiere,
+    pero convierte un silencio absoluto en una línea que se puede buscar el día
+    que alguien diga «hice la solicitud y no llegó».
+  */
   if (isHoneypotTripped(formData)) {
+    console.warn(
+      `[honeypot] Envío descartado en «${scope}». Si esto se repite con personas reales, ` +
+        `el campo trampa está siendo autocompletado y hay que volver a cambiarle el nombre.`,
+    );
     return { ok: false, state: { status: "success" } };
   }
 
@@ -98,10 +111,7 @@ async function createLead(input: LeadInput) {
 
 /* --- Consulta desde una ficha ------------------------------------------------ */
 
-export async function submitInquiry(
-  _previous: FormState,
-  formData: FormData,
-): Promise<FormState> {
+export async function submitInquiry(_previous: FormState, formData: FormData): Promise<FormState> {
   const locale = readLocale(formData);
   const dict = getDictionary(locale);
 
@@ -118,7 +128,8 @@ export async function submitInquiry(
   }
 
   const verticalRaw = formData.get("vertical");
-  const vertical = typeof verticalRaw === "string" && isVertical(verticalRaw) ? verticalRaw : undefined;
+  const vertical =
+    typeof verticalRaw === "string" && isVertical(verticalRaw) ? verticalRaw : undefined;
 
   /*
     Quien pulsa «WhatsApp» quiere seguir por ahí, no en el correo. Pero pasa
@@ -190,8 +201,7 @@ function enlaceWhatsapp(
   const slugRaw = formData.get("slug");
 
   const vertical = typeof verticalRaw === "string" && isVertical(verticalRaw) ? verticalRaw : null;
-  const slug =
-    typeof slugRaw === "string" && /^[a-z0-9-]{1,120}$/.test(slugRaw) ? slugRaw : null;
+  const slug = typeof slugRaw === "string" && /^[a-z0-9-]{1,120}$/.test(slugRaw) ? slugRaw : null;
 
   const enlace = vertical && slug ? absoluteUrl(`/${locale}/${vertical}/${slug}`) : null;
 
@@ -208,10 +218,7 @@ function enlaceWhatsapp(
 
 /* --- Contacto general ---------------------------------------------------------- */
 
-export async function submitContact(
-  _previous: FormState,
-  formData: FormData,
-): Promise<FormState> {
+export async function submitContact(_previous: FormState, formData: FormData): Promise<FormState> {
   const locale = readLocale(formData);
   const dict = getDictionary(locale);
 

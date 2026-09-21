@@ -355,12 +355,36 @@ export function CheckboxGroup({
 /**
  * Campo trampa. Oculto para la vista y para los lectores de pantalla, pero
  * presente en el DOM: los bots lo rellenan, las personas no lo ven (§40).
+ *
+ * ESTO SE COMIÓ UNA CONSULTA REAL, y conviene que quede escrito por qué. El
+ * campo se llamaba `dcm_company_website`, llevaba una etiqueta que decía
+ * «Website» y se escondía sacándolo de la pantalla con una posición negativa.
+ * Las tres cosas juntas son exactamente el perfil que el autocompletar de
+ * Chrome y los gestores de contraseñas buscan para rellenar la web de una
+ * empresa: no leen píxeles, leen nombres y etiquetas, y un campo desplazado
+ * sigue siendo para ellos un campo normal. Lo rellenaron por la persona, la
+ * trampa saltó y la consulta se descartó sin que nadie se enterara.
+ *
+ * De ahí las tres defensas de ahora:
+ *
+ * · `display:none`. Es la única ocultación que el autocompletar respeta de
+ *   verdad; la posición negativa no lo es.
+ * · SIN ETIQUETA Y CON NOMBRE MUDO. La heurística se apoya en el texto de la
+ *   etiqueta y en el nombre del campo. Sin ninguna de las dos pistas no hay
+ *   nada que reconocer.
+ * · `autoComplete="off"` se queda, pero como el último de la lista y no como
+ *   el primero: los navegadores lo ignoran cuando creen saber más.
  */
 export function Honeypot() {
   return (
-    <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
-      <label htmlFor={HONEYPOT_FIELD}>Website</label>
-      <input id={HONEYPOT_FIELD} name={HONEYPOT_FIELD} type="text" tabIndex={-1} autoComplete="off" />
+    <div aria-hidden="true" style={{ display: "none" }}>
+      <input
+        id={HONEYPOT_FIELD}
+        name={HONEYPOT_FIELD}
+        type="text"
+        tabIndex={-1}
+        autoComplete="off"
+      />
     </div>
   );
 }
