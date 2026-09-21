@@ -48,28 +48,34 @@ const POOL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 /**
  * Milisegundos entre sustituciones.
  *
- * Sube de 50 a 66: a cincuenta el cambio de glifo era casi un parpadeo y la
- * palabra se leía como ruido. A sesenta y seis se distingue cada sustitución,
- * que es lo que hace que parezca un sistema resolviendo y no una pantalla
- * temblando.
+ * Cincuenta y cinco, después de probar los dos extremos: a cincuenta el cambio
+ * de glifo era casi un parpadeo y la palabra se leía como ruido; a sesenta y
+ * seis el revuelto se hacía largo. Aquí se distingue cada sustitución sin que
+ * la espera se note.
  */
-const TICK_MS = 66;
+const TICK_MS = 55;
 
 const TIMELINE = {
   /*
-    Toda la coreografía va una vez y media más lenta que la primera versión.
-    Lo que se gana no es espectáculo: a la velocidad anterior las tres
-    iniciales se fijaban antes de que el ojo llegara a mirarlas, y ACCESS
-    entero se resolvía en menos de lo que dura leerlo. Se sigue pudiendo
-    saltar con cualquier gesto.
+    EL TIEMPO ESTÁ DONDE SE LEE, NO DONDE SE REVUELVE.
+
+    La primera versión resolvía la palabra en 1,7 s y la sostenía 1,4. Luego se
+    alargó todo por igual a 2,6 s de revuelto, y quedó al revés de lo que hace
+    falta: mirar caracteres girando cansa enseguida, y lo que de verdad hay que
+    dar tiempo a leer —la marca resuelta y su lema— pasaba de largo.
+
+    Ahora el revuelto vuelve a acortarse (2,1 s) y el sostenido se duplica
+    (2,8 s). De esos 2,8 hay que descontar los 480 ms que tardan en entrar el
+    filete y el lema, así que quedan más de dos segundos de lectura limpia.
+    Sigue saltándose con cualquier gesto.
   */
   /** Todo aleatorio hasta aquí. */
-  chaos: 520,
-  dcmFrom: 520,
-  dcmTo: 1500,
-  spaceAt: 1560,
-  accessFrom: 1600,
-  accessTo: 2620,
+  chaos: 440,
+  dcmFrom: 440,
+  dcmTo: 1200,
+  spaceAt: 1250,
+  accessFrom: 1290,
+  accessTo: 2100,
   /**
    * Tiempo que la composición permanece quieta DESPUÉS de resolverse la
    * palabra, contado desde `accessTo`.
@@ -82,7 +88,7 @@ const TIMELINE = {
    * que en un portátil. Lo que se acorta en pantallas pequeñas es la
    * animación, no la lectura.
    */
-  holdAfterResolve: 1400,
+  holdAfterResolve: 2800,
   /**
    * Duración total de la salida, que ahora es SECUENCIAL:
    *   0–320 ms    se retira el wordmark

@@ -584,7 +584,16 @@ body:has(.dcm-video-layer) .dcm-intro__cell {
 
 .dcm-intro__descriptor {
   font-family: var(--font-logo);
-  font-size: 0.6875rem;
+  /*
+    El lema iba a 11 px fijos, heredados de cuando era una línea de apoyo en
+    letra de interfaz. Debajo de una marca que ocupa media pantalla se leía
+    como el pie de página de un contrato. Ahora crece con la ventana igual que
+    la palabra, en la proporción que tiene en el logotipo —en torno a un
+    cuarto del cuerpo de las iniciales—, y con el tope puesto donde la frase
+    más larga de las dos, «CONECTANDO OPORTUNIDADES», todavía entra holgada en
+    un teléfono.
+  */
+  font-size: clamp(0.875rem, 2.2vw, 1.5rem);
   font-weight: 600;
   letter-spacing: 0.3em;
   text-transform: uppercase;
