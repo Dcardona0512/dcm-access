@@ -62,6 +62,9 @@ export function SiteFooter({
             </FooterColumn>
 
             <FooterColumn heading={dict.footer.contactHeading}>
+              {/* Vender vive aquí y no en la cabecera: la barra es para
+                  explorar, y quien viene a ofrecer algo llega buscándolo. */}
+              <FooterLink href={to("/sell")}>{dict.sell.eyebrow}</FooterLink>
               <FooterLink href={to(navHrefs.contact)}>{dict.navLabels.contact}</FooterLink>
               <FooterLink href={`mailto:${contact.email}`}>{contact.email}</FooterLink>
               {contact.phone ? (

@@ -488,6 +488,29 @@ export const en: Dictionary = {
     errorRequired: "Sign in to continue.",
   },
 
+  sell: {
+    eyebrow: "Sell",
+    heading: "Put your asset in a broker's hands",
+    lede: "Tell us what you have, we ask the questions that category needs, and we prepare and publish the listing. You fill in no forms.",
+    chooseHeading: "What would you like to sell?",
+    steps: [
+      {
+        title: "Message us",
+        body: "Pick the category and WhatsApp opens with the message ready. No account, no sign-up.",
+      },
+      {
+        title: "Answer a few questions",
+        body: "We send what we need to know for that category, and you send the photos in the same chat.",
+      },
+      {
+        title: "We publish and filter",
+        body: "We prepare the listing, publish it and handle the enquiries. You only talk to serious buyers.",
+      },
+    ],
+    cta: "Message on WhatsApp",
+    note: "Enquiries come to us. We coordinate viewings and stay with the negotiation through to closing.",
+  },
+
   legal: {
     heading: "Legal",
     lede: "Terms, policies and disclaimers governing the use of the platform.",

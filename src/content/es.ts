@@ -490,6 +490,29 @@ export const es: Dictionary = {
     errorRequired: "Inicie sesión para continuar.",
   },
 
+  sell: {
+    eyebrow: "Vender",
+    heading: "Ponga su activo en manos de un intermediario",
+    lede: "Nos cuenta qué tiene, le hacemos las preguntas de esa categoría y nosotros preparamos y publicamos la ficha. Usted no rellena formularios.",
+    chooseHeading: "¿Qué quiere vender?",
+    steps: [
+      {
+        title: "Escríbanos",
+        body: "Elija la categoría y se abre WhatsApp con el mensaje listo. No hace falta cuenta ni registro.",
+      },
+      {
+        title: "Responda unas preguntas",
+        body: "Le enviamos lo que necesitamos saber de esa categoría y nos manda las fotos por el mismo chat.",
+      },
+      {
+        title: "Publicamos y filtramos",
+        body: "Preparamos la ficha, la publicamos y atendemos a los interesados. Usted solo habla con quien va en serio.",
+      },
+    ],
+    cta: "Escribir por WhatsApp",
+    note: "Los interesados nos escriben a nosotros. Coordinamos la visita y acompañamos la negociación hasta el cierre.",
+  },
+
   legal: {
     heading: "Legal",
     lede: "Términos, políticas y descargos que rigen el uso de la plataforma.",

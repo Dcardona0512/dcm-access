@@ -32,6 +32,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
       changeFrequency: "daily" as const,
     })),
+    // La entrada de la oferta: es la página que trae inventario, así que pesa
+    // más que el resto de las estáticas.
+    { path: "/sell", priority: 0.8, changeFrequency: "monthly" },
     { path: "/motors/sell", priority: 0.6, changeFrequency: "monthly" },
     { path: "/contact", priority: 0.5, changeFrequency: "monthly" },
     ...legalSlugs.map((slug) => ({

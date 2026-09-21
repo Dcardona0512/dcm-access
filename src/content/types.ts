@@ -416,6 +416,24 @@ export type Dictionary = {
     readonly errorRequired: string;
   };
 
+  /**
+   * Vender a través de DCM ACCESS.
+   *
+   * No hay formulario: se elige la categoría y se abre WhatsApp con el mensaje
+   * escrito. La conversación la lleva una persona —y pronto un bot que hace
+   * las preguntas de esa categoría—, que para quien vende un carro es mucho
+   * menos trabajo que rellenar veinte campos en el móvil.
+   */
+  readonly sell: {
+    readonly eyebrow: string;
+    readonly heading: string;
+    readonly lede: string;
+    readonly chooseHeading: string;
+    readonly steps: readonly { readonly title: string; readonly body: string }[];
+    readonly cta: string;
+    readonly note: string;
+  };
+
   readonly legal: {
     readonly heading: string;
     readonly lede: string;

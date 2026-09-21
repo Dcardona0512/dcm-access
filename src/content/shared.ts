@@ -32,15 +32,22 @@ export const brand = {
 export const contact = {
   email: process.env.NEXT_PUBLIC_DCM_EMAIL ?? "dcmxaccess@gmail.com",
   phone: process.env.NEXT_PUBLIC_DCM_PHONE ?? "",
-  /** Solo dígitos con indicativo de país: es el formato que exige wa.me. */
-  whatsapp: process.env.NEXT_PUBLIC_DCM_WHATSAPP ?? "573205088849",
   /**
-   * Segundo número, el de quien atiende a los interesados en una ficha.
+   * El número de la plataforma. Solo dígitos con indicativo, que es lo que
+   * exige wa.me.
    *
-   * Son dos líneas distintas a propósito: por la primera entra quien QUIERE
-   * VENDER y hay que valorar lo que trae; por esta entra quien quiere COMPRAR
-   * algo ya publicado. Mezclarlas obligaría a adivinar en cada mensaje de qué
-   * lado de la mesa está quien escribe.
+   * AHORA ES UNO SOLO, y antes eran dos: uno para quien venía a vender y otro
+   * para quien preguntaba por una ficha. Se juntan porque el segundo era una
+   * línea personal que no debe recibir trabajo, y porque es este número el que
+   * atenderá el bot: quien escribe elige en el primer mensaje de qué lado de
+   * la mesa está, y eso lo clasifica mejor que tener dos líneas que hay que
+   * recordar cuál es cuál.
+   */
+  whatsapp: process.env.NEXT_PUBLIC_DCM_WHATSAPP ?? "573222607394",
+  /**
+   * Se conserva el nombre porque lo usan la ficha y el formulario de contacto,
+   * pero apunta al mismo sitio. El día que vuelva a haber dos líneas —una
+   * comercial y otra de soporte, por ejemplo— solo cambia este valor.
    */
   whatsappSales: process.env.NEXT_PUBLIC_DCM_WHATSAPP_SALES ?? "573222607394",
   baseCity: "Medellín",
