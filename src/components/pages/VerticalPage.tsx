@@ -9,7 +9,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Eyebrow, Section, SectionHeading } from "@/components/ui/Section";
 import { getDictionary } from "@/content";
 import { getRepositories } from "@/lib/data";
-import { localized, type MediaTone, type Vertical } from "@/lib/domain/types";
+import type { MediaTone, Vertical } from "@/lib/domain/types";
 import { isLocale, localizePath } from "@/lib/i18n/config";
 import { breadcrumbSchema, buildMetadata, jsonLd } from "@/lib/seo";
 
@@ -71,9 +71,13 @@ export async function VerticalPage({
   const copy = dict.verticals[vertical];
 
   const { opportunities, categories } = getRepositories();
-  const [results, verticalCategories, allCategories] = await Promise.all([
+  /*
+    Las categorías de la vertical ya no se piden: solo daban título a la
+    sección de epígrafes que se retiró. Las de todo el catálogo sí, porque
+    cada tarjeta necesita la suya.
+  */
+  const [results, allCategories] = await Promise.all([
     opportunities.search({ vertical, sort: "newest", limit: 6 }),
-    categories.byVertical(vertical),
     categories.list(),
   ]);
 
@@ -184,44 +188,22 @@ export async function VerticalPage({
           </Container>
         </section>
 
-        {/* --- Qué se puede pedir aquí (§3) --------------------------------- */}
-        <Section surface="raised" width="wide" divider>
-          <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] lg:gap-24">
-            <SectionHeading
-              eyebrow={dict.home.verticals.eyebrow}
-              heading={
-                verticalCategories.length > 0
-                  ? localized(verticalCategories[0].name, locale)
-                  : copy.eyebrow
-              }
-              size="sm"
-              className="lg:sticky lg:top-28 lg:self-start"
-            />
+        {/*
+          AQUÍ HABÍA «Categorías»: la lista de epígrafes de la sección en dos
+          columnas, con su encuadre regulatorio debajo. Se retira de todas las
+          verticales, igual que en la de vehículos.
 
-            <div className="flex flex-col gap-10">
-              <ul className="border-line grid gap-x-10 border-t sm:grid-cols-2">
-                {copy.offerings.map((offering) => (
-                  <li
-                    key={offering}
-                    className="border-line text-fg-muted flex items-center gap-3 border-b py-3.5 text-sm"
-                  >
-                    <span className="bg-accent-dim/60 h-px w-4 shrink-0" aria-hidden="true" />
-                    {offering}
-                  </li>
-                ))}
-              </ul>
+          Es la prosa que sostenía la página cuando no había nada publicado.
+          Ahora lo que se pide se ve, y una lista que promete «apartamentos» o
+          «vuelos charter» encima de las fichas solo separa la portada de la
+          categoría de lo que hay dentro. El texto sigue en el diccionario,
+          que lo usa la portada.
 
-              {/* Encuadre regulatorio en aviación, seguridad y blindados
-                (§3, §26): dónde termina la intermediación y empieza el
-                proveedor habilitado. */}
-              {copy.compliance ? (
-                <p className="border-accent/25 bg-accent/[0.03] text-fg-muted rounded-(--radius-card) border px-5 py-4 text-sm text-pretty">
-                  {copy.compliance}
-                </p>
-              ) : null}
-            </div>
-          </div>
-        </Section>
+          Nota para quien vuelva: con esto desaparece del sitio el único lugar
+          donde se leía el encuadre de aeronaves y blindados. Sigue publicado
+          en la página legal —`dict.legal`—, pero si alguna vez conviene que se
+          vea junto al inventario, el sitio es la ficha, no una sección aparte.
+        */}
 
         {/* --- Oportunidades publicadas ------------------------------------- */}
         <Section id="publicadas" width="wide" divider>

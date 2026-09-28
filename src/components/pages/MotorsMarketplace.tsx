@@ -320,31 +320,16 @@ export async function MotorsMarketplace({
           ) : null}
         </Section>
 
-        {/* --- La prosa de la categoría, ya sin estorbar -------------------- */}
-        <Section surface="raised" width="wide" divider>
-          <SectionHeading eyebrow={copy.eyebrow} heading={market.offeringsHeading} size="sm" />
+        {/*
+          AQUÍ HABÍA «Lo que nos puedes pedir»: la lista de ocho epígrafes en
+          dos columnas y el encuadre regulatorio de blindados. Se retira.
 
-          <div className="mt-10 flex flex-col gap-10">
-            <ul className="border-line grid gap-x-10 border-t sm:grid-cols-2">
-              {copy.offerings.map((offering) => (
-                <li
-                  key={offering}
-                  className="border-line text-fg-muted flex items-center gap-3 border-b py-3.5 text-sm"
-                >
-                  <span className="bg-accent-dim/60 h-px w-4 shrink-0" aria-hidden="true" />
-                  {offering}
-                </li>
-              ))}
-            </ul>
-
-            {/* Encuadre regulatorio de blindados y seguridad (§3, §26). */}
-            {copy.compliance ? (
-              <p className="border-accent/25 bg-accent/[0.03] text-fg-muted rounded-(--radius-card) border px-5 py-4 text-sm text-pretty">
-                {copy.compliance}
-              </p>
-            ) : null}
-          </div>
-        </Section>
+          Era la prosa de la categoría heredada de cuando no había inventario:
+          con la parrilla llena, una lista que promete «carros y motos» debajo
+          de los vehículos que se pueden ver y pedir no añade nada y alarga la
+          página. El texto sigue en el diccionario (`verticals.motors`) porque
+          lo usa la portada.
+        */}
       </div>
     </>
   );
