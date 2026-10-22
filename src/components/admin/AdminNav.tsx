@@ -38,6 +38,10 @@ const ENTRIES: readonly { href: string; label: string; resource: Resource }[] = 
   // menú que se llena sola, sin que nadie del equipo haga nada: por eso está,
   // y por eso lo pendiente se cuenta dentro.
   { href: "/admin/requests", label: "Solicitudes", resource: "leads" },
+  // El vídeo se sube una vez y sale a las redes desde aquí. Va con `content`
+  // y no con `opportunities`: publicar en las cuentas de la casa no es trabajo
+  // de ventas, y la matriz ya lo dice.
+  { href: "/admin/social", label: "Redes", resource: "content" },
 ];
 
 export function AdminNav({ role }: { readonly role: Role }) {
