@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 
+import { contact } from "@/content/shared";
 import { TEAM_ROLES } from "@/lib/auth/roles";
 import { getSession } from "@/lib/auth/session";
+import { siteUrl } from "@/lib/seo";
 
 /* ============================================================================
    BUSCAR UNA DIRECCIÓN
@@ -134,8 +136,12 @@ async function buscarEnOSM(q: string, pais: string): Promise<Resultado[]> {
 
   const respuesta = await fetch(url, {
     headers: {
-      // Lo exige su política de uso: quién consulta y dónde reclamar.
-      "User-Agent": "DCM-ACCESS/1.0 (https://dcmxaccess.vercel.app; dcmxaccess@gmail.com)",
+      /*
+        Lo exige su política de uso: quién consulta y dónde reclamar. El
+        dominio sale de `siteUrl` y no escrito a mano, que es como se quedó
+        apuntando al anterior cuando el sitio cambió de dirección.
+      */
+      "User-Agent": `DCM-ACCESS/1.0 (${siteUrl}; ${contact.email})`,
       "Accept-Language": "es",
     },
     signal: AbortSignal.timeout(6000),
